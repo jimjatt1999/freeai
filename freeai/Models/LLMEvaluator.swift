@@ -167,4 +167,87 @@ class LLMEvaluator {
         running = false
         return output
     }
+    
+    // Generate a streaming response
+    func generateStream(modelName: String, thread: Thread, systemPrompt: String) -> AsyncThrowingStream<String, Error> {
+        return AsyncThrowingStream { continuation in
+            Task {
+                guard !running else {
+                    continuation.finish()
+                    return
+                }
+                
+                running = true
+                cancelled = false
+                output = ""
+                startTime = Date()
+                var lastOutput = ""
+                
+                do {
+                    let modelContainer = try await load(modelName: modelName)
+                    
+                    // augment the prompt as needed
+                    let promptHistory = modelContainer.configuration.getPromptHistory(thread: thread, systemPrompt: systemPrompt)
+                    
+                    if modelContainer.configuration.modelType == .reasoning {
+                        isThinking = true
+                    }
+                    
+                    // each time you generate you will get something new
+                    MLXRandom.seed(UInt64(Date.timeIntervalSinceReferenceDate * 1000))
+                    
+                    try await modelContainer.perform { context in
+                        let input = try await context.processor.prepare(input: .init(messages: promptHistory))
+                        return try MLXLMCommon.generate(
+                            input: input, parameters: generateParameters, context: context
+                        ) { tokens in
+                            
+                            var cancelled = false
+                            Task { @MainActor in
+                                cancelled = self.cancelled
+                            }
+                            
+                            // update the output -- this will make the view show the text as it generates
+                            if tokens.count % displayEveryNTokens == 0 {
+                                let text = context.tokenizer.decode(tokens: tokens)
+                                Task { @MainActor in
+                                    self.output = text
+                                    
+                                    // Send just the new characters added since last update
+                                    if text.count > lastOutput.count {
+                                        let newContent = String(text.dropFirst(lastOutput.count))
+                                        if !newContent.isEmpty {
+                                            continuation.yield(newContent)
+                                        }
+                                        lastOutput = text
+                                    }
+                                }
+                            }
+                            
+                            if tokens.count >= maxTokens || cancelled {
+                                return .stop
+                            } else {
+                                return .more
+                            }
+                        }
+                    }
+                    
+                    // Make sure we've sent all the output
+                    if output != lastOutput {
+                        let finalContent = String(output.dropFirst(lastOutput.count))
+                        if !finalContent.isEmpty {
+                            continuation.yield(finalContent)
+                        }
+                    }
+                    
+                    continuation.finish()
+                    
+                } catch {
+                    continuation.finish(throwing: error)
+                }
+                
+                running = false
+            }
+        }
+    }
 }

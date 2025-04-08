@@ -2,7 +2,6 @@
 //  FreeModeView.swift
 //  free ai
 //
-//  Created by Jordan Singer on 4/8/24.
 //
 
 import SwiftUI
@@ -41,10 +40,48 @@ struct FreeModeView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                if contentCards.isEmpty {
-                    emptyStateView
-                } else {
-                    contentListView
+                // Header with lowercased name
+                VStack(spacing: 0) {
+                    HStack {
+                        Button {
+                            showChat = false
+                        } label: {
+                            Image(systemName: "chevron.left")
+                                .font(.system(size: 18, weight: .semibold))
+                        }
+                        
+                        Spacer()
+                        
+                        Text("freestyle")
+                            .font(.title)
+                            .fontWeight(.bold)
+                        
+                        Spacer()
+                        
+                        HStack(spacing: 16) {
+                            // Saved/All toggle
+                            Button {
+                                appManager.playHaptic()
+                                showingSavedCards.toggle()
+                            } label: {
+                                Image(systemName: showingSavedCards ? "bookmark.fill" : "bookmark")
+                                    .foregroundColor(.blue)
+                            }
+                            
+                            // Settings
+                            NavigationLink(destination: FreeModeSettingsView()) {
+                                Image(systemName: "gearshape")
+                                    .font(.system(size: 18))
+                            }
+                        }
+                    }
+                    .padding()
+                    
+                    if contentCards.isEmpty {
+                        emptyStateView
+                    } else {
+                        contentListView
+                    }
                 }
                 
                 VStack {
@@ -56,44 +93,7 @@ struct FreeModeView: View {
                     }
                 }
             }
-            .navigationTitle("Freestyle")
-            .toolbar {
-                // Leading: Back to Chat button
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button {
-                        showChat = false
-                    } label: {
-                        HStack(spacing: 6) {
-                            Image(systemName: "chevron.left")
-                            Text("Chat")
-                        }
-                        .foregroundColor(.blue)
-                    }
-                }
-                
-                // Trailing: Model selector and settings
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    HStack(spacing: 16) {
-                        // Saved/All toggle
-                        Button {
-                            appManager.playHaptic()
-                            showingSavedCards.toggle()
-                        } label: {
-                            Image(systemName: showingSavedCards ? "bookmark.fill" : "bookmark")
-                                .foregroundColor(.blue)
-                        }
-                        
-                        // Settings
-                        NavigationLink(destination: FreeModeSettingsView()) {
-                            Image(systemName: "gearshape")
-                                .foregroundColor(.primary)
-                        }
-                        
-                        // Model picker
-                        modelPickerButton
-                    }
-                }
-            }
+            .navigationBarHidden(true)
             .sheet(isPresented: $showTopicInput) {
                 topicInputView
             }
@@ -102,6 +102,12 @@ struct FreeModeView: View {
             }
             .sheet(isPresented: $showCustomPromptSheet) {
                 customPromptView
+            }
+            .toolbar {
+                // Model picker in toolbar
+                ToolbarItem(placement: .principal) {
+                    modelPickerButton
+                }
             }
             .onAppear {
                 // Set initial values from AppManager
@@ -123,7 +129,7 @@ struct FreeModeView: View {
                 .font(.system(size: 60))
                 .foregroundColor(.blue.opacity(0.7))
             
-            Text("Welcome to Freestyle")
+            Text("Welcome to freestyle")
                 .font(.title2)
                 .fontWeight(.bold)
             
@@ -244,7 +250,22 @@ struct FreeModeView: View {
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundColor(.blue)
                 }
+                
+                Text(appManager.modelDisplayName(appManager.freeModeModelName ?? appManager.currentModelName ?? ""))
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(.primary)
+                
+                Image(systemName: "chevron.down")
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundColor(.gray)
             }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .background(
+                Capsule()
+                    .fill(Color(.systemBackground))
+                    .shadow(color: Color.black.opacity(0.05), radius: 1, x: 0, y: 1)
+            )
         }
         .buttonStyle(.plain)
     }
@@ -520,7 +541,7 @@ struct FreeModeView: View {
             if useSelectedTopics && !topicInput.isEmpty {
                 topicForGeneration = topicInput
             } else {
-                topicForGeneration = "general knowledge"
+                topicForGeneration = "custom"
             }
             
             // Content length based on settings
@@ -669,7 +690,7 @@ struct FreeModeView: View {
             if useSelectedTopics && !topicInput.isEmpty {
                 topicForGeneration = topicInput
             } else {
-                topicForGeneration = "general knowledge"
+                topicForGeneration = "custom"
             }
             
             // Get style based on preferences (same as regular generation)
@@ -880,7 +901,7 @@ struct FreeModeView: View {
                 .filter { !$0.isEmpty }
             
             // If no topics, use a default one
-            let effectiveTopics = topics.isEmpty ? ["general knowledge"] : topics
+            let effectiveTopics = topics.isEmpty ? ["custom"] : topics
             
             // Select a topic to focus on for this generation
             // Either select one topic or combine a small number (max 2-3) based on settings

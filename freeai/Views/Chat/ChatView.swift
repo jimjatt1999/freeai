@@ -276,45 +276,21 @@ struct ChatView: View {
 
                     // Free Mode & Settings buttons in consistent position
                     ToolbarItem(placement: .navigationBarTrailing) {
-                        HStack(spacing: 16) {
-                            // Free Mode button
-                            Button(action: {
-                                appManager.playHaptic()
-                                showFreeMode = true
-                            }) {
-                                HStack(spacing: 6) {
-                                    Image(systemName: "square.text.square")
-                                    Text("Freestyle")
-                                }
-                                .foregroundColor(.blue)
-                            }
-                            
-                            // Settings button
-                            Button(action: {
-                                appManager.playHaptic()
-                                showSettings.toggle()
-                            }) {
-                                Image(systemName: "gearshape")
-                                    .font(.system(size: 18))
-                            }
+                        Button(action: {
+                            appManager.playHaptic()
+                            showSettings.toggle()
+                        }) {
+                            Image(systemName: "gearshape")
+                                .font(.system(size: 18))
                         }
                     }
                     #elseif os(macOS)
                     ToolbarItem(placement: .primaryAction) {
-                        HStack(spacing: 8) {
-                            Button(action: {
-                                appManager.playHaptic()
-                                showFreeMode = true
-                            }) {
-                                Label("Free Mode", systemImage: "brain.head.profile")
-                            }
-                            
-                            Button(action: {
-                                appManager.playHaptic()
-                                showSettings.toggle()
-                            }) {
-                                Label("Settings", systemImage: "gear")
-                            }
+                        Button(action: {
+                            appManager.playHaptic()
+                            showSettings.toggle()
+                        }) {
+                            Label("Settings", systemImage: "gear")
                         }
                     }
                     #endif

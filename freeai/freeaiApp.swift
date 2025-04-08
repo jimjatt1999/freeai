@@ -35,14 +35,53 @@ struct freeaiApp: App {
             Thread.self,
             Message.self,
             UserProfile.self,
-            ContentCard.self
+            ContentCard.self,
+            DumpNote.self
         ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false, allowsSave: true)
         
+        // Add this to forcibly reset the database if needed
+        let url = URL.applicationSupportDirectory.appending(path: "default.store")
+        
+        // Create configuration with correct parameters
+        let modelConfiguration = ModelConfiguration(schema: schema, 
+                                               isStoredInMemoryOnly: false,
+                                               allowsSave: true)
+        
+        // For debugging purposes
+        print("📱 App version: \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown")")
+        print("📁 Database path: \(url.path)")
+
         do {
-            return try SwiftData.ModelContainer(for: schema, configurations: [modelConfiguration])
+            // Try to create the model container
+            let container = try SwiftData.ModelContainer(for: schema, configurations: [modelConfiguration])
+            print("✅ Successfully created model container")
+            return container
         } catch {
-            fatalError("Could not create ModelContainer: \(error)")
+            // Print detailed error information
+            print("❌ Error creating model container: \(error)")
+            print("🔍 Error details: \(String(describing: error))")
+            
+            // Attempt to delete the database and retry
+            print("🗑️ Attempting to delete and recreate database...")
+            try? FileManager.default.removeItem(at: url)
+            
+            do {
+                // Try again with a fresh database
+                return try SwiftData.ModelContainer(for: schema, configurations: [modelConfiguration])
+            } catch {
+                print("❌❌ Critical error after database reset: \(error)")
+                
+                // Last resort: in-memory only database
+                print("⚠️ Falling back to in-memory database")
+                let fallbackConfig = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+                
+                do {
+                    return try SwiftData.ModelContainer(for: schema, configurations: [fallbackConfig])
+                } catch {
+                    print("💥 Fatal error: Could not create any model container")
+                    fatalError("Could not create ModelContainer: \(error)")
+                }
+            }
         }
     }()
     

@@ -9,7 +9,7 @@ import SwiftData
 import SwiftUI
 import MarkdownUI
 
-// Import views
+// Import views for FreeDump
 import SwiftUI
 
 struct ContentView: View {
@@ -21,67 +21,73 @@ struct ContentView: View {
     @State var showChats = false
     @State var currentThread: Thread?
     @State var showFreeMode = false
+    @State var showFreeDump = false
     @FocusState var isPromptFocused: Bool
+    
+    // Combined state for navigation
+    private var showChat: Bool {
+        return !showFreeMode && !showFreeDump
+    }
 
     var body: some View {
         Group {
             if appManager.userInterfaceIdiom == .pad || appManager.userInterfaceIdiom == .mac || appManager.userInterfaceIdiom == .vision {
-                // iPad
+                // iPad/Mac/Vision layout
                 NavigationSplitView {
                     VStack {
-                        // Mode toggle buttons at the top
-                        HStack {
-                            Spacer()
-                            
-                            Button {
-                                showFreeMode = false
-                            } label: {
-                                Text("Chat")
-                                    .fontWeight(showFreeMode ? .regular : .bold)
-                                    .padding(.vertical, 8)
-                                    .padding(.horizontal, 16)
-                                    .background(
-                                        RoundedRectangle(cornerRadius: 8)
-                                            .fill(showFreeMode ? Color.clear : Color.blue)
-                                    )
-                                    .foregroundColor(showFreeMode ? .primary : .white)
-                            }
-                            
-                            Button {
-                                showFreeMode = true
-                            } label: {
-                                Text("Freestyle")
-                                    .fontWeight(showFreeMode ? .bold : .regular)
-                                    .padding(.vertical, 8)
-                                    .padding(.horizontal, 16)
-                                    .background(
-                                        RoundedRectangle(cornerRadius: 8)
-                                            .fill(showFreeMode ? Color.blue : Color.clear)
-                                    )
-                                    .foregroundColor(showFreeMode ? .white : .primary)
-                            }
-                        }
-                        .padding()
-                        
-                        // Chat list
                         ChatsListView(currentThread: $currentThread, isPromptFocused: $isPromptFocused)
                     }
                     #if os(macOS)
                     .navigationSplitViewColumnWidth(min: 240, ideal: 240, max: 320)
                     #endif
                 } detail: {
-                    if showFreeMode {
-                        FreeModeView(showChat: $showFreeMode, currentThread: $currentThread)
-                    } else {
-                        ChatView(currentThread: $currentThread, isPromptFocused: $isPromptFocused, showChats: $showChats, showSettings: $showSettings, showFreeMode: $showFreeMode)
+                    VStack(spacing: 0) {
+                        // Main content area
+                        if showFreeMode {
+                            FreeModeView(showChat: $showFreeMode, currentThread: $currentThread)
+                        } else if showFreeDump {
+                            FreeDumpView(showFreeDump: $showFreeDump, currentThread: $currentThread)
+                        } else {
+                            ChatView(currentThread: $currentThread, isPromptFocused: $isPromptFocused, showChats: $showChats, showSettings: $showSettings, showFreeMode: $showFreeMode)
+                        }
+                        
+                        // Bottom navigation
+                        BottomNavBar(
+                            showChat: Binding(
+                                get: { !showFreeMode && !showFreeDump },
+                                set: { if $0 { showFreeMode = false; showFreeDump = false } }
+                            ),
+                            showFreeMode: $showFreeMode,
+                            showFreeDump: $showFreeDump
+                        )
                     }
                 }
             } else {
-                // iPhone
-                if showFreeMode {
-                    FreeModeView(showChat: $showFreeMode, currentThread: $currentThread)
-                } else {
-                    ChatView(currentThread: $currentThread, isPromptFocused: $isPromptFocused, showChats: $showChats, showSettings: $showSettings, showFreeMode: $showFreeMode)
+                // iPhone layout
+                ZStack(alignment: .bottom) {
+                    // Main content area
+                    if showFreeMode {
+                        FreeModeView(showChat: $showFreeMode, currentThread: $currentThread)
+                            .padding(.bottom, 50) // Add padding for the navigation bar
+                    } else if showFreeDump {
+                        FreeDumpView(showFreeDump: $showFreeDump, currentThread: $currentThread)
+                            .padding(.bottom, 50) // Add padding for the navigation bar
+                    } else {
+                        ChatView(currentThread: $currentThread, isPromptFocused: $isPromptFocused, showChats: $showChats, showSettings: $showSettings, showFreeMode: $showFreeMode)
+                            .padding(.bottom, 50) // Add padding for the navigation bar
+                    }
+                    
+                    // Bottom navigation
+                    VStack(spacing: 0) {
+                        BottomNavBar(
+                            showChat: Binding(
+                                get: { !showFreeMode && !showFreeDump },
+                                set: { if $0 { showFreeMode = false; showFreeDump = false } }
+                            ),
+                            showFreeMode: $showFreeMode,
+                            showFreeDump: $showFreeDump
+                        )
+                    }
                 }
             }
         }
@@ -131,7 +137,6 @@ struct ContentView: View {
             OnboardingView(showOnboarding: $showOnboarding)
                 .environment(llm)
                 .interactiveDismissDisabled(appManager.installedModels.count == 0)
-            
         }
         #if !os(visionOS)
         .tint(appManager.appTintColor.getColor())

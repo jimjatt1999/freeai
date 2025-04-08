@@ -367,3 +367,28 @@ extension AppManager {
         return augmentedPrompt
     }
 }
+
+@Model
+class DumpNote {
+    var id: UUID
+    var rawContent: String
+    var structuredContent: String
+    var title: String
+    var tags: [String]
+    var timestamp: Date
+    var modelName: String?
+    var isProcessing: Bool
+    var isPinned: Bool
+    
+    init(rawContent: String, structuredContent: String = "", title: String = "", tags: [String] = [], modelName: String? = nil) {
+        self.id = UUID()
+        self.rawContent = rawContent
+        self.structuredContent = structuredContent
+        self.title = title
+        self.tags = tags
+        self.timestamp = Date()
+        self.modelName = modelName
+        self.isProcessing = false
+        self.isPinned = false
+    }
+}

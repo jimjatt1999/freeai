@@ -702,6 +702,7 @@ struct ConversationView: View {
 
     @State private var scrollID: String?
     @State private var scrollInterrupted = false
+    @State private var disableAllAnimations = false
 
     var body: some View {
         ScrollViewReader { scrollView in
@@ -711,6 +712,7 @@ struct ConversationView: View {
                         VStack(spacing: 0) {
                         MessageView(message: message)
                             .id(message.id.uuidString)
+                            .animation(disableAllAnimations ? nil : .default, value: message.id)
                             
                             if message.role == .assistant {
                                 Divider()
@@ -745,7 +747,6 @@ struct ConversationView: View {
                         }
                         .id("output")
                         .onAppear {
-                            print("output appeared")
                             scrollInterrupted = false // reset interruption when a new output begins
                         }
                     }
@@ -761,7 +762,7 @@ struct ConversationView: View {
             .onChange(of: llm.output) { _, _ in
                 // auto scroll to bottom
                 if !scrollInterrupted {
-                    scrollView.scrollTo("bottom")
+                    scrollView.scrollTo("bottom", anchor: .bottom)
                 }
 
                 if !llm.isThinking {
@@ -773,6 +774,17 @@ struct ConversationView: View {
                 if llm.running {
                     scrollInterrupted = true
                 }
+            }
+            .onAppear {
+                // Temporarily disable animations when the view first appears
+                disableAllAnimations = true
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    disableAllAnimations = false
+                }
+            }
+            .onDisappear {
+                // Disable animations when leaving the view to prevent unwanted effects
+                disableAllAnimations = true
             }
         }
         .defaultScrollAnchor(.bottom)
