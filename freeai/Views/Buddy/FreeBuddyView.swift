@@ -34,6 +34,11 @@ struct FreeBuddyView: View {
     @State private var alertMessage = ""
     // --- End State for User Feedback ---
 
+    // --- State for Level Up Quote ---
+    @State private var showLevelUpQuote = false
+    @State private var levelUpQuote = ""
+    // --- End Level Up Quote State ---
+
     // --- State for Editing --- 
     @State private var reminderToEdit: Reminder? = nil
     // --- End State for Editing ---
@@ -71,12 +76,37 @@ struct FreeBuddyView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) { // Use spacing 0 for tighter control
-                // --- Animated Eyes (Placeholder) ---
-                if appManager.showAnimatedEyes {
-                    AnimatedEyesView(isGenerating: isProcessing)
-                        .padding(.top)
-                        .padding(.bottom, 20)
+                // --- Eyes & Level Display ---
+                HStack {
+                    Spacer()
+                    // Eyes (if enabled)
+                    if appManager.showAnimatedEyes {
+                        AnimatedEyesView(isGenerating: isProcessing)
+                            // Pass level info later if needed for eye changes
+                            // .environment(\.buddyLevel, appManager.buddyLevel)
+                    }
+                    Spacer()
+                    // Level Display
+                    VStack(alignment: .center) {
+                         Text("Level \(appManager.buddyLevel)")
+                             .font(.headline)
+                             .foregroundColor(.primary)
+                         ProgressView(value: Float(appManager.xpTowardsNextLevel), total: Float(appManager.xpForNextLevel)) {
+                            // Label (optional)
+                         } currentValueLabel: {
+                             Text("XP: \(appManager.xpTowardsNextLevel)/\(appManager.xpForNextLevel)")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                         }
+                         .progressViewStyle(.linear)
+                         .frame(width: 80) // Adjust width as needed
+                    }
+                    .padding(.horizontal)
+                     Spacer()
                 }
+                .padding(.top)
+                .padding(.bottom, 10) // Reduced bottom padding slightly
+                 // --- End Eyes & Level Display ---
 
                 // --- Reminder List (With Sections) --- 
                 List {
@@ -146,13 +176,18 @@ struct FreeBuddyView: View {
                 HStack(spacing: 8) {
                     // Mic Button
                     Button {
-                         startSpeechRecognition()
+                        if isRecording {
+                            stopSpeechRecognition()
+                        } else {
+                            startSpeechRecognition()
+                        }
                     } label: {
                         Image(systemName: isRecording ? "stop.circle.fill" : "mic.circle.fill")
                             .font(.title2)
-                            .foregroundColor(isRecording ? .red : .blue)
-                            .padding(.leading, 4)
+                            // Use tint color for active mic
+                            .foregroundColor(isRecording ? .red : appManager.appTintColor.getColor())
                     }
+                    .padding(.leading, 4)
                     
                     TextField("Remind me... (e.g., call mom tomorrow 5pm)", text: $reminderInput, axis: .vertical)
                         .focused($isInputFocused)
@@ -163,13 +198,15 @@ struct FreeBuddyView: View {
                     // Show progress indicator when processing
                     if isProcessing {
                          ProgressView()
+                             .tint(appManager.appTintColor.getColor()) // Tint the ProgressView
                              .padding(.trailing, 8)
                              .frame(width: 30, height: 30)
                      } else {
                         Button(action: processReminder) {
                             Image(systemName: "arrow.up.circle.fill")
                                 .font(.title2)
-                                .foregroundColor(reminderInput.isEmpty ? .secondary : .blue)
+                                // Use tint color for enabled send button
+                                .foregroundColor(reminderInput.isEmpty ? .secondary : appManager.appTintColor.getColor())
                         }
                         .disabled(reminderInput.isEmpty)
                         .padding(.trailing, 4)
@@ -202,6 +239,14 @@ struct FreeBuddyView: View {
                 Text(alertMessage)
             }
             // --- End Alert Modifier ---
+            // --- Add Level Up Quote Alert ---
+            .alert("Level Up!", isPresented: $showLevelUpQuote) {
+                 Button("Nice!") { }
+             } message: {
+                 // Display the fetched quote
+                 Text(levelUpQuote)
+             }
+             // --- End Level Up Quote Alert ---
             .onAppear {
                  // Request permission when view appears (can be moved elsewhere)
                  requestNotificationPermission()
@@ -308,14 +353,32 @@ struct FreeBuddyView: View {
     }
 
     private func toggleCompletion(reminder: Reminder) {
+        let wasCompleted = reminder.isCompleted
         reminder.isCompleted.toggle()
+        
+        // Grant XP only when completing a task for the *first* time
+        if reminder.isCompleted && !wasCompleted && !reminder.xpAwarded { 
+             let xpGained = 10 // Grant 10 XP per task for now
+             appManager.buddyXP += xpGained
+             reminder.xpAwarded = true // Set the flag
+             print("Gained \(xpGained) XP! Total: \(appManager.buddyXP)")
+             
+             // Check for level up AFTER awarding XP
+             checkForLevelUp(previousXP: appManager.buddyXP - xpGained, currentXP: appManager.buddyXP)
+             
+        } else if !reminder.isCompleted && wasCompleted {
+             // Optional: If needed, reset xpAwarded flag if task is unmarked?
+             // Depends on desired game design - for now, let's keep it awarded once.
+             // reminder.xpAwarded = false 
+        }
+        
         do {
             try modelContext.save()
             print("Toggled completion for reminder: \(reminder.id) to \(reminder.isCompleted)")
             appManager.playHaptic()
         } catch {
             print("Error saving toggled reminder: \(error)")
-            reminder.isCompleted.toggle()
+            reminder.isCompleted.toggle() // Revert state on error
             showUserAlert(title: "Error", message: "Could not update reminder status.")
         }
     }
@@ -460,6 +523,13 @@ struct FreeBuddyView: View {
         // Ensure input field is focused when starting
         self.isInputFocused = true // Use self directly
     }
+
+    private func stopSpeechRecognition() {
+        audioEngine.stop()
+        recognitionRequest?.endAudio()
+        isRecording = false
+        print("Stopped recording via button")
+    }
     // --- End Speech Recognition Helpers ---
 
     // --- Add Edit Helper ---
@@ -468,7 +538,40 @@ struct FreeBuddyView: View {
     }
     // --- End Edit Helper ---
 
-    // --- End Helper Functions ---
+    // --- Level Up Logic ---
+    private func checkForLevelUp(previousXP: Int, currentXP: Int) {
+        let previousLevel = (previousXP / 100) + 1
+        let currentLevel = (currentXP / 100) + 1
+        
+        if currentLevel > previousLevel {
+            print("Level Up! Reached Level \(currentLevel)")
+            fetchAndShowLevelUpQuote(level: currentLevel)
+        }
+    }
+    
+    private func fetchAndShowLevelUpQuote(level: Int) {
+        // Placeholder for fetching a quote. Replace with a real API or local list.
+        let quotes = [
+            "The journey of a thousand miles begins with one step.",
+            "Knowing yourself is the beginning of all wisdom.",
+            "The only true wisdom is in knowing you know nothing.",
+            "The unexamined life is not worth living.",
+            "Whereof one cannot speak, thereof one must be silent.",
+            "Happiness is the highest good.",
+            "Man is the measure of all things.",
+            "We are what we repeatedly do. Excellence, then, is not an act, but a habit.",
+            "To be is to be perceived.",
+            "Entities should not be multiplied without necessity."
+            // Add many more quotes!
+        ]
+        
+        // Simple selection logic (can be improved)
+        let quoteIndex = (level - 1) % quotes.count 
+        levelUpQuote = quotes[quoteIndex]
+        showLevelUpQuote = true
+        appManager.playHaptic() // Extra feedback for level up
+    }
+    // --- End Level Up Logic ---
 }
 
 // --- Add Reminder Model (Placeholder) ---
@@ -501,27 +604,31 @@ final class Reminder {
 
 // --- Reminder Row Subview ---
 struct ReminderRow: View {
+    @EnvironmentObject var appManager: AppManager
     let reminder: Reminder
     let toggleAction: (Reminder) -> Void
     let deleteAction: (Reminder) -> Void
     let editAction: () -> Void
 
-    private var isOverdue: Bool {
-        guard let date = reminder.scheduledDate else { return false }
-        return !reminder.isCompleted && date < Calendar.current.startOfDay(for: Date())
+    var isOverdue: Bool {
+        guard let date = reminder.scheduledDate, !reminder.isCompleted else { return false }
+        return date < Calendar.current.startOfDay(for: Date())
     }
 
     var body: some View {
         HStack(spacing: 12) {
+            // Toggle Button (Square)
             Button {
                 toggleAction(reminder)
             } label: {
-                 // Overdue (red) > Completed (green) > Default (secondary)
-                 let iconName = reminder.isCompleted ? "checkmark.circle.fill" : (isOverdue ? "exclamationmark.circle.fill" : "circle")
-                 let iconColor = reminder.isCompleted ? Color.green : (isOverdue ? Color.red : Color.secondary)
+                 let iconName = reminder.isCompleted ? "checkmark.square.fill" : "square"
+                 // Use tint color for completed state
+                 let iconColor = reminder.isCompleted ? appManager.appTintColor.getColor() : (isOverdue ? Color.red : Color.secondary)
                  Image(systemName: iconName)
                     .foregroundColor(iconColor)
                     .font(.title2)
+                    .padding(4) 
+                    .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
             
@@ -552,8 +659,6 @@ struct ReminderRow: View {
                              .font(.caption) // Match font size
                     }
                     .buttonStyle(.plain)
-                    .contentShape(Rectangle()) // Keep tappable area defined
-                    // Removed the Button wrapper from the date text itself
                 }
             }
             Spacer()
@@ -562,17 +667,15 @@ struct ReminderRow: View {
                 deleteAction(reminder)
             } label: {
                 Image(systemName: "xmark.circle.fill")
-                    .foregroundColor(.gray.opacity(0.7)) // Subtle delete button
+                    .foregroundColor(.gray.opacity(0.7)) 
                     .font(.title3)
             }
             .buttonStyle(.plain)
         }
         .padding(.vertical, 6)
         .listRowSeparator(.hidden)
-        // Add long press gesture to the whole row
-        .contentShape(Rectangle()) // Define the shape for gestures
         .onLongPressGesture {
-            editAction() // Trigger edit sheet on long press
+            editAction() // Keep long press for edit on the whole row
         }
     }
 }

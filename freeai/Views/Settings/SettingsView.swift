@@ -2,7 +2,6 @@
 //  SettingsView.swift
 //  free ai
 //
-//  Created by Jordan Singer on 10/4/24.
 //
 
 import SwiftUI
@@ -48,21 +47,6 @@ struct SettingsView: View {
                     NavigationLink(destination: CreditsView()) {
                         Text("credits")
                     }
-                }
-
-                Section {} footer: {
-                    HStack {
-                        Spacer()
-                        VStack(spacing: 4) {
-                            Image(systemName: appManager.getMoonPhaseIcon())
-                                .foregroundStyle(.quaternary)
-                            Text("v\(Bundle.main.releaseVersionNumber ?? "0").\(Bundle.main.buildVersionNumber ?? "0")")
-                                .font(.footnote)
-                                .foregroundStyle(.tertiary)
-                        }
-                        Spacer()
-                    }
-                    .padding(.vertical)
                 }
             }
             .formStyle(.grouped)

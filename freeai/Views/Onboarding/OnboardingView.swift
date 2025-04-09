@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct OnboardingView: View {
+    @EnvironmentObject var appManager: AppManager
     @Binding var showOnboarding: Bool
     @State private var animationTrigger = false
     @State private var fadeInTrigger = false
@@ -46,6 +47,16 @@ struct OnboardingView: View {
                 Feature(icon: "tag", title: "Categorize", description: "Auto-tag and filter your notes"),
                 Feature(icon: "pencil", title: "Edit", description: "Refine your processed notes")
             ]
+        ),
+        OnboardingPage(
+            title: "freebuddy",
+            subtitle: "natural language reminders",
+            features: [
+                Feature(icon: "bell", title: "Reminders", description: "Set reminders like \"call mom tomorrow 5pm\""),
+                Feature(icon: "figure.walk", title: "Gamification", description: "Level up by completing tasks & get insights"),
+                Feature(icon: "app.badge.checkmark", title: "Checklist", description: "Track tasks and stay organized"),
+                Feature(icon: "speaker.wave.2", title: "Voice Input", description: "Dictate reminders quickly and easily")
+            ]
         )
     ]
     
@@ -73,31 +84,25 @@ struct OnboardingView: View {
                     .tabViewStyle(.page(indexDisplayMode: .never))
                     .animation(.easeInOut, value: currentPage)
                     
-                    // Bottom controls - fixed position with better separation
+                    // Minimalist Bottom Controls
                     VStack {
                         Spacer()
                         
-                        // Add a subtle divider line
-                        Rectangle()
-                            .fill(Color.primary.opacity(0.1))
-                            .frame(height: 1)
-                            .padding(.horizontal, 24)
-                            .opacity(fadeInTrigger ? 1 : 0)
-                        
-                        // Page indicator and buttons
-                        HStack {
+                        HStack(spacing: 16) { // Increased spacing between dots and button
                             // Page dots
                             HStack(spacing: 8) {
                                 ForEach(0..<pages.count, id: \.self) { index in
                                     Circle()
-                                        .fill(index == currentPage ? Color.primary : Color.primary.opacity(0.3))
-                                        .frame(width: 8, height: 8)
+                                        // Use tint color for active dot
+                                        .fill(index == currentPage ? appManager.appTintColor.getColor() : Color.secondary.opacity(0.3))
+                                        .frame(width: 6, height: 6) // Slightly smaller dots
+                                        .animation(.spring(), value: currentPage == index) // Add animation
                                 }
                             }
                             
                             Spacer()
                             
-                            // Next/Continue button
+                            // Next/Continue Button (Minimal Style)
                             Button {
                                 if currentPage < pages.count - 1 {
                                     withAnimation {
@@ -108,31 +113,34 @@ struct OnboardingView: View {
                                     navigateToModelSelection = true
                                 }
                             } label: {
-                                HStack {
+                                HStack(spacing: 6) { // Reduced spacing inside button
                                     Text(currentPage < pages.count - 1 ? "Next" : "Continue")
-                                        .font(.title3)
-                                        .fontWeight(.bold)
-                                    
+                                        .font(.headline) // Smaller font
+                                        .fontWeight(.medium)
                                     Image(systemName: "arrow.right")
-                                        .font(.body.bold())
-                                        .padding(.leading, 4)
+                                        .font(.subheadline.weight(.medium)) // Smaller icon
                                 }
-                                .frame(width: 160)
-                                .frame(height: 60)
-                                .foregroundStyle(.white)
-                                .background(Color.primary)
-                                .cornerRadius(20)
+                                .padding(.horizontal, 20) // Adjust padding
+                                .padding(.vertical, 12) // Adjust padding
+                                .foregroundColor(currentPage < pages.count - 1 ? appManager.appTintColor.getColor() : Color(.systemBackground)) // Tint for next, background for continue
+                                .background(
+                                    Capsule()
+                                        // Use tint color for Continue background
+                                        .fill(currentPage < pages.count - 1 ? Color.clear : appManager.appTintColor.getColor())
+                                        // Subtle border for Next button
+                                        .overlay(currentPage < pages.count - 1 ? Capsule().stroke(appManager.appTintColor.getColor().opacity(0.5), lineWidth: 1) : nil)
+                                )
                             }
+                            .buttonStyle(.plain)
                         }
                         .padding(.horizontal, 24)
-                        .padding(.vertical, 24)
-                        .background(
-                            Rectangle()
-                                .fill(Color(.systemBackground))
-                                .edgesIgnoringSafeArea(.bottom)
-                        )
+                        .padding(.bottom, geo.safeAreaInsets.bottom > 0 ? 0 : 16) // Adjust bottom padding based on safe area
+                        .padding(.top, 10) // Add some top padding
+                        .background(Color(.systemBackground).edgesIgnoringSafeArea(.bottom)) // Ensure background extends
                         .opacity(fadeInTrigger ? 1.0 : 0.0)
+                        .animation(.easeInOut, value: currentPage) // Animate changes
                     }
+                    // End Minimalist Bottom Controls
                 }
                 .onAppear {
                     // Sequence the animations for a more dramatic effect
@@ -255,4 +263,5 @@ struct FeatureCard: View {
 
 #Preview {
     OnboardingView(showOnboarding: .constant(true))
+        .environmentObject(AppManager())
 }

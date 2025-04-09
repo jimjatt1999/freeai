@@ -4,12 +4,15 @@ An on-device AI assistant for iPhone, iPad and Mac with chat, content generation
 
 ## Key Features
 
-- **Chat**: Conversational AI always available, no internet required
-- **freestyle**: Generate creative content on any topic, in various styles
-- **freedump**: Process and organize your notes with AI assistance
-- **Customizable Animated Eyes**: Fun, interactive visual feedback (optional)
-- **Completely Local**: All processing happens on-device, no data sent anywhere
-- **No Subscriptions**: Free forever, no hidden costs
+- **Integrated Chat**: Conversational AI that can also discuss your notes and reminders.
+- **FreeBuddy Reminders**: Set reminders using natural language (e.g., "call mom tomorrow 5pm"). Includes notification scheduling and completion tracking.
+- **FreeDump Notes**: Process and organize your notes with AI assistance.
+- **Freestyle Content**: Generate creative content on any topic, in various styles.
+- **Gamified Reminders**: Level up your "Buddy" by completing tasks and receive philosophical insights.
+- **Customizable Animated Eyes**: Fun, interactive visual feedback (optional).
+- **Voice Input**: Dictate notes, reminders, or chat messages.
+- **Completely Local**: All processing happens on-device, no data sent anywhere.
+- **No Subscriptions**: Free forever, no hidden costs.
 
 ## Supported Models
 
@@ -18,10 +21,11 @@ An on-device AI assistant for iPhone, iPad and Mac with chat, content generation
 
 ## What Sets Free AI Apart
 
-- **True Privacy**: Works offline with no external dependencies
-- **Multiple Tools**: Chat, create content, and process notes all in one app
-- **Voice Input**: Dictate notes and ideas for AI processing
-- **Clean Design**: Minimalist interface focused on content
+- **True Privacy**: Works offline with no external dependencies.
+- **Unified Interface**: Chat, create, manage notes, and track reminders within a single app.
+- **Contextual Chat Modes**: Seamlessly switch between general chat, discussing FreeDump notes, or querying Reminders.
+- **Natural Language Input**: Use everyday language for reminders and note queries.
+- **Clean Design**: Minimalist interface focused on content.
 
 ## System Requirements
 

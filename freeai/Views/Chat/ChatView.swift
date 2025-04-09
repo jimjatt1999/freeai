@@ -49,6 +49,15 @@ struct ExamplePromptsView: View {
 }
 // --- End Example Prompts View Definition ---
 
+// --- Chat Mode Enum ---
+fileprivate enum ChatMode: String, CaseIterable, Identifiable {
+    case chat = "Chat"
+    case freeDump = "FreeDump"
+    case reminders = "Reminders"
+    var id: String { self.rawValue }
+}
+// --- End Chat Mode Enum ---
+
 struct ChatView: View {
     @EnvironmentObject var appManager: AppManager
     @Environment(\.modelContext) var modelContext
@@ -72,24 +81,24 @@ struct ChatView: View {
     @State private var audioEngine = AVAudioEngine()
     @State private var isRecording = false
 
-    // Add array of example prompts
-    let examplePrompts = [
-        "How does an airplane work?",
-        "Why is the sky blue?",
-        "What are black holes?",
-        "How do vaccines work?",
-        "Explain quantum physics simply",
-        "What causes earthquakes?",
-        "How do computers store data?",
-        "Why do we dream?",
-        "How does photosynthesis work?",
-        "What makes rainbows appear?",
-        "How does GPS navigation work?",
-        "Why do leaves change color?",
-        "How do batteries store energy?",
-        "What's inside the human brain?",
-        "How does the internet work?"
+    // --- Chat Mode State ---
+    @State private var selectedMode: ChatMode = .chat
+    // --- End Chat Mode State ---
+
+    // --- Example Prompts (Updated & Renamed) ---
+    let chatExamples = [
+        "Explain how planes fly", "How do vaccines work?", "Write a poem about the moon"
+        // ... more chat examples if needed
     ]
+    let freeDumpExamples = [ // Renamed & updated examples
+        "Summarize notes from today", "Find notes tagged #idea", "What did I write last week?",
+        "List note titles containing 'budget'", "Show all tags used"
+    ]
+    let reminderExamples = [
+        "What's due today?", "Show overdue reminders", "What's scheduled for tomorrow?",
+        "List my completed tasks", "Any 'someday' reminders?"
+    ]
+    // --- End Example Prompts ---
 
     var isPromptEmpty: Bool {
         prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
@@ -108,24 +117,28 @@ struct ChatView: View {
     // Voice dictation button with toggle state
     var micButton: some View {
         Button {
+            if isRecording {
+                 stopSpeechRecognition()
+             } else {
             startSpeechRecognition()
+             }
         } label: {
             ZStack {
                 Circle()
-                    .fill(isRecording ? Color.blue.opacity(0.1) : Color.clear)
+                    .fill(isRecording ? appManager.appTintColor.getColor().opacity(0.1) : Color.clear) // Use tint color for recording BG
                     .frame(width: 36, height: 36)
                 
                 Image(systemName: isRecording ? "waveform" : "mic.circle.fill")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: isRecording ? 18 : 24, height: isRecording ? 18 : 24)
-                    .foregroundColor(isRecording ? .blue : .gray)
+                    .foregroundColor(isRecording ? appManager.appTintColor.getColor() : .gray) // Use tint color for recording icon
                     .animation(.spring(duration: 0.3), value: isRecording)
             }
             .overlay(
                 isRecording ? 
                 Circle()
-                    .stroke(Color.blue, lineWidth: 1.5)
+                    .stroke(appManager.appTintColor.getColor(), lineWidth: 1.5) // Use tint color for recording stroke
                     .frame(width: 36, height: 36) 
                 : nil
             )
@@ -133,43 +146,54 @@ struct ChatView: View {
         .padding(.trailing, 4)
     }
 
-    // Update the chat input to include keyboard dismiss button aligned with mic
+    // Updated Chat Input with Alignment Fixes
     var chatInput: some View {
-        HStack(alignment: .bottom, spacing: 8) {
-            if isPromptFocused {
+        HStack(alignment: .bottom, spacing: 6) { // Reduced spacing
+            // New Chat Button
                 Button {
-                    hideKeyboard()
+                 newChat()
                 } label: {
+                 Image(systemName: "plus.circle.fill")
+                     .font(.title2)
+                     .foregroundColor(.secondary)
+             }
+             .frame(width: 30, height: 30) // Fixed frame
+             .padding(.leading, 4)
+            
+            // Mic Button OR Keyboard Dismiss
+            Group { // Group to apply frame consistently
+                 if isPromptFocused {
+                     Button { hideKeyboard() } label: {
                     Image(systemName: "keyboard.chevron.compact.down")
                         .foregroundColor(.gray)
                         .font(.system(size: 18))
-                        .frame(width: 24, height: 24)
                 }
             } else {
-                micButton
+                     micButton // micButton already includes sizing/padding logic
+                 }
             }
+            .frame(width: 30, height: 30) // Fixed frame for this slot
             
-            TextField("freely ask anything", text: $prompt, axis: .vertical)
+            // Main TextField
+            TextField("freely ask anything...", text: $prompt, axis: .vertical) // Updated placeholder
                 .submitLabel(.send)
                 .focused($isPromptFocused)
                 .textFieldStyle(.plain)
-                .onSubmit {
-                    generate()
-                }
-                .padding(.horizontal)
+                // Give it some vertical padding within the background
+                .padding(.vertical, 8)
+                // Horizontal padding applied by the outer HStack padding now
+                .onSubmit { generate() }
+                .frame(minHeight: 36) // Ensure minimum height matches buttons
             
-            if !isPromptFocused {
-                // Only show mic when keyboard is not active
-                Spacer().frame(width: 0)
-            }
-            
-            if llm.running {
-                stopButton
-            } else {
-                generateButton
-            }
+            // Send / Stop Button Slot
+             Group {
+                 if llm.running { stopButton } else { generateButton }
+             }
+             .frame(width: 32, height: 32) // Use fixed frame matching buttons inside
+             .padding(.trailing, 4)
+
         }
-        .padding(EdgeInsets(top: 8, leading: 12, bottom: 8, trailing: 8))
+        .padding(EdgeInsets(top: 4, leading: 8, bottom: 4, trailing: 8)) // Adjusted padding
         .background(
             RoundedRectangle(cornerRadius: 24)
                 .fill(Color(.secondarySystemBackground))
@@ -177,11 +201,21 @@ struct ChatView: View {
         )
     }
 
-    // Create an example prompts view for the scrollable prompts
+    // Updated example prompts view
     var examplePromptsView: some View {
+        let currentExamples = switch selectedMode {
+        case .chat: chatExamples
+        case .freeDump: freeDumpExamples
+        case .reminders: reminderExamples
+        }
+        
+        // Only show examples if the list is NOT empty for the current mode
+        guard !currentExamples.isEmpty else { return AnyView(EmptyView()) }
+        
+        return AnyView(
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
-                ForEach(examplePrompts, id: \.self) { examplePrompt in
+                    ForEach(currentExamples, id: \.self) { examplePrompt in
                     Button {
                         prompt = examplePrompt
                         isPromptFocused = true
@@ -201,6 +235,7 @@ struct ChatView: View {
             .padding(.horizontal)
         }
         .frame(height: 40)
+        )
     }
 
     var modelPickerButton: some View {
@@ -244,7 +279,8 @@ struct ChatView: View {
         } label: {
             ZStack {
                 Circle()
-                    .fill(isPromptEmpty ? Color.gray.opacity(0.2) : Color.blue)
+                    // Use tint color for enabled background
+                    .fill(isPromptEmpty ? Color.gray.opacity(0.2) : appManager.appTintColor.getColor())
                     .frame(width: 32, height: 32)
                 
                 Image(systemName: "arrow.up")
@@ -262,6 +298,7 @@ struct ChatView: View {
         } label: {
             ZStack {
                 Circle()
+                    // Keep stop red for clarity
                     .fill(Color.red.opacity(0.9))
                     .frame(width: 32, height: 32)
                 
@@ -295,12 +332,39 @@ struct ChatView: View {
                     }
                 
                 VStack(spacing: 0) {
+                    // --- Custom Minimalist Mode Selector ---
+                    HStack(spacing: 10) { // Adjust spacing as needed
+                        ForEach(ChatMode.allCases) { mode in
+                            Button {
+                                // Only allow changing mode if conversation hasn't started
+                                if currentThread == nil || currentThread?.messages.isEmpty ?? true {
+                                    selectedMode = mode
+                                }
+                            } label: {
+                                 Text(mode.rawValue)
+                                     .font(.subheadline) // Use a slightly smaller font
+                                     .padding(.vertical, 6)
+                                     .padding(.horizontal, 12)
+                                     .foregroundColor(selectedMode == mode ? Color.primary : Color.secondary)
+                                     .background(selectedMode == mode ? Color.gray.opacity(0.15) : Color.clear) // Subtle background for selected
+                                     .clipShape(Capsule())
+                            }
+                            .buttonStyle(.plain)
+                            .disabled(currentThread != nil && !(currentThread?.messages.isEmpty ?? true)) // Disable button itself
+                        }
+                    }
+                    .fontDesign(appManager.appFontDesign.getFontDesign()) // Apply font design to the HStack
+                    .padding(.horizontal) // Keep horizontal padding for the group
+                    .padding(.vertical, 8)
+                    // --- End Custom Minimalist Mode Selector ---
+                    
                     // Model picker at the top
                     if appManager.userInterfaceIdiom == .phone {
                         // REMOVED: Phone top bar with model picker
                     }
                     
-                    // Conversation view
+                    // --- Conversation View --- 
+                    // Takes up remaining space
                     if let currentThread = currentThread {
                         ConversationView(thread: currentThread, generatingThreadID: generatingThreadID)
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -313,20 +377,20 @@ struct ChatView: View {
                                 }
                             }
                     } else {
+                         // Empty state when no thread exists 
                         Spacer()
                     }
                     
-                    // Example prompts section - show only if it's a new chat (no messages yet)
-                    if currentThread == nil || currentThread?.messages.isEmpty ?? true {
+                     // --- Example Prompts View (Moved Above Input) --- 
                         examplePromptsView
-                            .padding(.bottom, 8)
-                            .transition(.opacity.combined(with: .move(edge: .bottom))) // Add animation
-                    }
+                         .padding(.bottom, 4) // Padding above input
+                         .transition(.opacity.combined(with: .move(edge: .bottom)))
                     
+                     // --- Chat Input Area --- 
                     HStack {
                         chatInput
                     }
-                    .padding()
+                    .padding() // Keep padding around input box
                 }
             }
             .navigationTitle(chatTitle)
@@ -442,7 +506,6 @@ struct ChatView: View {
 
     private func generate() {
         if !isPromptEmpty {
-            // Dismiss keyboard when sending message
             hideKeyboard()
             
             if currentThread == nil {
@@ -460,14 +523,18 @@ struct ChatView: View {
                     appManager.playHaptic()
 
                     sendMessage(Message(role: .user, content: message, thread: currentThread))
-                    isPromptFocused = true
+                    
+                    // --- Mode-Specific Logic --- 
+                    switch selectedMode {
+                    case .chat:
+                         print("Generating standard chat response...")
                     if let modelName = appManager.currentModelName {
                         // Fetch profile (no memories)
                         let descriptor = FetchDescriptor<UserProfile>()
                         let profiles = try? modelContext.fetch(descriptor)
                         let userProfile = profiles?.first
 
-                        // Create augmented system prompt (no memories)
+                            // Create augmented system prompt
                         let augmentedPrompt = appManager.createAugmentedSystemPrompt(
                             originalPrompt: appManager.systemPrompt,
                             userProfile: userProfile
@@ -475,13 +542,175 @@ struct ChatView: View {
 
                         let output = await llm.generate(
                             modelName: modelName,
-                            thread: currentThread,
+                                 thread: currentThread, // Pass the actual thread
                             systemPrompt: augmentedPrompt
                         )
+                            sendMessage(Message(role: .assistant, content: output, thread: currentThread, generatingTime: llm.thinkingTime))
+                         }
+                         
+                    case .freeDump:
+                         print("Generating response based on FreeDump...")
+                         // --- Notes Logic --- 
+                         // 1. Parse Query (Simple keywords for now)
+                         let noteQuery = message.lowercased()
+                         var notePredicate: Predicate<DumpNote>? = nil
+                         // TODO: Add more sophisticated tag/date parsing
+                         if noteQuery.contains("today") { 
+                             let startOfToday = Calendar.current.startOfDay(for: Date())
+                             notePredicate = #Predicate<DumpNote> { $0.timestamp >= startOfToday }
+                         } else if noteQuery.contains("last week") {
+                              let oneWeekAgo = Calendar.current.date(byAdding: .day, value: -7, to: Date())!
+                              notePredicate = #Predicate<DumpNote> { $0.timestamp >= oneWeekAgo }
+                         } else {
+                             // Basic text search (can be slow on large datasets)
+                             // Consider adding specific tag search later: #Predicate { $0.tags.contains("#tag") }
+                             if !noteQuery.isEmpty {
+                                 notePredicate = #Predicate<DumpNote> { $0.rawContent.contains(noteQuery) || $0.title.contains(noteQuery) }
+                             }
+                         }
+                         
+                         // 2. Fetch Notes (Metadata only initially)
+                         var noteDescriptor = FetchDescriptor<DumpNote>(predicate: notePredicate)
+                         noteDescriptor.fetchLimit = 20 // Limit context size
+                         noteDescriptor.sortBy = [SortDescriptor(\.timestamp, order: .reverse)]
+                         
+                         let fetchedNotes = (try? modelContext.fetch(noteDescriptor)) ?? []
+                         
+                         // 3. Prepare Notes Context (Titles, Tags, Timestamps)
+                         var notesContextString = "User\'s Notes based on query:\\n"
+                         if fetchedNotes.isEmpty {
+                             notesContextString += "- No relevant notes found.\\n"
+                         } else {
+                             let dateFormatter = DateFormatter()
+                             dateFormatter.dateStyle = .short
+                             for note in fetchedNotes {
+                                // Simplify string construction to avoid complex interpolation issues
+                                 let dateStr = dateFormatter.string(from: note.timestamp)
+                                 let tagsStr = note.tags.isEmpty ? "" : " Tags: [\(note.tags.joined(separator: ", "))]"
+                                 let titleStr = note.title.isEmpty ? String(note.rawContent.prefix(30)) + "..." : note.title
+                                 let noteLine = "- \"\(titleStr)\" (\(dateStr))\(tagsStr)\n"
+                                 notesContextString += noteLine // Append the constructed line
+                             }
+                         }
+                         print("Notes Context:\\n\\(notesContextString)")
 
-                        sendMessage(Message(role: .assistant, content: output, thread: currentThread, generatingTime: llm.thinkingTime))
-                        generatingThreadID = nil
+                         // 4. Call LLM with Notes Context
+                         if let modelName = appManager.currentModelName {
+                             let notesSystemPrompt = "You are discussing the user\'s notes from FreeDump. Use the provided list of note titles, dates, and tags to answer their query. Do not assume you have the full note content unless explicitly asked to retrieve it later. Keep responses concise."
+
+                              // Revert to multi-line string construction
+                             let combinedNotePrompt = """
+                             \(notesSystemPrompt)
+
+                             Context:
+                             \(notesContextString)
+                             User Query: \(message)
+                             """ // Ensure closing quotes are on a new line
+                             
+                             print("Notes Combined Prompt (Multi-line):\n\(combinedNotePrompt)") // Debugging print
+
+                             let tempNotesThread = Thread()
+                             tempNotesThread.messages = [Message(role: .user, content: combinedNotePrompt)]
+                             
+                             let output = await llm.generate(
+                                 modelName: modelName,
+                                 thread: tempNotesThread,
+                                 systemPrompt: "" // System prompt embedded in message
+                             )
+                             sendMessage(Message(role: .assistant, content: output, thread: currentThread))
+                         } else {
+                             sendMessage(Message(role: .assistant, content: "Error: No AI model selected.", thread: currentThread))
+                         }
+                         // --- End Notes Logic ---
+                         
+                    case .reminders:
+                         print("Generating response based on reminders...")
+                         // 1. Parse user query (Simple keyword check for now)
+                         let query = message.lowercased()
+                         var filterPredicate: Predicate<Reminder>? = nil
+                         var fetchLimit = 50 // Limit fetched reminders
+                         
+                         if query.contains("overdue") {
+                             // Fetch incomplete reminders scheduled before the start of today
+                             let startOfToday = Calendar.current.startOfDay(for: Date())
+                             filterPredicate = #Predicate<Reminder> { !$0.isCompleted && $0.scheduledDate != nil && $0.scheduledDate! < startOfToday }
+                         } else if query.contains("today") {
+                             // Fetch incomplete reminders scheduled for today
+                             let startOfToday = Calendar.current.startOfDay(for: Date())
+                             let startOfTomorrow = Calendar.current.date(byAdding: .day, value: 1, to: startOfToday)!
+                             filterPredicate = #Predicate<Reminder> { !$0.isCompleted && $0.scheduledDate != nil && $0.scheduledDate! >= startOfToday && $0.scheduledDate! < startOfTomorrow }
+                         } else if query.contains("later") || query.contains("upcoming") {
+                             // Fetch incomplete reminders scheduled after today (including someday)
+                             let startOfTomorrow = Calendar.current.startOfDay(for: Date()) // Start of today to compare
+                             // Fetch future dated OR nil date reminders that are not complete
+                             filterPredicate = #Predicate<Reminder> { !$0.isCompleted && ($0.scheduledDate == nil || $0.scheduledDate! >= startOfTomorrow) }
+                         } else if query.contains("someday") {
+                             filterPredicate = #Predicate<Reminder> { !$0.isCompleted && $0.scheduledDate == nil }
+                         } else if query.contains("completed") {
+                             filterPredicate = #Predicate<Reminder> { $0.isCompleted }
+                         } else {
+                            // Default: Fetch all non-completed for general queries
+                             filterPredicate = #Predicate<Reminder> { !$0.isCompleted }
+                             fetchLimit = 20 // Lower limit for general queries
+                         }
+                         
+                         // 2. Fetch relevant Reminder objects
+                         var descriptor = FetchDescriptor<Reminder>(predicate: filterPredicate)
+                         descriptor.fetchLimit = fetchLimit
+                         // Add sorting if desired
+                         descriptor.sortBy = [SortDescriptor(\Reminder.scheduledDate, order: .forward)]
+                         
+                         let fetchedReminders = (try? modelContext.fetch(descriptor)) ?? []
+                         
+                         // 3. Prepare context
+                         var contextString = "User's Reminders based on query:\n"
+                         if fetchedReminders.isEmpty {
+                             contextString += "- No relevant reminders found.\n"
+                         } else {
+                             let dateFormatter = DateFormatter()
+                             dateFormatter.dateStyle = .short
+                             dateFormatter.timeStyle = .short
+                             for reminder in fetchedReminders {
+                                 let dateStr = reminder.scheduledDate != nil ? dateFormatter.string(from: reminder.scheduledDate!) : "Someday"
+                                 let status = reminder.isCompleted ? "Completed" : (reminder.scheduledDate != nil && reminder.scheduledDate! < Date() ? "Overdue" : "Pending")
+                                 contextString += "- \(reminder.taskDescription) (Due: \(dateStr), Status: \(status))\n"
+                             }
+                         }
+                         print("Reminder Context:\n\(contextString)")
+                         
+                         // 4. Call LLM (Revised Prompting AGAIN)
+                         if let modelName = appManager.currentModelName {
+                             // Stricter System Prompt
+                             let reminderSystemPrompt = "You are an assistant that ONLY answers questions about a list of reminders provided below. Use ONLY the information in the \'REMINDER LIST CONTEXT\' section to answer the \'USER QUERY\". Do not infer or discuss anything else. If the list doesn't contain the answer, say so clearly."
+                             
+                             // Revised User Message Content Format with Markers
+                             let userMessageContent = """
+                             [CONTEXT START]
+                             REMINDER LIST CONTEXT:
+                             \(contextString)
+                             [CONTEXT END]
+                             
+                             [QUERY START]
+                             USER QUERY: \(message)
+                             [QUERY END]
+                             """
+                             
+                             let tempRemindersThread = Thread()
+                             tempRemindersThread.messages = [Message(role: .user, content: userMessageContent)]
+                             
+                             let output = await llm.generate(
+                                 modelName: modelName,
+                                 thread: tempRemindersThread,
+                                 systemPrompt: reminderSystemPrompt 
+                             )
+                             sendMessage(Message(role: .assistant, content: output, thread: currentThread))
+                         } else {
+                             sendMessage(Message(role: .assistant, content: "Error: No AI model selected.", thread: currentThread))
+                         }
                     }
+                    // --- End Mode-Specific Logic ---
+                    
+                    generatingThreadID = nil
                 }
             }
         }
@@ -578,6 +807,29 @@ struct ChatView: View {
         audioEngine.prepare()
         try audioEngine.start()
     }
+
+    // --- Add stopSpeechRecognition Function ---
+    private func stopSpeechRecognition() {
+        audioEngine.stop()
+        recognitionRequest?.endAudio()
+        isRecording = false
+        print("Stopped recording via button")
+        // Deactivate audio session
+        try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
+    }
+    // --- End stopSpeechRecognition Function ---
+
+    // --- New Chat Helper --- 
+    private func newChat() {
+         currentThread = nil // Clear the current thread
+         prompt = "" // Clear any text in the input field
+         selectedMode = .chat // Optionally reset mode to default chat
+         isPromptFocused = false // Dismiss keyboard if open
+         // TODO: Maybe reset LLM state if needed?
+         appManager.playHaptic()
+         print("Started new chat.")
+     }
+    // --- End New Chat Helper ---
 }
 
 #Preview {

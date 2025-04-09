@@ -43,6 +43,29 @@ class AppManager: ObservableObject {
     @AppStorage("eyeTapAction") var eyeTapAction: EyeTapActionType = .blink // Default to blink
     // --- End Eye Tap Action Setting ---
     
+    // --- Buddy Gamification ---
+    @AppStorage("buddyXP") var buddyXP: Int = 0
+    
+    var buddyLevel: Int {
+        // Simple level calculation: Level up every 100 XP
+        // Level 1: 0-99 XP, Level 2: 100-199 XP, etc.
+        // Add 1 because level should start at 1, not 0.
+        return (buddyXP / 100) + 1 
+    }
+    
+    var xpTowardsNextLevel: Int {
+        // XP accumulated within the current level
+        return buddyXP % 100
+    }
+    
+    var xpForNextLevel: Int {
+        // Total XP needed to reach the *start* of the next level
+        // return buddyLevel * 100 // This is XP needed for *current* level start
+        // XP needed for the *next* level is 100
+        return 100 // Simple fixed 100 XP per level for now
+    }
+    // --- End Buddy Gamification ---
+    
     // --- Store Current User Name --- 
     @Published var currentUserName: String? = nil
     // --- End Store Current User Name ---
@@ -470,13 +493,15 @@ final class Reminder {
     var scheduledDate: Date?
     var isCompleted: Bool
     var creationDate: Date
+    var xpAwarded: Bool
 
-    init(id: UUID = UUID(), taskDescription: String, scheduledDate: Date?, isCompleted: Bool = false, creationDate: Date = Date()) {
+    init(id: UUID = UUID(), taskDescription: String, scheduledDate: Date?, isCompleted: Bool = false, creationDate: Date = Date(), xpAwarded: Bool = false) {
         self.id = id
         self.taskDescription = taskDescription
         self.scheduledDate = scheduledDate
         self.isCompleted = isCompleted
         self.creationDate = creationDate
+        self.xpAwarded = xpAwarded
     }
 }
 // --- End Reminder Model ---

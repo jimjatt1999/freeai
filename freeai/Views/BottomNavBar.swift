@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct BottomNavBar: View {
+    @EnvironmentObject var appManager: AppManager
     @Binding var showChat: Bool
     @Binding var showFreeMode: Bool
     @Binding var showFreeDump: Bool
@@ -32,11 +33,11 @@ struct BottomNavBar: View {
                     VStack(spacing: 4) {
                         Image(systemName: "bubble.left")
                             .font(.system(size: 20))
-                            .foregroundColor(showChat ? .blue : .gray.opacity(0.7))
+                            .foregroundColor(showChat ? appManager.appTintColor.getColor() : .gray.opacity(0.7))
                         
                         Text("Chat")
                             .font(.caption2)
-                            .foregroundColor(showChat ? .blue : .gray.opacity(0.7))
+                            .foregroundColor(showChat ? appManager.appTintColor.getColor() : .gray.opacity(0.7))
                     }
                     .frame(maxWidth: .infinity)
                 }
@@ -51,11 +52,11 @@ struct BottomNavBar: View {
                     VStack(spacing: 4) {
                         Image(systemName: "doc.text")
                             .font(.system(size: 20))
-                            .foregroundColor(showFreeMode ? .blue : .gray.opacity(0.7))
+                            .foregroundColor(showFreeMode ? appManager.appTintColor.getColor() : .gray.opacity(0.7))
                         
                         Text("Freestyle")
                             .font(.caption2)
-                            .foregroundColor(showFreeMode ? .blue : .gray.opacity(0.7))
+                            .foregroundColor(showFreeMode ? appManager.appTintColor.getColor() : .gray.opacity(0.7))
                     }
                     .frame(maxWidth: .infinity)
                 }
@@ -70,11 +71,11 @@ struct BottomNavBar: View {
                     VStack(spacing: 4) {
                         Image(systemName: "note.text")
                             .font(.system(size: 20))
-                            .foregroundColor(showFreeDump ? .blue : .gray.opacity(0.7))
+                            .foregroundColor(showFreeDump ? appManager.appTintColor.getColor() : .gray.opacity(0.7))
                         
                         Text("FreeDump")
                             .font(.caption2)
-                            .foregroundColor(showFreeDump ? .blue : .gray.opacity(0.7))
+                            .foregroundColor(showFreeDump ? appManager.appTintColor.getColor() : .gray.opacity(0.7))
                     }
                     .frame(maxWidth: .infinity)
                 }
@@ -89,11 +90,11 @@ struct BottomNavBar: View {
                     VStack(spacing: 4) {
                         Image(systemName: "face.smiling")
                             .font(.system(size: 20))
-                            .foregroundColor(showFreeBuddy ? .blue : .gray.opacity(0.7))
+                            .foregroundColor(showFreeBuddy ? appManager.appTintColor.getColor() : .gray.opacity(0.7))
                         
                         Text("Buddy")
                             .font(.caption2)
-                            .foregroundColor(showFreeBuddy ? .blue : .gray.opacity(0.7))
+                            .foregroundColor(showFreeBuddy ? appManager.appTintColor.getColor() : .gray.opacity(0.7))
                     }
                     .frame(maxWidth: .infinity)
                 }
@@ -117,4 +118,5 @@ struct BottomNavBar: View {
         showFreeDump: .constant(false),
         showFreeBuddy: .constant(false)
     )
+    .environmentObject(AppManager())
 } 

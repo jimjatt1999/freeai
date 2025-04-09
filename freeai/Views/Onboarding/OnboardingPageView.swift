@@ -10,37 +10,28 @@ struct OnboardingPageView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 30) {
-                // --- Display Animated Eyes instead of Title/Subtitle --- 
+            VStack(spacing: 20) {
+                // Animated Eyes
                 AnimatedEyesView()
-                    .scaleEffect(2.5) // Make eyes larger for onboarding
-                    .padding(.top, geo.size.height * 0.1) // Adjust vertical position
+                    .scaleEffect(2.0)
+                    .padding(.top, geo.size.height * 0.08)
                     .opacity(fadeInTrigger ? 1 : 0)
                     .scaleEffect(animationTrigger ? 1 : 0.8)
                     .offset(y: animationTrigger ? 0 : 30)
-                    .padding(.bottom, 10) // Add some space below eyes
+                    .padding(.bottom, 5)
 
-                // --- Commented Out Original Title/Subtitle ---
-                /*
-                 Text(page.title)
-                 .font(.largeTitle.bold())
-                 .scaleEffect(animationTrigger ? 1 : 0.8)
-                 .offset(y: animationTrigger ? 0 : 30)
-                 .opacity(fadeInTrigger ? 1 : 0)
-                 
-                 Text(page.subtitle)
-                 .font(.title3)
-                 .multilineTextAlignment(.center)
-                 .foregroundStyle(.secondary)
-                 .padding(.horizontal, 40)
-                 .scaleEffect(animationTrigger ? 1 : 0.9)
-                 .offset(y: animationTrigger ? 0 : 30)
-                 .opacity(fadeInTrigger ? 1 : 0)
-                 */
-                // --- End Original ---
+                // --- Add Section Title --- 
+                Text(page.title)
+                     .font(.system(size: 28, weight: .bold, design: .rounded))
+                     .foregroundStyle(.primary)
+                     .scaleEffect(animationTrigger ? 1 : 0.8)
+                     .offset(y: animationTrigger ? 0 : 30)
+                     .opacity(fadeInTrigger ? 1 : 0)
+                     .padding(.bottom, 15)
+                // --- End Section Title ---
                 
                 // Features grid 
-                VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: 6) {
                     Text("FEATURES")
                         .font(.subheadline)
                         .fontWeight(.semibold)
@@ -50,9 +41,9 @@ struct OnboardingPageView: View {
                         .opacity(fadeInTrigger ? 1 : 0)
                     
                     LazyVGrid(columns: [
-                        GridItem(.flexible(), spacing: 12, alignment: .top),
-                        GridItem(.flexible(), spacing: 12, alignment: .top)
-                    ], spacing: 12) {
+                        GridItem(.flexible(), spacing: 10, alignment: .top),
+                        GridItem(.flexible(), spacing: 10, alignment: .top)
+                    ], spacing: 10) {
                         ForEach(page.features) { feature in
                             FeatureCard(
                                 icon: feature.icon,
@@ -67,10 +58,10 @@ struct OnboardingPageView: View {
                 .offset(y: fadeInTrigger ? 0 : 40)
                 .opacity(fadeInTrigger ? 1 : 0)
                 
-                // Add bottom padding to ensure content doesn't overlap with controls
+                // Add bottom padding
                 Spacer(minLength: 150)
             }
-            .frame(minHeight: geo.size.height - 150) // Ensure content fills space
+            .frame(minHeight: geo.size.height - 150)
         }
         .scrollDisabled(true)
         .onAppear {

@@ -168,86 +168,15 @@ struct FreeDumpView: View {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 8) {
                             // All filter
-                            Button {
-                                withAnimation {
-                                    selectedCategoryFilter = nil
-                                }
-                            } label: {
-                                Text("All")
-                                    .font(.caption)
-                                    .padding(.horizontal, 12)
-                                    .padding(.vertical, 6)
-                                    .background(
-                                        Capsule()
-                                            .fill(selectedCategoryFilter == nil ? 
-                                                  Color.blue : Color(.systemGray5))
-                                    )
-                                    .foregroundColor(selectedCategoryFilter == nil ? 
-                                                  .white : .primary)
-                            }
+                            filterChip(label: "All", filterValue: nil)
                             
                             // Date filters
-                            Group {
-                                Button {
-                                    withAnimation {
-                                        selectedCategoryFilter = "today"
-                                    }
-                                } label: {
-                                    Text("Today")
-                                        .font(.caption)
-                                        .padding(.horizontal, 12)
-                                        .padding(.vertical, 6)
-                                        .background(
-                                            Capsule()
-                                                .fill(selectedCategoryFilter == "today" ? 
-                                                      Color.blue : Color(.systemGray5))
-                                        )
-                                        .foregroundColor(selectedCategoryFilter == "today" ? 
-                                                      .white : .primary)
-                                }
-                                
-                                Button {
-                                    withAnimation {
-                                        selectedCategoryFilter = "this-week"
-                                    }
-                                } label: {
-                                    Text("This Week")
-                                        .font(.caption)
-                                        .padding(.horizontal, 12)
-                                        .padding(.vertical, 6)
-                                        .background(
-                                            Capsule()
-                                                .fill(selectedCategoryFilter == "this-week" ? 
-                                                      Color.blue : Color(.systemGray5))
-                                        )
-                                        .foregroundColor(selectedCategoryFilter == "this-week" ? 
-                                                      .white : .primary)
-                                }
-                            }
+                            filterChip(label: "Today", filterValue: "today")
+                            filterChip(label: "This Week", filterValue: "this-week")
                             
                             // Category filters
                             ForEach(availableCategories, id: \.self) { category in
-                                Button {
-                                    withAnimation {
-                                        if selectedCategoryFilter == category {
-                                            selectedCategoryFilter = nil
-                                        } else {
-                                            selectedCategoryFilter = category
-                                        }
-                                    }
-                                } label: {
-                                    Text(category.capitalized)
-                                        .font(.caption)
-                                        .padding(.horizontal, 12)
-                                        .padding(.vertical, 6)
-                                        .background(
-                                            Capsule()
-                                                .fill(selectedCategoryFilter == category ? 
-                                                      Color.blue : Color(.systemGray5))
-                                        )
-                                        .foregroundColor(selectedCategoryFilter == category ? 
-                                                      .white : .primary)
-                                }
+                                filterChip(label: category.capitalized, filterValue: category)
                             }
                         }
                         .padding(.horizontal)
@@ -280,7 +209,7 @@ struct FreeDumpView: View {
                             } label: {
                                 Text("Clear filter")
                                     .font(.caption)
-                                    .foregroundColor(.blue)
+                                    .foregroundColor(appManager.appTintColor.getColor())
                             }
                         }
                         .padding(.horizontal)
@@ -349,7 +278,7 @@ struct FreeDumpView: View {
                             Image(systemName: "square.and.pencil")
                                 .font(.system(size: 24, weight: .semibold))
                                 .padding()
-                                .background(Circle().fill(Color.blue))
+                                .background(Circle().fill(appManager.appTintColor.getColor()))
                                 .foregroundColor(.white)
                                 .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 3)
                         }
@@ -425,7 +354,7 @@ struct FreeDumpView: View {
                     .foregroundColor(.white)
                     .padding(.horizontal, 20)
                     .padding(.vertical, 12)
-                    .background(Capsule().fill(Color.blue))
+                    .background(Capsule().fill(appManager.appTintColor.getColor()))
             }
             .padding(.top, 10)
             
@@ -517,6 +446,33 @@ struct FreeDumpView: View {
             return formatter.string(from: date)
         }
     }
+    
+    // --- Filter Chip Helper View ---
+    private func filterChip(label: String, filterValue: String?) -> some View {
+        Button {
+            withAnimation {
+                if selectedCategoryFilter == filterValue {
+                    selectedCategoryFilter = nil
+                } else {
+                    selectedCategoryFilter = filterValue
+                }
+            }
+        } label: {
+            Text(label)
+                .font(.caption)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(
+                    Capsule()
+                        .fill(selectedCategoryFilter == filterValue ? 
+                              appManager.appTintColor.getColor() : Color(.systemGray5))
+                )
+                .foregroundColor(selectedCategoryFilter == filterValue ? 
+                              .white : .primary)
+        }
+        .buttonStyle(.plain)
+    }
+    // --- End Filter Chip Helper View ---
 }
 
 // Preview provider

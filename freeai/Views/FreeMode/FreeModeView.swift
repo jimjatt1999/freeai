@@ -231,12 +231,12 @@ struct FreeModeView: View {
             } label: {
                 Text("Set Your Preferences")
                     .fontWeight(.semibold)
-                    .foregroundColor(.white)
+                    .foregroundColor(.white) // Keep text white
                     .padding(.vertical, 12)
                     .padding(.horizontal, 20)
                     .background(
                         RoundedRectangle(cornerRadius: 12)
-                            .fill(Color.blue)
+                            .fill(appManager.appTintColor.getColor()) // Use tint color
                     )
             }
             .padding(.top)
@@ -298,7 +298,7 @@ struct FreeModeView: View {
             }
         }
         .frame(width: fabWidth, height: 50) // Animate width, fixed height
-        .background(Color.blue)
+        .background(appManager.appTintColor.getColor()) // Use tint color
         .clipShape(Capsule())
         .shadow(radius: 5)
         .scaleEffect(fabScale) // Apply scale effect for long press
@@ -369,12 +369,12 @@ struct FreeModeView: View {
             HStack(spacing: 6) {
                 ZStack {
                     Circle()
-                        .fill(Color.blue.opacity(0.1))
+                        .fill(appManager.appTintColor.getColor().opacity(0.1)) // Use tint color (lightly)
                         .frame(width: 28, height: 28)
                     
                     Text(String(appManager.modelDisplayName(appManager.freeModeModelName ?? appManager.currentModelName ?? "").prefix(1)))
                         .font(.system(size: 14, weight: .semibold))
-                        .foregroundColor(.blue)
+                        .foregroundColor(appManager.appTintColor.getColor()) // Use tint color
                 }
                 
                 Text(appManager.modelDisplayName(appManager.freeModeModelName ?? appManager.currentModelName ?? ""))
@@ -627,9 +627,9 @@ struct FreeModeView: View {
                         showCustomPromptSheet = false
                     }
                     .frame(maxWidth: .infinity, alignment: .center)
-                    .foregroundColor(.white)
+                    .foregroundColor(.white) // Keep text white
                     .padding()
-                    .background(Color.blue)
+                    .background(appManager.appTintColor.getColor()) // Use tint color
                     .cornerRadius(10)
                     .buttonStyle(PlainButtonStyle())
                     .disabled((useSelectedTopics && topicInput.isEmpty) && 
@@ -1535,7 +1535,7 @@ struct ContentCardView: View {
                     }
                     
                     // Save/unsave button
-                    actionButton(iconName: contentCard.isSaved ? "bookmark.fill" : "bookmark", color: contentCard.isSaved ? .accentColor : .secondary) {
+                    actionButton(iconName: contentCard.isSaved ? "bookmark.fill" : "bookmark", color: contentCard.isSaved ? appManager.appTintColor.getColor() : .secondary) {
                         contentCard.isSaved.toggle()
                     }
                     
