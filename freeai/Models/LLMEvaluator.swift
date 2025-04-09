@@ -120,9 +120,12 @@ class LLMEvaluator {
             // augment the prompt as needed
             let promptHistory = modelContainer.configuration.getPromptHistory(thread: thread, systemPrompt: systemPrompt)
 
+            // DeepSeek models are no longer available
+            /*
             if modelContainer.configuration.modelType == .reasoning {
                 isThinking = true
             }
+            */
 
             // each time you generate you will get something new
             MLXRandom.seed(UInt64(Date.timeIntervalSinceReferenceDate * 1000))
@@ -189,9 +192,12 @@ class LLMEvaluator {
                     // augment the prompt as needed
                     let promptHistory = modelContainer.configuration.getPromptHistory(thread: thread, systemPrompt: systemPrompt)
                     
+                    // DeepSeek models are no longer available
+                    /*
                     if modelContainer.configuration.modelType == .reasoning {
                         isThinking = true
                     }
+                    */
                     
                     // each time you generate you will get something new
                     MLXRandom.seed(UInt64(Date.timeIntervalSinceReferenceDate * 1000))

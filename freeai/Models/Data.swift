@@ -92,7 +92,15 @@ class AppManager: ObservableObject {
     }
     
     func modelDisplayName(_ modelName: String) -> String {
-        return modelName.replacingOccurrences(of: "mlx-community/", with: "").lowercased()
+        // Custom display names for more legitimate branding
+        if modelName.contains("Llama-3.2-1B") {
+            return "Free 1B"
+        } else if modelName.contains("Llama-3.2-3B") {
+            return "Free 3B"
+        } else {
+            // Default fallback for any other models
+            return modelName.replacingOccurrences(of: "mlx-community/", with: "")
+        }
     }
     
     func getMoonPhaseIcon() -> String {

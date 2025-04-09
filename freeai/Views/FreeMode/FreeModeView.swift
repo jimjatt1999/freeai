@@ -39,51 +39,59 @@ struct FreeModeView: View {
     
     var body: some View {
         NavigationStack {
-            ZStack {
-                // Header with lowercased name
-                VStack(spacing: 0) {
-                    HStack {
+            VStack(spacing: 0) {
+                // Header with lowercased name - always at top
+                HStack {
+                    Button {
+                        showChat = false
+                    } label: {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 18, weight: .semibold))
+                    }
+                    
+                    Spacer()
+                    
+                    Text("freestyle")
+                        .font(.title)
+                        .fontWeight(.bold)
+                    
+                    Spacer()
+                    
+                    HStack(spacing: 16) {
+                        // Saved/All toggle
                         Button {
-                            showChat = false
+                            appManager.playHaptic()
+                            showingSavedCards.toggle()
                         } label: {
-                            Image(systemName: "chevron.left")
-                                .font(.system(size: 18, weight: .semibold))
+                            Image(systemName: showingSavedCards ? "bookmark.fill" : "bookmark")
+                                .foregroundColor(.blue)
                         }
                         
-                        Spacer()
-                        
-                        Text("freestyle")
-                            .font(.title)
-                            .fontWeight(.bold)
-                        
-                        Spacer()
-                        
-                        HStack(spacing: 16) {
-                            // Saved/All toggle
-                            Button {
-                                appManager.playHaptic()
-                                showingSavedCards.toggle()
-                            } label: {
-                                Image(systemName: showingSavedCards ? "bookmark.fill" : "bookmark")
-                                    .foregroundColor(.blue)
-                            }
-                            
-                            // Settings
-                            NavigationLink(destination: FreeModeSettingsView()) {
-                                Image(systemName: "gearshape")
-                                    .font(.system(size: 18))
-                            }
+                        // Settings
+                        NavigationLink(destination: FreeModeSettingsView()) {
+                            Image(systemName: "gearshape")
+                                .font(.system(size: 18))
                         }
                     }
-                    .padding()
-                    
+                }
+                .padding()
+                
+                // Content area - fill remaining space with a ZStack that positions empty state correctly
+                ZStack {
                     if contentCards.isEmpty {
-                        emptyStateView
+                        ScrollView {
+                            emptyStateView
+                                .frame(minHeight: UIScreen.main.bounds.height * 0.7) // Ensure proper spacing
+                        }
                     } else {
                         contentListView
                     }
                 }
-                
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+            
+            // Floating action button
+            .overlay(
                 VStack {
                     Spacer()
                     HStack {
@@ -92,7 +100,7 @@ struct FreeModeView: View {
                             .padding()
                     }
                 }
-            }
+            )
             .navigationBarHidden(true)
             .sheet(isPresented: $showTopicInput) {
                 topicInputView

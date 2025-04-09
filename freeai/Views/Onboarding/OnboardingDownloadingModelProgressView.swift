@@ -19,17 +19,17 @@ struct OnboardingDownloadingModelProgressView: View {
     @State private var messageIndex = 0
     
     let funMessages = [
-        "AI will take over the world, might as well be free...",
-        "Loading intelligence...",
-        "Downloading brain cells...",
-        "Free forever, no subscriptions ever!",
-        "No internet needed, complete privacy",
-        "Super free, super private, super cool",
-        "Freestyle AI, coming right up",
-        "No data leaves your device",
-        "The future is free and it's looking good",
-        "This is what freedom looks like",
-        "Free AI for everyone!"
+        "Installing AI directly into your device... no cloud needed!",
+        "Moving in furniture for the AI living in your phone...",
+        "Teaching your device to think for itself...",
+        "No internet needed! Works even in elevator shafts!",
+        "The entire universe of AI, now in your pocket...",
+        "Your device is getting smarter by the second...",
+        "Building a tiny AI apartment in your local storage...",
+        "All the computing happens right here in your hands...",
+        "No data vacations to server farms allowed...",
+        "If your phone feels warmer, that's just the AI thinking...",
+        "100% offline - works great during zombie apocalypses!"
     ]
     
     var installed: Bool {
@@ -41,24 +41,24 @@ struct OnboardingDownloadingModelProgressView: View {
             Spacer()
             
             // Animation and status section
-            VStack(spacing: 24) {
+            VStack(spacing: 30) {
                 ZStack {
                     // Progress ring
                     Circle()
                         .stroke(
-                            Color.primary.opacity(0.2),
-                            lineWidth: 8
+                            Color.primary.opacity(0.15),
+                            lineWidth: 10
                         )
-                        .frame(width: 120, height: 120)
+                        .frame(width: 140, height: 140)
                     
                     // Progress indicator
                     Circle()
                         .trim(from: 0, to: CGFloat(llm.progress))
                         .stroke(
                             Color.primary,
-                            style: StrokeStyle(lineWidth: 8, lineCap: .round)
+                            style: StrokeStyle(lineWidth: 10, lineCap: .round)
                         )
-                        .frame(width: 120, height: 120)
+                        .frame(width: 140, height: 140)
                         .rotationEffect(.degrees(-90))
                         .animation(.easeInOut(duration: 0.2), value: llm.progress)
                     
@@ -67,24 +67,25 @@ struct OnboardingDownloadingModelProgressView: View {
                         Image(systemName: "checkmark.circle.fill")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
-                            .frame(width: 60, height: 60)
+                            .frame(width: 70, height: 70)
                             .foregroundStyle(.green)
                             .transition(.scale.combined(with: .opacity))
                     } else {
                         MoonAnimationView(isDone: false)
                             .scaleEffect(progressScale)
+                            .frame(width: 70, height: 70)
                     }
                 }
                 .scaleEffect(animationTrigger ? 1 : 0.5)
                 .opacity(animationTrigger ? 1 : 0)
                 
-                VStack(spacing: 8) {
-                    Text(installed ? "Installation Complete" : "Installing Model")
-                        .font(.system(size: 28, weight: .bold, design: .rounded))
+                VStack(spacing: 12) {
+                    Text(installed ? "Installation Complete" : "Setting Up Free AI")
+                        .font(.system(size: 32, weight: .bold, design: .rounded))
                         .foregroundStyle(Color.primary)
                         .multilineTextAlignment(.center)
                     
-                    Text(appManager.modelDisplayName(selectedModel.name))
+                    Text(installed ? "Ready to use \(appManager.modelDisplayName(selectedModel.name))" : "Installing \(selectedModel.name.contains("3B") ? "Free 3B" : "Free 1B")")
                         .font(.headline)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
@@ -95,9 +96,9 @@ struct OnboardingDownloadingModelProgressView: View {
                 
                 // Progress text and fun message
                 if !installed {
-                    VStack(spacing: 12) {
+                    VStack(spacing: 16) {
                         Text("\(Int(llm.progress * 100))%")
-                            .font(.headline)
+                            .font(.title2.bold())
                             .foregroundStyle(.secondary)
                             .contentTransition(.numericText())
                             .animation(.easeInOut, value: llm.progress)
@@ -106,7 +107,7 @@ struct OnboardingDownloadingModelProgressView: View {
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                             .multilineTextAlignment(.center)
-                            .padding(.horizontal)
+                            .padding(.horizontal, 40)
                             .frame(height: 50)
                             .transition(.opacity)
                             .id("message-\(messageIndex)")
@@ -125,11 +126,10 @@ struct OnboardingDownloadingModelProgressView: View {
                         .font(.headline)
                         .fontWeight(.semibold)
                         .frame(maxWidth: .infinity)
-                        .frame(height: 56)
+                        .frame(height: 60)
                         .foregroundStyle(.white)
                         .background(Color.primary)
-                        .clipShape(RoundedRectangle(cornerRadius: 16))
-                        .shadow(color: .black.opacity(0.05), radius: 3, x: 0, y: 1)
+                        .cornerRadius(16)
                 }
                 .padding(.horizontal, 32)
                 .transition(.opacity.combined(with: .move(edge: .bottom)))
@@ -142,11 +142,12 @@ struct OnboardingDownloadingModelProgressView: View {
                     .opacity(animationTrigger ? 1 : 0)
             }
         }
-        .padding()
+        .padding(30)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(.systemBackground))
+        .ignoresSafeArea()
         .navigationTitle("")
-        .toolbar(installed ? .hidden : .visible)
+        .toolbar(.hidden)
         .navigationBarBackButtonHidden()
         .onAppear {
             withAnimation(.spring(duration: 0.8)) {

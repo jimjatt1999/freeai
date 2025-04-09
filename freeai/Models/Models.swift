@@ -8,17 +8,20 @@ import Foundation
 import MLXLMCommon
 
 public extension ModelConfiguration {
+    // Commented out since DeepSeek models are removed and these were the only ones using reasoning type
+    /*
     enum ModelType {
         case regular, reasoning
     }
 
     var modelType: ModelType {
         switch self {
-        case .deepseek_r1_distill_qwen_1_5b_4bit: .reasoning
-        case .deepseek_r1_distill_qwen_1_5b_8bit: .reasoning
+        // case .deepseek_r1_distill_qwen_1_5b_4bit: .reasoning
+        // case .deepseek_r1_distill_qwen_1_5b_8bit: .reasoning
         default: .regular
         }
     }
+    */
 }
 
 extension ModelConfiguration: @retroactive Equatable {
@@ -34,19 +37,19 @@ extension ModelConfiguration: @retroactive Equatable {
         id: "mlx-community/Llama-3.2-3B-Instruct-4bit"
     )
 
-    public static let deepseek_r1_distill_qwen_1_5b_4bit = ModelConfiguration(
-        id: "mlx-community/DeepSeek-R1-Distill-Qwen-1.5B-4bit"
-    )
+    // public static let deepseek_r1_distill_qwen_1_5b_4bit = ModelConfiguration(
+    //     id: "mlx-community/DeepSeek-R1-Distill-Qwen-1.5B-4bit"
+    // )
     
-    public static let deepseek_r1_distill_qwen_1_5b_8bit = ModelConfiguration(
-        id: "mlx-community/DeepSeek-R1-Distill-Qwen-1.5B-8bit"
-    )
+    // public static let deepseek_r1_distill_qwen_1_5b_8bit = ModelConfiguration(
+    //     id: "mlx-community/DeepSeek-R1-Distill-Qwen-1.5B-8bit"
+    // )
 
     public static var availableModels: [ModelConfiguration] = [
         llama_3_2_1b_4bit,
-        llama_3_2_3b_4bit,
-        deepseek_r1_distill_qwen_1_5b_4bit,
-        deepseek_r1_distill_qwen_1_5b_8bit
+        llama_3_2_3b_4bit
+        // deepseek_r1_distill_qwen_1_5b_4bit,
+        // deepseek_r1_distill_qwen_1_5b_8bit
     ]
 
     public static var defaultModel: ModelConfiguration {
@@ -84,11 +87,14 @@ extension ModelConfiguration: @retroactive Equatable {
 
     // TODO: Remove this function when Jinja gets updated
     func formatForTokenizer(_ message: String) -> String {
+        // Removed reasoning model type since DeepSeek models are no longer available
+        /* 
         if self.modelType == .reasoning {
             return " " + message
                 .replacingOccurrences(of: "<think>", with: "")
                 .replacingOccurrences(of: "</think>", with: "")
         }
+        */
         
         return message
     }
@@ -98,8 +104,8 @@ extension ModelConfiguration: @retroactive Equatable {
         switch self {
         case .llama_3_2_1b_4bit: return 0.7
         case .llama_3_2_3b_4bit: return 1.8
-        case .deepseek_r1_distill_qwen_1_5b_4bit: return 1.0
-        case .deepseek_r1_distill_qwen_1_5b_8bit: return 1.9
+        // case .deepseek_r1_distill_qwen_1_5b_4bit: return 1.0
+        // case .deepseek_r1_distill_qwen_1_5b_8bit: return 1.9
         default: return nil
         }
     }

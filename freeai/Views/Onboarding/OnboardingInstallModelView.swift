@@ -24,22 +24,20 @@ struct OnboardingInstallModelView: View {
     var modelsList: some View {
         VStack(spacing: 24) {
             // Header
-            VStack(spacing: 12) {
-                Image(systemName: "square.and.arrow.down.fill")
-                    .font(.system(size: 38))
-                    .foregroundStyle(Color.primary)
-                    .frame(width: 80, height: 80)
-                    .background(Color(.systemBackground))
-                    .clipShape(Circle())
-                    .shadow(color: .black.opacity(0.05), radius: 5, x: 0, y: 2)
+            VStack(spacing: 18) {
+                // Minimalist icon
+                Rectangle()
+                    .fill(Color.primary)
+                    .frame(width: 60, height: 60)
+                    .cornerRadius(16)
                     .scaleEffect(animationTrigger ? 1.0 : 0.5)
                     .opacity(animationTrigger ? 1.0 : 0.0)
 
-                VStack(spacing: 8) {
+                VStack(spacing: 12) {
                     Text("Let's get you started")
-                        .font(.system(size: 28, weight: .bold, design: .rounded))
+                        .font(.system(size: 32, weight: .bold, design: .rounded))
                         .foregroundStyle(Color.primary)
-                    Text("Choose a model for your device")
+                    Text("Choose a model that lives entirely on your device")
                         .font(.headline)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
@@ -48,12 +46,12 @@ struct OnboardingInstallModelView: View {
                 .offset(y: animationTrigger ? 0 : 20)
                 .opacity(animationTrigger ? 1.0 : 0.0)
             }
-            .padding(.top, 36)
-            .padding(.bottom, 20)
+            .padding(.top, 60)
+            .padding(.bottom, 10)
 
             // Model sections
             ScrollView {
-                VStack(spacing: 20) {
+                VStack(spacing: 26) {
                     if appManager.installedModels.count > 0 {
                         ModelSection(
                             title: "Installed",
@@ -63,6 +61,7 @@ struct OnboardingInstallModelView: View {
                                 let model = ModelConfiguration.getModelByName(modelName)
                                 ModelRow(
                                     title: appManager.modelDisplayName(modelName),
+                                    subtitle: nil,
                                     isSelected: false,
                                     isDisabled: true,
                                     size: sizeBadge(model),
@@ -70,35 +69,95 @@ struct OnboardingInstallModelView: View {
                                 )
                             }
                         }
+                        
+                        // Show available models section if there are any non-installed models
+                        if !filteredModels.isEmpty {
+                            ModelSection(
+                                title: "Available Models",
+                                delay: 0.2
+                            ) {
+                                ForEach(filteredModels, id: \.name) { model in
+                                    ModelRow(
+                                        title: appManager.modelDisplayName(model.name),
+                                        subtitle: model.name.contains("3B") ? 
+                                            "The big brain that lives in your phone - no cloud needed" : 
+                                            "Light and zippy - the AI that fits in your pocket",
+                                        isSelected: selectedModel.name == model.name,
+                                        isDisabled: false,
+                                        size: sizeBadge(model),
+                                        action: { selectedModel = model }
+                                    )
+                                }
+                            }
+                        }
                     } else {
                         ModelSection(
-                            title: "Free",
+                            title: "Choose a Model",
                             delay: 0.1
                         ) {
+                            // Free 1B (previously Llama 3.2 1B)
                             ModelRow(
-                                title: "Llama 3.2 (Recommended)",
+                                title: "Free 1B",
+                                subtitle: "Light and zippy - the AI that fits in your pocket",
                                 isSelected: selectedModel.name == suggestedModel.name,
                                 isDisabled: false,
                                 size: sizeBadge(suggestedModel),
                                 action: { selectedModel = suggestedModel }
                             )
-                        }
-                    }
-
-                    if filteredModels.count > 0 {
-                        ModelSection(
-                            title: "More Options",
-                            delay: 0.3
-                        ) {
-                            ForEach(filteredModels, id: \.name) { model in
+                            
+                            // Free 3B (previously Llama 3.2 3B)
+                            if let model3b = ModelConfiguration.getModelByName("mlx-community/Llama-3.2-3B-Instruct-4bit") {
                                 ModelRow(
-                                    title: appManager.modelDisplayName(model.name),
-                                    isSelected: selectedModel.name == model.name,
+                                    title: "Free 3B",
+                                    subtitle: "The big brain that lives in your phone - no cloud needed",
+                                    isSelected: selectedModel.name == model3b.name,
                                     isDisabled: false,
-                                    size: sizeBadge(model),
-                                    action: { selectedModel = model }
+                                    size: sizeBadge(model3b),
+                                    action: { selectedModel = model3b }
                                 )
                             }
+                        }
+                        
+                        // Feature showcase section
+                        ModelSection(
+                            title: "App Features",
+                            delay: 0.2
+                        ) {
+                            AppFeatureRow(
+                                title: "Chat",
+                                description: "Your AI buddy that never leaves your device (or judges your spelling)",
+                                iconName: "message.fill"
+                            )
+                            
+                            AppFeatureRow(
+                                title: "freestyle",
+                                description: "Generate creative content faster than you can say 'writer's block'",
+                                iconName: "square.text.square.fill"
+                            )
+                            
+                            AppFeatureRow(
+                                title: "freedump",
+                                description: "Turn your brain dumps into organized notes, because your thoughts deserve better",
+                                iconName: "doc.text.fill"
+                            )
+                        }
+                        
+                        // Local processing emphasis section
+                        ModelSection(
+                            title: "100% On-Device",
+                            delay: 0.3
+                        ) {
+                            AppFeatureRow(
+                                title: "No Internet Required",
+                                description: "Works in airplane mode, underwater, or in a tin foil bunker",
+                                iconName: "wifi.slash"
+                            )
+                            
+                            AppFeatureRow(
+                                title: "Your Data Stays Local",
+                                description: "What happens on your device, stays on your device. Vegas rules.",
+                                iconName: "lock.shield"
+                            )
                         }
                     }
                 }
@@ -111,20 +170,20 @@ struct OnboardingInstallModelView: View {
                     .font(.headline)
                     .fontWeight(.semibold)
                     .frame(maxWidth: .infinity)
-                    .frame(height: 56)
+                    .frame(height: 60)
                     .foregroundStyle(.white)
                     .background(Color.primary)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
-                    .shadow(color: .black.opacity(0.05), radius: 3, x: 0, y: 1)
+                    .cornerRadius(16)
             }
             .disabled(filteredModels.isEmpty && appManager.installedModels.isEmpty)
             .padding(.horizontal, 20)
-            .padding(.bottom, 30)
+            .padding(.vertical, 30)
             .opacity(animationTrigger ? 1.0 : 0.0)
             .offset(y: animationTrigger ? 0 : 20)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(.systemBackground))
+        .ignoresSafeArea()
         .onAppear {
             withAnimation(.spring(duration: 0.8)) {
                 animationTrigger = true
@@ -145,18 +204,16 @@ struct OnboardingInstallModelView: View {
             checkMetal3Support()
         }
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.hidden)
     }
 
     var filteredModels: [ModelConfiguration] {
         ModelConfiguration.availableModels
             .filter { !appManager.installedModels.contains($0.name) }
-            .filter { model in
-                !(appManager.installedModels.isEmpty && model.name == suggestedModel.name)
-            }
             .sorted { $0.name < $1.name }
     }
 
-    func checkModels() {
+    private func checkModels() {
         // automatically select the first available model
         if appManager.installedModels.contains(suggestedModel.name) {
             if let model = filteredModels.first {
@@ -205,6 +262,7 @@ struct ModelSection<Content: View>: View {
 
 struct ModelRow: View {
     let title: String
+    let subtitle: String?
     let isSelected: Bool
     let isDisabled: Bool
     let size: String?
@@ -219,9 +277,16 @@ struct ModelRow: View {
                         .font(.system(size: 20))
                         .foregroundStyle(isInstalled ? .green : (isSelected ? .primary : .secondary))
                     
-                    Text(title)
-                        .font(.headline)
-                        .foregroundStyle(isDisabled ? .secondary : .primary)
+                    VStack(alignment: .leading) {
+                        Text(title)
+                            .font(.headline)
+                            .foregroundStyle(isDisabled ? .secondary : .primary)
+                        if let subtitle = subtitle {
+                            Text(subtitle)
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
                 }
                 
                 Spacer()
@@ -246,6 +311,33 @@ struct ModelRow: View {
         }
         .buttonStyle(PlainButtonStyle())
         .disabled(isDisabled)
+    }
+}
+
+struct AppFeatureRow: View {
+    let title: String
+    let description: String
+    let iconName: String
+    
+    var body: some View {
+        HStack(alignment: .top) {
+            Image(systemName: iconName)
+                .font(.system(size: 20))
+                .foregroundStyle(.secondary)
+            
+            VStack(alignment: .leading) {
+                Text(title)
+                    .font(.headline)
+                    .foregroundStyle(.primary)
+                Text(description)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(.secondarySystemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 }
 

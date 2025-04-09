@@ -133,7 +133,7 @@ struct ContentView: View {
                     view.presentationDetents([.medium])
                 }
         }
-        .sheet(isPresented: $showOnboarding, onDismiss: dismissOnboarding) {
+        .fullScreenCover(isPresented: $showOnboarding, onDismiss: dismissOnboarding) {
             OnboardingView(showOnboarding: $showOnboarding)
                 .environment(llm)
                 .interactiveDismissDisabled(appManager.installedModels.count == 0)
