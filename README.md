@@ -7,6 +7,7 @@ An on-device AI assistant for iPhone, iPad and Mac with chat, content generation
 - **Chat**: Conversational AI always available, no internet required
 - **freestyle**: Generate creative content on any topic, in various styles
 - **freedump**: Process and organize your notes with AI assistance
+- **Customizable Animated Eyes**: Fun, interactive visual feedback (optional)
 - **Completely Local**: All processing happens on-device, no data sent anywhere
 - **No Subscriptions**: Free forever, no hidden costs
 

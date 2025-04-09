@@ -2,7 +2,6 @@
 //  LaunchView.swift
 //  free ai
 //
-//  Created by Jordan Singer on 4/8/24.
 //
 
 import SwiftUI
@@ -26,14 +25,12 @@ struct LaunchView: View {
                 VStack(spacing: 20) {
                     Spacer()
                     
-                    // Minimalist launch icon (removing the moon)
-                    Rectangle()
-                        .fill(Color.primary)
-                        .frame(width: 60, height: 60)
-                        .cornerRadius(15)
-                        .opacity(opacity1)
-                        .scaleEffect(scale * pulseScale)
-                        .animation(Animation.easeInOut(duration: 2.0).repeatForever(autoreverses: true), value: pulseScale)
+                    // --- Replace Rectangle with Animated Eyes --- 
+                    AnimatedEyesView()
+                        .scaleEffect(2.0) // Make the eyes larger for launch
+                        .opacity(opacity1) // Use existing opacity animation
+                        // Optional: Add a scale animation if desired, replacing pulseScale
+                        // .scaleEffect(scale) 
                     
                     Text("free ai")
                         .font(.system(size: 42, weight: .bold, design: .rounded))
@@ -63,20 +60,15 @@ struct LaunchView: View {
             // Load the random message
             launchMessage = UserDefaults.standard.string(forKey: "currentLaunchMessage") ?? "completely free forever"
             
-            // First text animation
+            // Eyes/Opacity animation
             withAnimation(.easeOut(duration: 0.8).delay(0.2)) {
                 opacity1 = 1
-                scale = 1
+                // scale = 1 // Keep scale if using scale animation for eyes
             }
             
-            // Second text animation
+            // Message animation
             withAnimation(.easeOut(duration: 0.8).delay(0.7)) {
                 opacity2 = 1
-            }
-            
-            // Pulse animation
-            withAnimation(Animation.easeInOut(duration: 2.0).repeatForever(autoreverses: true)) {
-                pulseScale = 1.05
             }
             
             // Transition to main content

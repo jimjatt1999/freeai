@@ -26,6 +26,27 @@ class AppManager: ObservableObject {
     @AppStorage("chatAnimationStyle") var chatAnimationStyle: String = "fade" // Options: fade, bounce, typewriter, terminal, minimalist, retro, futuristic, handwritten, comic, none
     @AppStorage("freestyleCardStyle") var freestyleCardStyle: String = "minimalist" // Options: fade, bounce, typewriter, terminal, minimalist, retro, futuristic, handwritten, comic, none
     
+    // --- Add Toggle State for Eyes --- 
+    @Published var showAnimatedEyes: Bool = true
+    // --- End Toggle State ---
+    
+    // --- Eye Customization Settings ---
+    @AppStorage("eyeShape") var eyeShape: EyeShapeType = .circle
+    @AppStorage("eyeOutlineColor") var eyeOutlineColor: AppTintColor = .monochrome
+    @AppStorage("eyeBackgroundColor") var eyeBackgroundColor: EyeBackgroundColorType = .white
+    @AppStorage("eyeIrisColor") var eyeIrisColor: AppTintColor = .monochrome // Default to monochrome (often black/white)
+    @AppStorage("eyeIrisSize") var eyeIrisSize: EyeIrisSizeType = .medium
+    @AppStorage("eyeStrokeWidth") var eyeStrokeWidth: EyeStrokeWidthType = .medium
+    // --- End Eye Customization Settings ---
+    
+    // --- Eye Tap Action Setting ---
+    @AppStorage("eyeTapAction") var eyeTapAction: EyeTapActionType = .blink // Default to blink
+    // --- End Eye Tap Action Setting ---
+    
+    // --- Store Current User Name --- 
+    @Published var currentUserName: String? = nil
+    // --- End Store Current User Name ---
+    
     var userInterfaceIdiom: LayoutType {
         #if os(visionOS)
         return .vision
@@ -400,3 +421,43 @@ class DumpNote {
         self.isPinned = false
     }
 }
+
+// --- Eye Customization Enums ---
+
+enum EyeShapeType: String, CaseIterable, Identifiable {
+    case circle = "Circle"
+    case oval = "Oval"
+    var id: String { self.rawValue }
+}
+
+enum EyeBackgroundColorType: String, CaseIterable, Identifiable {
+    case white = "White"
+    case black = "Black"
+    case adaptive = "Adaptive"
+    var id: String { self.rawValue }
+}
+
+enum EyeIrisSizeType: String, CaseIterable, Identifiable {
+    case small = "Small"
+    case medium = "Medium"
+    case large = "Large"
+    var id: String { self.rawValue }
+}
+
+enum EyeStrokeWidthType: String, CaseIterable, Identifiable {
+    case thin = "Thin"
+    case medium = "Medium"
+    case thick = "Thick"
+    var id: String { self.rawValue }
+}
+
+// --- End Eye Customization Enums ---
+
+// --- Eye Tap Action Enum ---
+enum EyeTapActionType: String, CaseIterable, Identifiable {
+    case none = "None"
+    case blink = "Blink"
+    case predefined = "Message" // Simple predefined messages
+    var id: String { self.rawValue }
+}
+// --- End Eye Tap Action Enum ---

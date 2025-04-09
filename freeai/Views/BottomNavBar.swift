@@ -46,7 +46,7 @@ struct BottomNavBar: View {
                     showFreeDump = false
                 } label: {
                     VStack(spacing: 4) {
-                        Image(systemName: "lightbulb")
+                        Image(systemName: "doc.text")
                             .font(.system(size: 20))
                             .foregroundColor(showFreeMode ? .blue : .gray.opacity(0.7))
                         

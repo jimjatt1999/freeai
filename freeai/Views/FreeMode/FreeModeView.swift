@@ -8,6 +8,7 @@ import SwiftUI
 import SwiftData
 import MarkdownUI
 import MLXLMCommon
+import AVFoundation // Import AVFoundation for TTS
 
 struct FreeModeView: View {
     @EnvironmentObject var appManager: AppManager
@@ -28,6 +29,28 @@ struct FreeModeView: View {
     @Binding var showChat: Bool
     @Binding var currentThread: Thread?
     
+    // Add state for sorting
+    @State private var sortOrder: SortOrder = .newestFirst
+    
+    // --- State for FAB Animation ---
+    @State private var isGeneratingAnimated = false // Controls the animation state
+    @State private var fabWidth: CGFloat = 60 // Initial FAB size
+    @State private var fabScale: CGFloat = 1.0 // For long press animation
+    // --- End State for FAB Animation ---
+    
+    // --- State for First Time Hint ---
+    @AppStorage("hasSeenFreeModeFabHint") private var hasSeenHint = false
+    @State private var showHint = false
+    // --- End State for First Time Hint ---
+    
+    // Enum for sorting options
+    enum SortOrder: String, CaseIterable, Identifiable {
+        case newestFirst = "Newest First"
+        case oldestFirst = "Oldest First"
+        case byTopic = "By Topic"
+        var id: String { self.rawValue }
+    }
+    
     // Wide range of popular topics for quick selection
     let popularTopics = [
         "Science", "History", "Technology", "Art", "Philosophy", 
@@ -40,34 +63,27 @@ struct FreeModeView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                // Header with lowercased name - always at top
+                // Header with conditional eyes
                 HStack {
-                    Button {
-                        showChat = false
-                    } label: {
-                        Image(systemName: "chevron.left")
-                            .font(.system(size: 18, weight: .semibold))
-                    }
+                    // Back Button (if needed, or other leading items)
+                    // Button { showChat = false } label: { Image(systemName: "chevron.left") ... }
                     
                     Spacer()
                     
-                    Text("freestyle")
-                        .font(.title)
-                        .fontWeight(.bold)
-                    
+                    // Conditionally show Title or Eyes in Center
+                    if appManager.showAnimatedEyes {
+                         AnimatedEyesView(isGenerating: isGenerating)
+                             .transition(.opacity.combined(with: .scale(scale: 0.8)))
+                } else {
+                        Text("freestyle")
+                            .font(.title)
+                            .fontWeight(.bold)
+                }
+                
                     Spacer()
                     
+                    // Settings button remains trailing
                     HStack(spacing: 16) {
-                        // Saved/All toggle
-                        Button {
-                            appManager.playHaptic()
-                            showingSavedCards.toggle()
-                        } label: {
-                            Image(systemName: showingSavedCards ? "bookmark.fill" : "bookmark")
-                                .foregroundColor(.blue)
-                        }
-                        
-                        // Settings
                         NavigationLink(destination: FreeModeSettingsView()) {
                             Image(systemName: "gearshape")
                                 .font(.system(size: 18))
@@ -75,6 +91,31 @@ struct FreeModeView: View {
                     }
                 }
                 .padding()
+                
+                // --- Add Filter/Sort/Style Controls ---
+                HStack(spacing: 8) { // Reduced spacing slightly
+                    // Sort Picker
+                    Picker("", selection: $sortOrder) { // Removed label for space
+                        ForEach(SortOrder.allCases) { order in
+                            Label(order.rawValue, systemImage: "arrow.up.arrow.down").tag(order)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .font(.footnote)
+                    
+                    // Filter Picker (All/Saved)
+                    Picker("Filter", selection: $showingSavedCards) {
+                        Text("All").tag(false)
+                        Text("Saved").tag(true)
+                    }
+                    .pickerStyle(.segmented)
+                    .frame(maxWidth: 120)
+                    .font(.caption) // Use caption font for segmented control
+                    
+                }
+                .padding(.horizontal)
+                .padding(.bottom, 8) 
+                // --- End Filter/Sort/Style Controls ---
                 
                 // Content area - fill remaining space with a ZStack that positions empty state correctly
                 ZStack {
@@ -90,26 +131,29 @@ struct FreeModeView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
             
-            // Floating action button
-            .overlay(
+            // Floating action button area
+            .overlay(alignment: .bottomTrailing) {
                 VStack {
-                    Spacer()
-                    HStack {
-                        Spacer()
-                        generateButton
-                            .padding()
+                    // --- First Time Hint ---
+                    if showHint {
+                        hintBubble
+                            .transition(.scale.combined(with: .opacity))
                     }
+                    // --- End First Time Hint ---
+                    
+                    generateButton // Use the animated FAB here
                 }
-            )
-            .navigationBarHidden(true)
-            .sheet(isPresented: $showTopicInput) {
-                topicInputView
+                .padding()
             }
+            .navigationBarHidden(true)
             .sheet(isPresented: $showModelPicker) {
                 modelPickerView
             }
             .sheet(isPresented: $showCustomPromptSheet) {
                 customPromptView
+            }
+            .sheet(isPresented: $showTopicInput) {
+                topicInputView
             }
             .toolbar {
                 // Model picker in toolbar
@@ -126,9 +170,44 @@ struct FreeModeView: View {
                 if appManager.freeModeModelName == nil && appManager.currentModelName != nil {
                     appManager.freeModeModelName = appManager.currentModelName
                 }
+                
+                // --- Show Hint Logic ---
+                // Delay slightly to allow view to settle
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                    if !hasSeenHint {
+                        withAnimation(.spring()) {
+                            showHint = true
+                        }
+                    }
+                }
+                // --- End Show Hint Logic ---
             }
         }
     }
+    
+    // --- Hint Bubble View ---
+    private var hintBubble: some View {
+        Text("Tap to generate, long press for options.")
+            .font(.caption)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(Color.blue.opacity(0.9))
+            .foregroundColor(.white)
+            .clipShape(Capsule())
+            .shadow(radius: 3)
+            .onTapGesture {
+                dismissHint()
+            }
+            .padding(.bottom, 4)
+    }
+    
+    private func dismissHint() {
+        withAnimation(.spring()) {
+            showHint = false
+        }
+        hasSeenHint = true
+    }
+    // --- End Hint Bubble View ---
     
     // Empty state view when no cards are available
     private var emptyStateView: some View {
@@ -168,79 +247,118 @@ struct FreeModeView: View {
     // Content list view showing generated cards
     private var contentListView: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 4) {
-                // Filter status indicator
-                if showingSavedCards {
-                    HStack {
-                        Spacer()
-                        Text("Showing Saved Cards")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .padding(.vertical, 6)
-                            .padding(.horizontal, 12)
-                            .background(
-                                Capsule()
-                                    .fill(Color(.systemBackground))
-                                    .shadow(color: Color.black.opacity(0.1), radius: 2)
-                            )
-                        Spacer()
-                    }
-                    .padding(.top, 8)
-                }
-                
-                // Cards list
-                LazyVStack(spacing: 16) {
-                    ForEach(showingSavedCards 
-                            ? contentCards.filter({ $0.isSaved }).sorted(by: { $0.timestamp > $1.timestamp })
-                            : contentCards.sorted(by: { $0.timestamp > $1.timestamp })) { card in
-                        ContentCardView(contentCard: card, showChat: $showChat, currentThread: $currentThread)
+            // --- Adjusted Padding --- 
+            VStack(alignment: .leading, spacing: 16) { // Use spacing for cards
+                // Cards list - Apply sorting logic
+                ForEach(sortedContentCards) { card in
+                    ContentCardView(contentCard: card, showChat: $showChat, currentThread: $currentThread)
                             .environmentObject(appManager)
                             .environment(\.modelContext, modelContext)
                     }
                 }
-                .padding(.horizontal)
-                .padding(.vertical, 8)
-            }
+            .padding(.horizontal) // Keep horizontal padding
+            .padding(.top, 8) // Adjust top padding
+            .padding(.bottom, 80) // Add more bottom padding for FAB
+            // --- End Adjusted Padding ---
         }
     }
     
-    // Generate button to create new content
+    // Computed property for sorted and filtered cards
+    private var sortedContentCards: [ContentCard] {
+        let filtered = showingSavedCards ? contentCards.filter { $0.isSaved } : contentCards
+        
+        switch sortOrder {
+        case .newestFirst:
+            return filtered.sorted { $0.timestamp > $1.timestamp }
+        case .oldestFirst:
+            return filtered.sorted { $0.timestamp < $1.timestamp }
+        case .byTopic:
+            return filtered.sorted { $0.topic.lowercased() < $1.topic.lowercased() }
+        }
+    }
+    
+    // --- Updated Generate Button with Animation ---
     private var generateButton: some View {
-        Button {
+        // Base Button structure
+        HStack {
+            if isGeneratingAnimated {
+                // Show AnimatedEyesView instead of ProgressView
+                 AnimatedEyesView()
+                     .padding(.leading, 5)
+                 Text("Generating...")
+                     .font(.caption)
+                     .fontWeight(.medium)
+                     .foregroundColor(.white)
+                     .padding(.trailing, 5) // Adjust padding
+                     .transition(.opacity) // Fade text in/out
+            } else {
+                Image(systemName: "wand.and.stars")
+                    .font(.system(size: 20, weight: .semibold))
+                    .foregroundColor(.white)
+            }
+        }
+        .frame(width: fabWidth, height: 50) // Animate width, fixed height
+        .background(Color.blue)
+        .clipShape(Capsule())
+        .shadow(radius: 5)
+        .scaleEffect(fabScale) // Apply scale effect for long press
+        .onTapGesture {
+             // Don't trigger tap if generating or long press sheet is shown
+             guard !isGeneratingAnimated && !showCustomPromptSheet else { return }
+             
+             // Trigger generation
             appManager.playHaptic()
             if topicInput.isEmpty && preferencesInput.isEmpty {
                 showTopicInput = true
             } else {
+                 // Animate to generating state
+                 withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+                     isGeneratingAnimated = true
+                     fabWidth = 150 // Expand width
+                 }
                 generateContent()
             }
-        } label: {
-            ZStack {
-                Circle()
-                    .fill(Color.blue)
-                    .frame(width: 60, height: 60)
-                    .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
-                
-                if isGenerating {
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                        .scaleEffect(1.5)
-                } else {
-                    Image(systemName: "square.text.square.fill")
-                        .font(.system(size: 24, weight: .medium))
-                        .foregroundColor(.white)
-                }
-            }
-        }
-        .disabled(isGenerating)
+         }
         .simultaneousGesture(
             LongPressGesture(minimumDuration: 0.5)
-                .onEnded { _ in
+                .onChanged { _ in 
+                    guard !isGeneratingAnimated else { return } // Don't allow long press if generating
+                    // Initial haptic and scale down animation
+                    UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                        fabScale = 0.9
+                    }
+                }
+                .onEnded { finished in
+                    // Restore scale
+                     withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                         fabScale = 1.0
+                     }
+                     
+                    guard finished && !isGeneratingAnimated else { return }
+                    
+                    // Trigger sheet presentation
                     appManager.playHaptic()
                     customPrompt = ""
                     showCustomPromptSheet = true
                 }
         )
+        .onChange(of: isGenerating) { _, newValue in
+             // This detects when the actual generation *finishes* 
+             // Animate back to original state ONLY IF it was animating
+             if !newValue && isGeneratingAnimated {
+                 withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
+                     isGeneratingAnimated = false
+                     fabWidth = 60 // Contract width back to circle
+                 }
+             }
+         }
+         // Dismiss hint if FAB is interacted with
+         .simultaneousGesture(DragGesture(minimumDistance: 0).onChanged { _ in 
+             if showHint { dismissHint() }
+         })
     }
+    // --- End Updated Generate Button ---
     
     // Model picker button
     private var modelPickerButton: some View {
@@ -528,9 +646,6 @@ struct FreeModeView: View {
                     }
                 }
             }
-        }
-        .sheet(isPresented: $showTopicInput) {
-            topicInputView
         }
     }
     
@@ -826,7 +941,7 @@ struct FreeModeView: View {
                     generatedContent = String(generatedContent[range.upperBound...]).trimmingCharacters(in: .whitespacesAndNewlines)
                 }
             }
-            
+
             // Also check for explanation notes at the end of content
             let explanationPatterns = [
                 "\\n\\s*Note:.*$",
@@ -1155,6 +1270,12 @@ struct ContentCardView: View {
     @State private var isCopied = false
     @State private var animationProgress: CGFloat = 0
     
+    // --- TTS State ---
+    @State private var speechSynthesizer = AVSpeechSynthesizer()
+    @State private var isSpeaking = false
+    @State private var speechCoordinator: Coordinator?
+    // --- End TTS State ---
+
     // Card backgrounds
     enum CardBackground: String, CaseIterable, Identifiable {
         case plain = "Plain"
@@ -1284,109 +1405,103 @@ struct ContentCardView: View {
     }
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 10) {
             // Card header
             HStack(alignment: .center) {
                 // Topic pill
                 Text(contentCard.topic)
-                    .font(.subheadline)
+                    .font(.caption)
                     .fontWeight(.medium)
-                    .foregroundColor(appManager.freestyleCardStyle == "terminal" ? .green : .blue)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 4)
+                    .foregroundColor(appManager.freestyleCardStyle == "terminal" ? .green : .accentColor)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
                     .background(
                         Capsule()
-                            .fill(appManager.freestyleCardStyle == "terminal" ? Color.green.opacity(0.2) : Color.blue.opacity(0.1))
+                            .fill(appManager.freestyleCardStyle == "terminal" ? Color.green.opacity(0.2) : Color.accentColor.opacity(0.1))
                     )
                 
                 Spacer()
                 
                 // Time ago
                 Text(timeAgo(from: contentCard.timestamp))
-                    .font(.caption)
+                    .font(.caption2)
                     .foregroundColor(.secondary)
             }
             
             // Content with style-specific modifications
             Group {
+                // Terminal Style
                 if appManager.freestyleCardStyle == "terminal" {
                     Text(displayedContent)
-                        .font(.system(.body, design: .monospaced))
+                        .font(.system(.callout, design: .monospaced))
                         .foregroundColor(.green)
-                } else if appManager.freestyleCardStyle == "retro" {
-                    Text(displayedContent)
-                        .font(.system(.body, design: .monospaced))
-                        .foregroundColor(.orange)
-                        .padding(8)
-                        .background(Color.black.opacity(0.8))
-                        .cornerRadius(4)
-                } else if appManager.freestyleCardStyle == "handwritten" {
-                    Text(displayedContent)
-                        .font(.system(.body, design: .serif))
-                        .italic()
-                        .foregroundColor(.primary)
-                } else if appManager.freestyleCardStyle == "comic" {
-                    Text(displayedContent)
-                        .font(.system(.body, design: .rounded))
-                        .foregroundColor(.primary)
-                        .padding(8)
-                        .background(Color.yellow.opacity(0.2))
-                        .cornerRadius(4)
-                } else if appManager.freestyleCardStyle == "futuristic" {
-                    VStack {
-                        Text(displayedContent)
-                            .font(.system(.body, design: .rounded))
-                            .foregroundColor(.white)
-                            .padding(12)
-                            .background(
-                                ZStack {
-                                    LinearGradient(
-                                        colors: [Color.blue.opacity(0.7), Color.purple.opacity(0.7)],
-                                        startPoint: .topLeading, 
-                                        endPoint: .bottomTrailing
-                                    )
-                                    
-                                    // Futuristic grid lines
-                                    GeometryReader { geometry in
-                                        Path { path in
-                                            // Horizontal lines
-                                            for i in 0...10 {
-                                                let y = CGFloat(i) * geometry.size.height / 10
-                                                path.move(to: CGPoint(x: 0, y: y))
-                                                path.addLine(to: CGPoint(x: geometry.size.width, y: y))
-                                            }
-                                            
-                                            // Vertical lines
-                                            for i in 0...10 {
-                                                let x = CGFloat(i) * geometry.size.width / 10
-                                                path.move(to: CGPoint(x: x, y: 0))
-                                                path.addLine(to: CGPoint(x: x, y: geometry.size.height))
-                                            }
-                                        }
-                                        .stroke(Color.cyan.opacity(0.2), lineWidth: 0.5)
-                                    }
-                                }
-                            )
-                            .cornerRadius(8)
-                    }
-                } else {
-                    Markdown(displayedContent)
-                        .markdownTheme(.gitHub)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
+                        .lineSpacing(4)
+                } 
+                // Retro Style
+                else if appManager.freestyleCardStyle == "retro" {
+                     Text(displayedContent)
+                         .font(.system(.callout, design: .monospaced))
+                         .foregroundColor(.orange)
+                         .padding(8)
+                         .background(Color.black.opacity(0.85))
+                         .cornerRadius(6)
+                .fixedSize(horizontal: false, vertical: true)
+                } 
+                // Handwritten/Paper Style
+                else if appManager.freestyleCardStyle == "handwritten" {
+                     Text(displayedContent)
+                         .font(.system(.callout, design: .serif))
+                         .italic()
+                         .foregroundColor(.black) // Usually on a light paper background
+                         .lineSpacing(4)
+                         .fixedSize(horizontal: false, vertical: true)
+                } 
+                // Comic Style
+                else if appManager.freestyleCardStyle == "comic" {
+                     Text(displayedContent)
+                         .font(.system(.callout, design: .rounded).weight(.medium))
+                         .foregroundColor(.black)
+                         .padding(10)
+                         .background(Color.yellow.opacity(0.3))
+                         .cornerRadius(8)
+                         .fixedSize(horizontal: false, vertical: true)
+                } 
+                // Futuristic Style
+                else if appManager.freestyleCardStyle == "futuristic" {
+                     Text(displayedContent)
+                         .font(.system(.callout, design: .rounded))
+                         .foregroundColor(.cyan)
+                         .padding(12)
+                         .background(
+                             LinearGradient(
+                                 colors: [Color.blue.opacity(0.2), Color.purple.opacity(0.3)],
+                                 startPoint: .topLeading, 
+                                 endPoint: .bottomTrailing
+                             )
+                             .overlay(
+                                // Subtle grid for futuristic feel
+                                Rectangle().stroke(Color.cyan.opacity(0.2), lineWidth: 0.5)
+                             )
+                         )
+                         .cornerRadius(8)
+                         .fixedSize(horizontal: false, vertical: true)
+                 } 
+                 // Default (Clean/Minimalist) Style
+                 else {
+                     Text(displayedContent)
+                         .font(.callout)
+                         .foregroundColor(.primary) // Adapts to light/dark
+                         .lineSpacing(4)
+                         .fixedSize(horizontal: false, vertical: true)
+                 }
             }
-            // Apply animations only if they're supported (handle legacy settings)
-            .opacity(appManager.freestyleCardStyle == "fade" ? animationProgress : 1)
-            .offset(y: appManager.freestyleCardStyle == "bounce" ? (1 - animationProgress) * 20 : 0)
             
             // Bottom row with read more and actions
             HStack {
-                // Read more button
                 if contentCard.content.count > 150 {
                     Button {
                         showFullContent.toggle()
                         if showFullContent && (appManager.freestyleCardStyle != "none") {
-                            // Reset and restart animation when showing full content
                             animationProgress = 0
                             withAnimation(.easeOut(duration: 1.0)) {
                                 animationProgress = 1.0
@@ -1394,61 +1509,45 @@ struct ContentCardView: View {
                         }
                     } label: {
                         Text(showFullContent ? "Show less" : "Read more")
-                            .font(.footnote)
-                            .foregroundColor(appManager.freestyleCardStyle == "terminal" ? .green : .blue)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
                     }
+                    .buttonStyle(.plain)
                 }
                 
                 Spacer()
                 
-                // Action buttons
-                HStack(spacing: 16) {
+                // --- Action Buttons Row (Improved Visibility + TTS) ---
+                HStack(spacing: 5) { // Reduced spacing slightly
+                    // Speak Button
+                    actionButton(iconName: isSpeaking ? "pause.circle.fill" : "speaker.wave.2.fill", color: isSpeaking ? .orange : .secondary) {
+                        toggleSpeech()
+                    }
+                    
                     // Continue in chat button
-                    Button {
+                    actionButton(iconName: "bubble.left.and.text.bubble.right") {
                         continueInChat()
-                    } label: {
-                        Image(systemName: "bubble.left.and.text.bubble.right")
-                            .foregroundColor(.gray)
                     }
                     
                     // Copy to clipboard button
-                    Button {
-                        #if os(iOS)
-                        UIPasteboard.general.string = contentCard.content
-                        withAnimation {
-                            isCopied = true
-                        }
-                        // Reset the copied state after 2 seconds
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                            withAnimation {
-                                isCopied = false
-                            }
-                        }
-                        #endif
-                    } label: {
-                        Image(systemName: isCopied ? "checkmark.circle.fill" : "doc.on.doc")
-                            .foregroundColor(isCopied ? .green : .gray)
+                    actionButton(iconName: isCopied ? "checkmark.circle.fill" : "doc.on.doc", color: isCopied ? .green : .secondary) {
+                        copyContent()
                     }
                     
                     // Save/unsave button
-                    Button {
+                    actionButton(iconName: contentCard.isSaved ? "bookmark.fill" : "bookmark", color: contentCard.isSaved ? .accentColor : .secondary) {
                         contentCard.isSaved.toggle()
-                    } label: {
-                        Image(systemName: contentCard.isSaved ? "bookmark.fill" : "bookmark")
-                            .foregroundColor(contentCard.isSaved ? .blue : .gray)
                     }
                     
                     // Delete button
-                    Button {
+                    actionButton(iconName: "trash", color: .red.opacity(0.8)) {
                         deleteCard()
-                    } label: {
-                        Image(systemName: "trash")
-                            .foregroundColor(.gray)
                     }
                 }
+                .font(.subheadline) // Apply consistent size to button icons
+                 // --- End Action Buttons Row ---
             }
             
-            // Model attribution
             if let modelName = contentCard.modelName {
                 HStack {
                     Spacer()
@@ -1456,97 +1555,125 @@ struct ContentCardView: View {
                         .font(.caption2)
                         .foregroundColor(.secondary)
                 }
+                .padding(.top, 4)
             }
         }
-        .padding()
+        .padding(EdgeInsets(top: 12, leading: 16, bottom: 12, trailing: 16))
         .background(
+            // Use ZStack for layering background and border
+            ZStack {
             RoundedRectangle(cornerRadius: 16)
-                .fill(cardBackgroundColor)
-                .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 1)
-        )
-        .contentShape(Rectangle())
-        .onTapGesture {
-            if contentCard.content.count > 150 {
-                showFullContent.toggle()
-                if showFullContent && (appManager.freestyleCardStyle != "none") {
-                    // Reset and restart animation when showing full content
-                    animationProgress = 0
-                    withAnimation(.easeOut(duration: 1.0)) {
-                        animationProgress = 1.0
-                    }
-                }
+                    // Use the computed property for background, which considers style
+                    .fill(cardBackgroundColor) 
+
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(colorScheme == .dark ? Color.white.opacity(0.1) : Color.black.opacity(0.08), lineWidth: 1)
             }
-        }
+            .shadow(color: colorScheme == .dark ? Color.black.opacity(0.2) : Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
+        )
         .sheet(isPresented: $showExportOptions) {
             exportOptionsView
         }
         .onAppear {
-            if appManager.freestyleCardStyle != "none" {
-                // Start animation when view appears
-                animationProgress = 0
-                withAnimation(.easeOut(duration: 1.0)) {
-                    animationProgress = 1.0
-                }
-            } else {
-                animationProgress = 1.0
-            }
-        }
+             // --- Assign Coordinator ---
+             if speechCoordinator == nil { // Create coordinator only once
+                 speechCoordinator = Coordinator(isSpeaking: $isSpeaking)
+                 speechSynthesizer.delegate = speechCoordinator
+             }
+             // --- End Assign Coordinator ---
+         }
+         .onDisappear { // Stop speech when view disappears
+             if speechSynthesizer.isSpeaking {
+                 speechSynthesizer.stopSpeaking(at: .immediate)
+                 isSpeaking = false
+             }
+         }
     }
     
-    // Background color based on style
+    // --- Helper for Action Buttons --- 
+    private func actionButton(iconName: String, color: Color = .secondary, action: @escaping () -> Void) -> some View {
+        Button(action: action) { 
+            Image(systemName: iconName)
+                .frame(width: 28, height: 28) // Ensure consistent tap area
+                .padding(4) // Padding inside the background
+                .background(
+                    Circle()
+                        // Use lighter gray in dark mode for max contrast
+                        .fill(colorScheme == .dark ? Color(.systemGray2) : Color.black.opacity(0.06))
+                )
+        }
+        .buttonStyle(.plain)
+        .foregroundColor(color) // Set the icon color
+    }
+    // --- End Helper ---
+    
+    // Background color based on style - Ensure this aligns
     var cardBackgroundColor: Color {
         switch appManager.freestyleCardStyle {
-        case "minimalist":
-            return Color(.systemBackground).opacity(0.8)
+        case "minimalist": // Clean
+            // Use adaptive background for default/clean style
+            return colorScheme == .dark ? Color(.secondarySystemGroupedBackground) : Color.white
         case "terminal":
-            return Color.black
+            return Color.black.opacity(0.9) // Dark background for terminal
         case "retro":
-            return Color(.systemBackground)
+            return Color(.systemGray6) // Slightly off-white/gray for retro base
+        case "handwritten": // Paper
+             return Color(red: 0.98, green: 0.97, blue: 0.94) // Papery color
+        case "comic":
+             return Color(.systemGray6).opacity(0.8) // Light base for comic panel
         case "futuristic":
-            return Color.blue.opacity(0.1)
-        default:
-            return Color(.systemBackground)
+            // Background handled inline with gradient, return clear or base
+             return colorScheme == .dark ? Color(.secondarySystemGroupedBackground).opacity(0.5) : Color.white.opacity(0.8)
+        case "none": // Explicitly handle 'none' if needed
+             return colorScheme == .dark ? Color(.secondarySystemGroupedBackground) : Color.white
+        default: // Fallback to adaptive background
+             return colorScheme == .dark ? Color(.secondarySystemGroupedBackground) : Color.white
         }
     }
     
     // Function to delete the card
     private func deleteCard() {
             modelContext.delete(contentCard)
+        }
+    
+    // Function to copy content
+    private func copyContent() {
+        #if os(iOS)
+        UIPasteboard.general.string = contentCard.content
+        withAnimation { isCopied = true }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            withAnimation { isCopied = false }
+        }
+        #endif
     }
     
-    // Improved chat continuation that properly handles the conversation context
+    // Function to continue in chat
     private func continueInChat() {
-        // Create a new thread
         let newThread = Thread()
         
-        // Add content as user message to establish the context for conversation
         let systemMessage = Message(
             role: .system, 
             content: "You are a helpful assistant engaging in a conversation about the topic: \(contentCard.topic). Respond to the user's questions and comments conversationally. Do not generate story-like content unless specifically requested.", 
             thread: newThread
         )
         
-        // Initial user message referencing the content
         let userMessage = Message(
             role: .user, 
             content: "I found this interesting: \"\(contentCard.content)\"\n\nLet's talk about this topic.", 
             thread: newThread
         )
         
-        // Initial AI response to establish conversation
         let aiMessage = Message(
             role: .assistant, 
             content: "That's an interesting topic! What aspects of it would you like to discuss or explore further?", 
             thread: newThread
         )
         
-        // Save messages to thread
         modelContext.insert(newThread)
         modelContext.insert(systemMessage)
         modelContext.insert(userMessage)
         modelContext.insert(aiMessage)
         
-        // Set as current thread and navigate to chat
         currentThread = newThread
         showChat = false
     }
@@ -1575,18 +1702,12 @@ struct ContentCardView: View {
                 
                 Section {
                     Button {
-                        // Copy card content to clipboard
                         #if os(iOS)
                         let contentToCopy = contentCard.content
                         UIPasteboard.general.string = contentToCopy
-                        withAnimation {
-                            isCopied = true
-                        }
-                        // Reset the copied state after 2 seconds
+                        withAnimation { isCopied = true }
                         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                            withAnimation {
-                                isCopied = false
-                            }
+                            withAnimation { isCopied = false }
                         }
                         #endif
                     } label: {
@@ -1687,6 +1808,86 @@ struct ContentCardView: View {
         formatter.unitsStyle = .abbreviated
         return formatter.localizedString(for: date, relativeTo: Date())
     }
+    
+    // --- TTS Functions --- 
+    private func toggleSpeech() {
+        if speechSynthesizer.isSpeaking {
+            speechSynthesizer.pauseSpeaking(at: .immediate)
+        } else {
+            if speechSynthesizer.isPaused {
+                speechSynthesizer.continueSpeaking()
+                isSpeaking = true
+            } else {
+                let utterance = AVSpeechUtterance(string: contentCard.content)
+                
+                // --- Attempt enhanced, then specific premium, then default voice ---
+                let enhancedVoice = AVSpeechSynthesisVoice.speechVoices()
+                    .filter { $0.language == "en-US" && $0.quality == .enhanced }
+                    .first
+                let premiumSamantha = AVSpeechSynthesisVoice(identifier: "com.apple.ttsbundle.Samantha-premium")
+                
+                if let voice = enhancedVoice {
+                    utterance.voice = voice
+                 } else if premiumSamantha != nil { // Check if specific premium exists
+                     utterance.voice = premiumSamantha
+                 } else {
+                     // Fallback to default US English voice
+                     utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
+                 }
+                 // --- End Voice Selection ---
+                 
+                 // --- Adjust Rate --- 
+                 utterance.rate = AVSpeechUtteranceDefaultSpeechRate * 0.95 // Slightly slower
+                 // --- End Adjust Rate --- 
+
+                // Ensure audio session allows playback
+                do {
+                     try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
+                     try AVAudioSession.sharedInstance().setActive(true)
+                } catch {
+                    print("Failed to set up audio session for TTS: \(error)")
+                    return
+                }
+                
+                speechSynthesizer.speak(utterance)
+                isSpeaking = true
+            }
+        }
+    }
+    
+    // --- TTS Coordinator --- 
+    class Coordinator: NSObject, AVSpeechSynthesizerDelegate {
+        @Binding var isSpeaking: Bool
+        
+        init(isSpeaking: Binding<Bool>) {
+            _isSpeaking = isSpeaking
+        }
+        
+        func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
+            DispatchQueue.main.async {
+                 self.isSpeaking = false
+            }
+        }
+        
+        func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didPause utterance: AVSpeechUtterance) {
+             DispatchQueue.main.async {
+                 self.isSpeaking = false
+            }
+        }
+        
+        func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didCancel utterance: AVSpeechUtterance) {
+             DispatchQueue.main.async {
+                 self.isSpeaking = false
+            }
+        }
+        
+        func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didContinue utterance: AVSpeechUtterance) {
+             DispatchQueue.main.async {
+                 self.isSpeaking = true
+            }
+        }
+    }
+    // --- End TTS Coordinator ---
 }
 
 #if os(iOS)

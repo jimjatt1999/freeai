@@ -287,7 +287,7 @@
 				CODE_SIGN_ENTITLEMENTS = freeai/freeai.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"freeai/Preview Content\"";
 				DEVELOPMENT_TEAM = A3338WURDA;
@@ -339,7 +339,7 @@
 				CODE_SIGN_ENTITLEMENTS = freeai/freeai.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"freeai/Preview Content\"";
 				DEVELOPMENT_TEAM = A3338WURDA;

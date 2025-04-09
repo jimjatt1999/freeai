@@ -146,15 +146,28 @@ struct PersonalizationSettingsView: View {
                 // Sync customization state
                 customizationEnabled = profile.hasCustomization()
                 
+                // --- Update AppManager --- 
+                 DispatchQueue.main.async {
+                    appManager.currentUserName = profile.name.isEmpty ? nil : profile.name
+                 }
+                 // --- End Update ---
+                
                 print("Final states - has customization: \(customizationEnabled)")
             } else {
                 // Create default profile
                 print("No profile found, creating default")
                 createDefaultProfile()
+                // Ensure AppManager reflects no name initially
+                DispatchQueue.main.async {
+                     appManager.currentUserName = nil
+                }
             }
             
         } catch {
             print("Failed to load profile: \(error)")
+            DispatchQueue.main.async {
+                 appManager.currentUserName = nil // Clear on error too
+            }
         }
     }
     
@@ -164,6 +177,10 @@ struct PersonalizationSettingsView: View {
         modelContext.insert(profile)
         try? modelContext.save()
         self.userProfile = profile
+        // Update AppManager after creating default (no name)
+         DispatchQueue.main.async {
+            appManager.currentUserName = nil
+         }
         print("Created default profile")
     }
 }
@@ -362,6 +379,11 @@ struct CustomizeAIView: View {
             )
             
             try? modelContext.save()
+             // --- Update AppManager --- 
+             DispatchQueue.main.async {
+                appManager.currentUserName = name.isEmpty ? nil : name
+             }
+             // --- End Update ---
             print("Saved custom profile")
         } else {
             // Create new profile
@@ -376,6 +398,11 @@ struct CustomizeAIView: View {
             modelContext.insert(newProfile)
             try? modelContext.save()
             customizationEnabled = true
+            // --- Update AppManager --- 
+             DispatchQueue.main.async {
+                appManager.currentUserName = name.isEmpty ? nil : name
+             }
+             // --- End Update ---
             print("Created new custom profile")
         }
     }

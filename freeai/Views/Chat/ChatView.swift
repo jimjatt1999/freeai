@@ -10,6 +10,45 @@ import SwiftUI
 import Speech
 import SwiftData
 
+// --- Example Prompts View Definition ---
+struct ExamplePromptsView: View {
+    let prompts = [
+        "Explain how planes fly",
+        "How do vaccines work?",
+        "Write a poem about the moon",
+        "What is quantum computing?",
+        "Give me a recipe for chocolate chip cookies"
+    ]
+
+    @Binding var prompt: String
+    @Binding var isPromptFocused: FocusState<Bool>.Binding
+
+    var body: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 10) {
+                ForEach(prompts, id: \.self) { example in
+                    Button {
+                        prompt = example
+                        isPromptFocused.wrappedValue = true // Focus the input field
+                    } label: {
+                        Text(example)
+                            .font(.caption)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
+                            .background(Color(.systemGray5))
+                            .foregroundColor(.primary)
+                            .cornerRadius(16)
+                    }
+                    .buttonStyle(.plain) // Use plain style for better visual appearance
+                }
+            }
+            .padding(.horizontal) // Add horizontal padding to the HStack
+        }
+        .frame(height: 35) // Give the ScrollView a fixed height
+    }
+}
+// --- End Example Prompts View Definition ---
+
 struct ChatView: View {
     @EnvironmentObject var appManager: AppManager
     @Environment(\.modelContext) var modelContext
@@ -32,6 +71,25 @@ struct ChatView: View {
     @State private var recognitionTask: SFSpeechRecognitionTask?
     @State private var audioEngine = AVAudioEngine()
     @State private var isRecording = false
+
+    // Add array of example prompts
+    let examplePrompts = [
+        "How does an airplane work?",
+        "Why is the sky blue?",
+        "What are black holes?",
+        "How do vaccines work?",
+        "Explain quantum physics simply",
+        "What causes earthquakes?",
+        "How do computers store data?",
+        "Why do we dream?",
+        "How does photosynthesis work?",
+        "What makes rainbows appear?",
+        "How does GPS navigation work?",
+        "Why do leaves change color?",
+        "How do batteries store energy?",
+        "What's inside the human brain?",
+        "How does the internet work?"
+    ]
 
     var isPromptEmpty: Bool {
         prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
@@ -75,10 +133,23 @@ struct ChatView: View {
         .padding(.trailing, 4)
     }
 
-    // Update the chat input to remove memory buttons and logic
+    // Update the chat input to include keyboard dismiss button aligned with mic
     var chatInput: some View {
         HStack(alignment: .bottom, spacing: 8) {
-            TextField("Message FREEly", text: $prompt, axis: .vertical)
+            if isPromptFocused {
+                Button {
+                    hideKeyboard()
+                } label: {
+                    Image(systemName: "keyboard.chevron.compact.down")
+                        .foregroundColor(.gray)
+                        .font(.system(size: 18))
+                        .frame(width: 24, height: 24)
+                }
+            } else {
+                micButton
+            }
+            
+            TextField("freely ask anything", text: $prompt, axis: .vertical)
                 .submitLabel(.send)
                 .focused($isPromptFocused)
                 .textFieldStyle(.plain)
@@ -87,7 +158,10 @@ struct ChatView: View {
                 }
                 .padding(.horizontal)
             
-            micButton
+            if !isPromptFocused {
+                // Only show mic when keyboard is not active
+                Spacer().frame(width: 0)
+            }
             
             if llm.running {
                 stopButton
@@ -98,9 +172,35 @@ struct ChatView: View {
         .padding(EdgeInsets(top: 8, leading: 12, bottom: 8, trailing: 8))
         .background(
             RoundedRectangle(cornerRadius: 24)
-                .fill(Color(.systemBackground))
+                .fill(Color(.secondarySystemBackground))
                 .shadow(color: Color.black.opacity(0.1), radius: 2, x: 0, y: 1)
         )
+    }
+
+    // Create an example prompts view for the scrollable prompts
+    var examplePromptsView: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(examplePrompts, id: \.self) { examplePrompt in
+                    Button {
+                        prompt = examplePrompt
+                        isPromptFocused = true
+                    } label: {
+                        Text(examplePrompt)
+                            .font(.footnote)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
+                            .background(Color(.tertiarySystemBackground))
+                            .foregroundColor(.primary)
+                            .cornerRadius(16)
+                            .lineLimit(1)
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                }
+            }
+            .padding(.horizontal)
+        }
+        .frame(height: 40)
     }
 
     var modelPickerButton: some View {
@@ -216,6 +316,13 @@ struct ChatView: View {
                         Spacer()
                     }
                     
+                    // Example prompts section - show only if it's a new chat (no messages yet)
+                    if currentThread == nil || currentThread?.messages.isEmpty ?? true {
+                        examplePromptsView
+                            .padding(.bottom, 8)
+                            .transition(.opacity.combined(with: .move(edge: .bottom))) // Add animation
+                    }
+                    
                     HStack {
                         chatInput
                     }
@@ -257,40 +364,75 @@ struct ChatView: View {
                 }
                 .toolbar {
                     #if os(iOS) || os(visionOS)
-                    if appManager.userInterfaceIdiom == .phone {
-                        ToolbarItem(placement: .navigationBarLeading) {
+                    // --- Conditional Toolbar Layout ---
+                    if appManager.showAnimatedEyes {
+                        // Eyes Centered, Model Picker & Chats Leading, Settings Trailing
+                        ToolbarItemGroup(placement: .navigationBarLeading) {
+                             if appManager.userInterfaceIdiom == .phone {
+                                 Button(action: {
+                                     appManager.playHaptic()
+                                     showChats.toggle()
+                                 }) {
+                                     Image(systemName: "line.3.horizontal")
+                                         .font(.system(size: 16, weight: .medium))
+                                 }
+                             }
+                             // Keep Model picker here, maybe make it smaller/icon only?
+                             modelPickerButton
+                                .font(.caption) // Make picker smaller when leading
+                        }
+                        ToolbarItem(placement: .principal) {
+                            // Eyes Centered
+                            AnimatedEyesView(isGenerating: llm.running)
+                        }
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            // Settings Trailing
                             Button(action: {
                                 appManager.playHaptic()
-                                showChats.toggle()
+                                showSettings.toggle()
                             }) {
-                                Image(systemName: "line.3.horizontal")
-                                    .font(.system(size: 16, weight: .medium))
+                                Image(systemName: "gearshape")
+                                    .font(.system(size: 18))
+                            }
+                        }
+                    } else {
+                        // No Eyes: Default Layout Restored
+                        if appManager.userInterfaceIdiom == .phone {
+                            ToolbarItem(placement: .navigationBarLeading) {
+                                // Chats Leading
+                                Button(action: {
+                                    appManager.playHaptic()
+                                    showChats.toggle()
+                                }) {
+                                    Image(systemName: "line.3.horizontal")
+                                        .font(.system(size: 16, weight: .medium))
+                                }
+                            }
+                        }
+                        ToolbarItem(placement: .principal) {
+                             // Model Centered
+                            modelPickerButton
+                        }
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                                // Settings Trailing
+                                Button(action: {
+                                    appManager.playHaptic()
+                                    showSettings.toggle()
+                                }) {
+                                    Image(systemName: "gearshape")
+                                        .font(.system(size: 18))
                             }
                         }
                     }
-
-                    // Model picker in center
-                    ToolbarItem(placement: .principal) {
-                        modelPickerButton
-                    }
-
-                    // Free Mode & Settings buttons in consistent position
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        Button(action: {
-                            appManager.playHaptic()
-                            showSettings.toggle()
-                        }) {
-                            Image(systemName: "gearshape")
-                                .font(.system(size: 18))
-                        }
-                    }
+                    // --- End Conditional Toolbar Layout ---
                     #elseif os(macOS)
+                    // macOS Toolbar (Keep as is for now, or adjust if needed)
                     ToolbarItem(placement: .primaryAction) {
-                        Button(action: {
-                            appManager.playHaptic()
-                            showSettings.toggle()
-                        }) {
-                            Label("Settings", systemImage: "gear")
+                            Button(action: {
+                                appManager.playHaptic()
+                                showSettings.toggle()
+                            }) {
+                                Label("Settings", systemImage: "gear")
                         }
                     }
                     #endif
@@ -300,6 +442,9 @@ struct ChatView: View {
 
     private func generate() {
         if !isPromptEmpty {
+            // Dismiss keyboard when sending message
+            hideKeyboard()
+            
             if currentThread == nil {
                 let newThread = Thread()
                 currentThread = newThread
@@ -382,8 +527,14 @@ struct ChatView: View {
         }
     }
 
+    // Helper function to dismiss keyboard
+    private func hideKeyboard() {
+        isPromptFocused = false
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+    }
+
     private func startRecording() throws {
-        // Cancel existing task if it exists
+        // Clear previous tasks
         recognitionTask?.cancel()
         recognitionTask = nil
         
@@ -426,15 +577,6 @@ struct ChatView: View {
         // Start audio engine
         audioEngine.prepare()
         try audioEngine.start()
-    }
-
-    // Add this method to handle keyboard dismissal on different platforms
-    private func hideKeyboard() {
-        #if os(iOS) || os(visionOS)
-        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-        #elseif os(macOS)
-        NSApp.keyWindow?.makeFirstResponder(nil)
-        #endif
     }
 }
 

@@ -368,9 +368,19 @@ struct DumpDetailView: View {
     // Processing content view with streaming text
     private var processingContentView: some View {
         VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                ProgressView()
-                    .scaleEffect(0.8)
+            HStack(spacing: 8) {
+                // Replace ProgressView with AnimatedEyesView, conditional on setting
+                if appManager.showAnimatedEyes {
+                    AnimatedEyesView(isGenerating: true) // Always generating in this context
+                        // Adjust color for the theme
+                        .foregroundColor(selectedTheme.accentColor(for: colorScheme))
+                        .transition(.opacity.combined(with: .scale(scale: 0.8)))
+                } else {
+                    // Fallback to ProgressView if eyes are disabled
+                    ProgressView()
+                        .scaleEffect(0.8)
+                }
+                
                 Text("AI is organizing your thoughts...")
                     .font(.subheadline)
                     .foregroundColor(selectedTheme.textColor(for: colorScheme).opacity(0.7))
@@ -394,7 +404,7 @@ struct DumpDetailView: View {
         
         if selectedTheme == .terminal {
             // Terminal style text with monospace font
-            return ScrollView {
+            return AnyView(ScrollView {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(content)
                         .font(.custom("Menlo", size: 14))
@@ -402,10 +412,10 @@ struct DumpDetailView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal)
-            }
+            })
         } else if selectedTheme == .retro {
             // Retro style for vintage look
-            return ScrollView {
+            return AnyView(ScrollView {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(content)
                         .font(.custom("AmericanTypewriter", size: 16))
@@ -413,14 +423,14 @@ struct DumpDetailView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal)
-            }
+            })
         } else {
             // Standard markdown for other themes
-            return Markdown(content)
+            return AnyView(Markdown(content)
                 .markdownTheme(.gitHub)
                 .padding(.horizontal)
                 .foregroundColor(selectedTheme.textColor(for: colorScheme))
-                .font(themeFont)
+                .font(themeFont))
         }
     }
     

@@ -127,35 +127,37 @@ struct FreeDumpView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                // Header
+                // Header - Removed ScrollView wrapper
                 HStack {
-                    Button {
-                        showFreeDump = false
-                    } label: {
-                        Image(systemName: "chevron.left")
-                            .font(.system(size: 18, weight: .semibold))
+                    Spacer()
+
+                    // Conditionally show Title or Eyes in Center
+                    if appManager.showAnimatedEyes {
+                         AnimatedEyesView(isGenerating: false) // No easy generating state here
+                             .transition(.opacity.combined(with: .scale(scale: 0.8)))
+                    } else {
+                         Text("free dump")
+                             .font(.title)
+                             .fontWeight(.bold)
                     }
-                    
+
                     Spacer()
-                    
-                    Text("freedump")
-                        .font(.title)
-                        .fontWeight(.bold)
-                    
-                    Spacer()
-                    
+
+                    // Settings button remains trailing
                     Button {
                         showSettings = true
                     } label: {
                         Image(systemName: "gearshape")
                             .font(.system(size: 18))
+                            .foregroundColor(.gray)
                     }
                 }
-                .padding()
-                
+                .padding() // Keep padding on the HStack
+
                 if dumpNotes.isEmpty {
                     // Empty state
                     emptyStateView
+                        .frame(maxHeight: .infinity) // Ensure empty state fills space
                 } else {
                     // Search bar
                     searchBar

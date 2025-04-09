@@ -25,6 +25,14 @@ struct AppearanceSettingsView: View {
             }
             #endif
 
+            // --- ADD NavigationLink to Eyes Settings --- 
+             Section(header: Text("Interface Elements")) {
+                 NavigationLink(destination: EyesSettingsView()) {
+                     Label("Animated Eyes", systemImage: "eyes")
+                 }
+             }
+            // --- END NavigationLink --- 
+            
             Section(header: Text("font")) {
                 Picker(selection: $appManager.appFontDesign) {
                     ForEach(AppFontDesign.allCases.sorted(by: { $0.rawValue < $1.rawValue }), id: \.rawValue) { option in
@@ -43,7 +51,6 @@ struct AppearanceSettingsView: View {
                 } label: {
                     Label("width", systemImage: "arrow.left.and.line.vertical.and.arrow.right")
                 }
-                .disabled(appManager.appFontDesign != .standard)
 
                 #if !os(macOS)
                 Picker(selection: $appManager.appFontSize) {
