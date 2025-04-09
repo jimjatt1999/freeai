@@ -461,3 +461,22 @@ enum EyeTapActionType: String, CaseIterable, Identifiable {
     var id: String { self.rawValue }
 }
 // --- End Eye Tap Action Enum ---
+
+// --- Reminder Model ---
+@Model
+final class Reminder {
+    @Attribute(.unique) var id: UUID
+    var taskDescription: String
+    var scheduledDate: Date?
+    var isCompleted: Bool
+    var creationDate: Date
+
+    init(id: UUID = UUID(), taskDescription: String, scheduledDate: Date?, isCompleted: Bool = false, creationDate: Date = Date()) {
+        self.id = id
+        self.taskDescription = taskDescription
+        self.scheduledDate = scheduledDate
+        self.isCompleted = isCompleted
+        self.creationDate = creationDate
+    }
+}
+// --- End Reminder Model ---

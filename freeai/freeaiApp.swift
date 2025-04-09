@@ -36,7 +36,8 @@ struct freeaiApp: App {
             Message.self,
             UserProfile.self,
             ContentCard.self,
-            DumpNote.self
+            DumpNote.self,
+            Reminder.self
         ])
         
         // Add this to forcibly reset the database if needed

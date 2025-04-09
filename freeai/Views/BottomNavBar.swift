@@ -11,6 +11,7 @@ struct BottomNavBar: View {
     @Binding var showChat: Bool
     @Binding var showFreeMode: Bool
     @Binding var showFreeDump: Bool
+    @Binding var showFreeBuddy: Bool
     @State private var isVisible: Bool = true
     
     var body: some View {
@@ -26,6 +27,7 @@ struct BottomNavBar: View {
                     showChat = true
                     showFreeMode = false
                     showFreeDump = false
+                    showFreeBuddy = false
                 } label: {
                     VStack(spacing: 4) {
                         Image(systemName: "bubble.left")
@@ -44,6 +46,7 @@ struct BottomNavBar: View {
                     showChat = false
                     showFreeMode = true
                     showFreeDump = false
+                    showFreeBuddy = false
                 } label: {
                     VStack(spacing: 4) {
                         Image(systemName: "doc.text")
@@ -62,6 +65,7 @@ struct BottomNavBar: View {
                     showChat = false
                     showFreeMode = false
                     showFreeDump = true
+                    showFreeBuddy = false
                 } label: {
                     VStack(spacing: 4) {
                         Image(systemName: "note.text")
@@ -71,6 +75,25 @@ struct BottomNavBar: View {
                         Text("FreeDump")
                             .font(.caption2)
                             .foregroundColor(showFreeDump ? .blue : .gray.opacity(0.7))
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+                
+                // FreeBuddy button
+                Button {
+                    showChat = false
+                    showFreeMode = false
+                    showFreeDump = false
+                    showFreeBuddy = true
+                } label: {
+                    VStack(spacing: 4) {
+                        Image(systemName: "face.smiling")
+                            .font(.system(size: 20))
+                            .foregroundColor(showFreeBuddy ? .blue : .gray.opacity(0.7))
+                        
+                        Text("Buddy")
+                            .font(.caption2)
+                            .foregroundColor(showFreeBuddy ? .blue : .gray.opacity(0.7))
                     }
                     .frame(maxWidth: .infinity)
                 }
@@ -91,6 +114,7 @@ struct BottomNavBar: View {
     BottomNavBar(
         showChat: .constant(true),
         showFreeMode: .constant(false),
-        showFreeDump: .constant(false)
+        showFreeDump: .constant(false),
+        showFreeBuddy: .constant(false)
     )
 } 

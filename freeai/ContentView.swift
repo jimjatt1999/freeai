@@ -22,11 +22,12 @@ struct ContentView: View {
     @State var currentThread: Thread?
     @State var showFreeMode = false
     @State var showFreeDump = false
+    @State var showFreeBuddy = false
     @FocusState var isPromptFocused: Bool
     
     // Combined state for navigation
     private var showChat: Bool {
-        return !showFreeMode && !showFreeDump
+        return !showFreeMode && !showFreeDump && !showFreeBuddy
     }
 
     var body: some View {
@@ -47,6 +48,9 @@ struct ContentView: View {
                             FreeModeView(showChat: $showFreeMode, currentThread: $currentThread)
                         } else if showFreeDump {
                             FreeDumpView(showFreeDump: $showFreeDump, currentThread: $currentThread)
+                        } else if showFreeBuddy {
+                            FreeBuddyView()
+                                .environmentObject(appManager)
                         } else {
                             ChatView(currentThread: $currentThread, isPromptFocused: $isPromptFocused, showChats: $showChats, showSettings: $showSettings, showFreeMode: $showFreeMode)
                         }
@@ -54,11 +58,12 @@ struct ContentView: View {
                         // Bottom navigation
                         BottomNavBar(
                             showChat: Binding(
-                                get: { !showFreeMode && !showFreeDump },
-                                set: { if $0 { showFreeMode = false; showFreeDump = false } }
+                                get: { !showFreeMode && !showFreeDump && !showFreeBuddy },
+                                set: { if $0 { showFreeMode = false; showFreeDump = false; showFreeBuddy = false } }
                             ),
                             showFreeMode: $showFreeMode,
-                            showFreeDump: $showFreeDump
+                            showFreeDump: $showFreeDump,
+                            showFreeBuddy: $showFreeBuddy
                         )
                     }
                 }
@@ -72,6 +77,10 @@ struct ContentView: View {
                     } else if showFreeDump {
                         FreeDumpView(showFreeDump: $showFreeDump, currentThread: $currentThread)
                             .padding(.bottom, 50) // Add padding for the navigation bar
+                    } else if showFreeBuddy {
+                        FreeBuddyView()
+                            .environmentObject(appManager)
+                            .padding(.bottom, 50) // Add padding for the navigation bar
                     } else {
                         ChatView(currentThread: $currentThread, isPromptFocused: $isPromptFocused, showChats: $showChats, showSettings: $showSettings, showFreeMode: $showFreeMode)
                             .padding(.bottom, 50) // Add padding for the navigation bar
@@ -81,11 +90,12 @@ struct ContentView: View {
                     VStack(spacing: 0) {
                         BottomNavBar(
                             showChat: Binding(
-                                get: { !showFreeMode && !showFreeDump },
-                                set: { if $0 { showFreeMode = false; showFreeDump = false } }
+                                get: { !showFreeMode && !showFreeDump && !showFreeBuddy },
+                                set: { if $0 { showFreeMode = false; showFreeDump = false; showFreeBuddy = false } }
                             ),
                             showFreeMode: $showFreeMode,
-                            showFreeDump: $showFreeDump
+                            showFreeDump: $showFreeDump,
+                            showFreeBuddy: $showFreeBuddy
                         )
                     }
                 }
