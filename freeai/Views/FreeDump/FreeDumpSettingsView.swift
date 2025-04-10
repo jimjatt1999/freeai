@@ -78,9 +78,25 @@ struct FreeDumpSettingsView: View {
             .onAppear {
                 // Load saved values
                 formattingStyle = UserDefaults.standard.string(forKey: "freeDumpFormattingStyle") ?? "Simple"
+                
+                // Collect all tags from notes and from UserDefaults
+                var allTags = Set<String>()
+                
+                // Add tags from UserDefaults
                 if let savedTags = UserDefaults.standard.stringArray(forKey: "freeDumpUserTags") {
-                    userTags = savedTags
+                    savedTags.forEach { allTags.insert($0) }
                 }
+                
+                // Add tags from all notes
+                for note in dumpNotes {
+                    for tag in note.tags {
+                        allTags.insert(tag)
+                    }
+                }
+                
+                // Update userTags and save to UserDefaults
+                userTags = Array(allTags).sorted()
+                UserDefaults.standard.set(userTags, forKey: "freeDumpUserTags")
             }
             .onChange(of: formattingStyle) { _, newValue in
                 UserDefaults.standard.set(newValue, forKey: "freeDumpFormattingStyle")
@@ -111,7 +127,7 @@ struct FreeDumpSettingsView: View {
     }
     
     private var customTagsSection: some View {
-        Section(header: Text("CREATE TAGS")) {
+        Section(header: Text("CREATE AND MANAGE TAGS")) {
             HStack {
                 TextField("New tag", text: $customTag)
                     .autocapitalization(.none)

@@ -106,26 +106,34 @@ struct FreeDumpView: View {
             } else if filter == "this-week" {
                 // This week filter
                 let calendar = Calendar.current
+                let currentWeekStart = calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: Date())
+                let currentWeekStartDate = calendar.date(from: currentWeekStart)!
+                
                 categoryFilteredPinned = textFilteredPinned.filter { note in
-                    let components = calendar.dateComponents([.weekOfYear], from: note.timestamp, to: Date())
-                    return components.weekOfYear == 0
+                    return calendar.date(note.timestamp, isInSameDayAs: currentWeekStartDate) ||
+                           note.timestamp > currentWeekStartDate
                 }
                 
                 categoryFilteredUnpinned = textFilteredUnpinned.filter { note in
-                    let components = calendar.dateComponents([.weekOfYear], from: note.timestamp, to: Date())
-                    return components.weekOfYear == 0
+                    return calendar.date(note.timestamp, isInSameDayAs: currentWeekStartDate) ||
+                           note.timestamp > currentWeekStartDate
                 }
             } else if filter == "this-month" {
                 // This month filter
                 let calendar = Calendar.current
+                let currentMonth = calendar.component(.month, from: Date())
+                let currentYear = calendar.component(.year, from: Date())
+                
                 categoryFilteredPinned = textFilteredPinned.filter { note in
-                    let components = calendar.dateComponents([.year, .month], from: note.timestamp, to: Date())
-                    return components.year == 0 && components.month == 0
+                    let noteMonth = calendar.component(.month, from: note.timestamp)
+                    let noteYear = calendar.component(.year, from: note.timestamp)
+                    return noteMonth == currentMonth && noteYear == currentYear
                 }
                 
                 categoryFilteredUnpinned = textFilteredUnpinned.filter { note in
-                    let components = calendar.dateComponents([.year, .month], from: note.timestamp, to: Date())
-                    return components.year == 0 && components.month == 0
+                    let noteMonth = calendar.component(.month, from: note.timestamp)
+                    let noteYear = calendar.component(.year, from: note.timestamp)
+                    return noteMonth == currentMonth && noteYear == currentYear
                 }
             } else {
                 // Tag filter
