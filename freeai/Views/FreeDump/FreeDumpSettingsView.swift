@@ -52,7 +52,7 @@ struct FreeDumpSettingsView: View {
                             .font(.footnote)
                             .foregroundColor(.secondary)
                         Spacer()
-                        Text("v\(Bundle.main.releaseVersionNumber ?? "1.0").\(Bundle.main.buildVersionNumber ?? "0")")
+                        Text("v\(Bundle.main.releaseVersionNumber ?? "1.0")")
                             .font(.footnote)
                             .foregroundColor(.secondary)
                     }
