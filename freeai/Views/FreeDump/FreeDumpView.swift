@@ -106,17 +106,20 @@ struct FreeDumpView: View {
             } else if filter == "this-week" {
                 // This week filter
                 let calendar = Calendar.current
-                let currentWeekStart = calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: Date())
-                let currentWeekStartDate = calendar.date(from: currentWeekStart)!
+                let today = Date()
+                let yearForWeek = calendar.component(.yearForWeekOfYear, from: today)
+                let weekOfYear = calendar.component(.weekOfYear, from: today)
                 
                 categoryFilteredPinned = textFilteredPinned.filter { note in
-                    return calendar.date(note.timestamp, isInSameDayAs: currentWeekStartDate) ||
-                           note.timestamp > currentWeekStartDate
+                    let noteYearForWeek = calendar.component(.yearForWeekOfYear, from: note.timestamp)
+                    let noteWeekOfYear = calendar.component(.weekOfYear, from: note.timestamp)
+                    return noteYearForWeek == yearForWeek && noteWeekOfYear == weekOfYear
                 }
                 
                 categoryFilteredUnpinned = textFilteredUnpinned.filter { note in
-                    return calendar.date(note.timestamp, isInSameDayAs: currentWeekStartDate) ||
-                           note.timestamp > currentWeekStartDate
+                    let noteYearForWeek = calendar.component(.yearForWeekOfYear, from: note.timestamp)
+                    let noteWeekOfYear = calendar.component(.weekOfYear, from: note.timestamp)
+                    return noteYearForWeek == yearForWeek && noteWeekOfYear == weekOfYear
                 }
             } else if filter == "this-month" {
                 // This month filter
@@ -165,25 +168,13 @@ struct FreeDumpView: View {
         return Array(categories).sorted()
     }
     
-    // --- Computed properties for Pinned/Others --- 
-    private var pinnedNotes: [DumpNote] {
-        dumpNotes.filter { $0.isPinned && filterByType($0) }
-                 .sorted { $0.timestamp > $1.timestamp }
+    // --- Computed properties for Display (Derived from filteredNotes) --- 
+    private var pinnedNotesForDisplay: [DumpNote] {
+        filteredNotes.filter { $0.isPinned }
     }
     
-    private var otherNotes: [DumpNote] {
-        let filtered = dumpNotes.filter { !$0.isPinned && filterByType($0) }.filter { note in
-            let matchesSearch = searchText.isEmpty || 
-                                note.rawContent.localizedCaseInsensitiveContains(searchText) ||
-                                note.title.localizedCaseInsensitiveContains(searchText) ||
-                                note.structuredContent.localizedCaseInsensitiveContains(searchText)
-                                
-            let matchesCategory = selectedCategoryFilter == nil || 
-                                  note.tags.contains { $0.lowercased() == selectedCategoryFilter?.lowercased() }
-                                  
-            return matchesSearch && matchesCategory
-        }
-        return filtered.sorted { $0.timestamp > $1.timestamp }
+    private var otherNotesForDisplay: [DumpNote] {
+        filteredNotes.filter { !$0.isPinned }
     }
     
     // Helper function for type filtering
@@ -301,104 +292,97 @@ struct FreeDumpView: View {
                     // Main content grid
                     ScrollView {
                         VStack(alignment: .leading, spacing: 20) { 
-                            // Pinned section
-                            if !pinnedNotes.isEmpty {
-                                Text("PINNED")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                                    .padding(.leading)
-                                    
-                                LazyVGrid(columns: gridColumns, spacing: 16) {
-                                    ForEach(pinnedNotes) { note in
-                                        NoteCardView(note: note)
-                                            .onTapGesture { selectedNote = note }
-                                            .contextMenu {
-                                                Button { 
-                                                    note.isPinned.toggle() 
-                                                    try? modelContext.save()
-                                                } label: {
-                                                    Label(note.isPinned ? "Unpin" : "Pin", systemImage: note.isPinned ? "pin.slash" : "pin")
-                                                }
-                                                
-                                                Button { selectedNote = note } label: {
-                                                    Label("Edit", systemImage: "pencil")
-                                                }
+                            // Only show notes if the filter result is not empty
+                            if !filteredNotes.isEmpty {
+                                // Pinned section
+                                if !pinnedNotesForDisplay.isEmpty {
+                                    Text("PINNED")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                        .padding(.leading)
+                                        
+                                    LazyVGrid(columns: gridColumns, spacing: 16) {
+                                        ForEach(pinnedNotesForDisplay) { note in
+                                            NoteCardView(note: note)
+                                                .onTapGesture { selectedNote = note }
+                                                .contextMenu {
+                                                    Button { 
+                                                        note.isPinned.toggle() 
+                                                        try? modelContext.save()
+                                                    } label: {
+                                                        Label(note.isPinned ? "Unpin" : "Pin", systemImage: note.isPinned ? "pin.slash" : "pin")
+                                                    }
+                                                    
+                                                    Button { selectedNote = note } label: {
+                                                        Label("Edit", systemImage: "pencil")
+                                                    }
 
-                                                Divider()
-                                                
-                                                Button(role: .destructive) {
-                                                    noteToDelete = note
-                                                    showDeleteAlert = true
-                                                } label: {
-                                                    Label("Delete", systemImage: "trash")
+                                                    Divider()
+                                                    
+                                                    Button(role: .destructive) {
+                                                        noteToDelete = note
+                                                        showDeleteAlert = true
+                                                    } label: {
+                                                        Label("Delete", systemImage: "trash")
+                                                    }
                                                 }
-                                            }
+                                        }
                                     }
-                                }
-                                .padding(.horizontal)
-                            }
-                            
-                            // Others section
-                            if !otherNotes.isEmpty {
-                                // Add separator only if pinned notes also exist
-                                if !pinnedNotes.isEmpty {
-                                    Divider().padding(.horizontal)
+                                    .padding(.horizontal)
                                 }
                                 
-                                Text(pinnedNotes.isEmpty ? "NOTES" : "OTHERS") // Adjust title
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                                    .padding(.leading)
-                                    
-                                LazyVGrid(columns: gridColumns, spacing: 16) {
-                                    ForEach(otherNotes) { note in
-                                        NoteCardView(note: note)
-                                            .onTapGesture { selectedNote = note }
-                                            .contextMenu {
-                                                Button { 
-                                                    note.isPinned.toggle() 
-                                                    try? modelContext.save()
-                                                } label: {
-                                                    Label(note.isPinned ? "Unpin" : "Pin", systemImage: note.isPinned ? "pin.slash" : "pin")
-                                                }
-                                                
-                                                Button { selectedNote = note } label: {
-                                                    Label("Edit", systemImage: "pencil")
-                                                }
-                                                
-                                                Divider()
-
-                                                Button(role: .destructive) {
-                                                    noteToDelete = note
-                                                    showDeleteAlert = true
-                                                } label: {
-                                                    Label("Delete", systemImage: "trash")
-                                                }
-                                            }
+                                // Others section
+                                if !otherNotesForDisplay.isEmpty {
+                                    // Add separator only if pinned notes also exist
+                                    if !pinnedNotesForDisplay.isEmpty {
+                                        Divider().padding(.horizontal)
                                     }
-                                }
-                                .padding(.horizontal)
-                            } else if pinnedNotes.isEmpty && searchText.isEmpty && selectedCategoryFilter == nil {
-                                // Empty state
-                                VStack {
-                                    Spacer(minLength: 100)
-                                    Text("No notes yet.")
+                                    
+                                    Text(pinnedNotesForDisplay.isEmpty ? "NOTES" : "OTHERS") // Adjust title
+                                        .font(.caption)
                                         .foregroundColor(.secondary)
-                                    Text("Tap '+' to add your first thought.")
-                                        .font(.subheadline)
-                                        .foregroundColor(Color(.tertiaryLabel))
-                                    Spacer()
+                                        .padding(.leading)
+                                        
+                                    LazyVGrid(columns: gridColumns, spacing: 16) {
+                                        ForEach(otherNotesForDisplay) { note in
+                                            NoteCardView(note: note)
+                                                .onTapGesture { selectedNote = note }
+                                                .contextMenu {
+                                                    Button { 
+                                                        note.isPinned.toggle() 
+                                                        try? modelContext.save()
+                                                    } label: {
+                                                        Label(note.isPinned ? "Unpin" : "Pin", systemImage: note.isPinned ? "pin.slash" : "pin")
+                                                    }
+                                                    
+                                                    Button { selectedNote = note } label: {
+                                                        Label("Edit", systemImage: "pencil")
+                                                    }
+                                                    
+                                                    Divider()
+
+                                                    Button(role: .destructive) {
+                                                        noteToDelete = note
+                                                        showDeleteAlert = true
+                                                    } label: {
+                                                        Label("Delete", systemImage: "trash")
+                                                    }
+                                                }
+                                        }
+                                    }
+                                    .padding(.horizontal)
                                 }
-                                .frame(maxWidth: .infinity)
-                            } else if !searchText.isEmpty || selectedCategoryFilter != nil {
-                                // No results state
-                                VStack {
-                                    Spacer(minLength: 100)
-                                    Text("No notes match your filter.")
-                                        .foregroundColor(.secondary)
-                                    Spacer()
+                            } else { // Show "No notes match" only if a filter is active or search text exists
+                                if !searchText.isEmpty || selectedCategoryFilter != nil {
+                                    VStack {
+                                        Spacer(minLength: 100)
+                                        Text("No notes match your filter.")
+                                            .foregroundColor(.secondary)
+                                        Spacer()
+                                    }
+                                    .frame(maxWidth: .infinity)
                                 }
-                                .frame(maxWidth: .infinity)
+                                // Note: The case for "No notes yet." is handled by the initial `if dumpNotes.isEmpty` check earlier.
                             }
                         }
                         .padding(.vertical) // Add padding to the VStack containing sections
