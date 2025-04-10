@@ -10,7 +10,6 @@ import SwiftUI
 struct BottomNavBar: View {
     @EnvironmentObject var appManager: AppManager
     @Binding var showChat: Bool
-    @Binding var showFreeMode: Bool
     @Binding var showFreeDump: Bool
     @Binding var showFreeBuddy: Bool
     @State private var isVisible: Bool = true
@@ -26,7 +25,6 @@ struct BottomNavBar: View {
                 // Chat button
                 Button {
                     showChat = true
-                    showFreeMode = false
                     showFreeDump = false
                     showFreeBuddy = false
                 } label: {
@@ -42,29 +40,9 @@ struct BottomNavBar: View {
                     .frame(maxWidth: .infinity)
                 }
                 
-                // Freestyle button
-                Button {
-                    showChat = false
-                    showFreeMode = true
-                    showFreeDump = false
-                    showFreeBuddy = false
-                } label: {
-                    VStack(spacing: 4) {
-                        Image(systemName: "doc.text")
-                            .font(.system(size: 20))
-                            .foregroundColor(showFreeMode ? appManager.appTintColor.getColor() : .gray.opacity(0.7))
-                        
-                        Text("Freestyle")
-                            .font(.caption2)
-                            .foregroundColor(showFreeMode ? appManager.appTintColor.getColor() : .gray.opacity(0.7))
-                    }
-                    .frame(maxWidth: .infinity)
-                }
-                
                 // FreeDump button
                 Button {
                     showChat = false
-                    showFreeMode = false
                     showFreeDump = true
                     showFreeBuddy = false
                 } label: {
@@ -83,7 +61,6 @@ struct BottomNavBar: View {
                 // FreeBuddy button
                 Button {
                     showChat = false
-                    showFreeMode = false
                     showFreeDump = false
                     showFreeBuddy = true
                 } label: {
@@ -114,7 +91,6 @@ struct BottomNavBar: View {
 #Preview {
     BottomNavBar(
         showChat: .constant(true),
-        showFreeMode: .constant(false),
         showFreeDump: .constant(false),
         showFreeBuddy: .constant(false)
     )

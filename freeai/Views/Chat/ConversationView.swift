@@ -22,25 +22,373 @@ extension TimeInterval {
     }
 }
 
+// --- Custom Markdown Theme for Plain Style ---
+extension Theme {
+    static var plain: Theme {
+        Theme()
+            .codeBlock { configuration in
+                ScrollView(.horizontal) {
+                    configuration.label
+                        .font(.system(.body, design: .monospaced))
+                        .relativeLineSpacing(.em(0.25))
+                        .padding()
+                }
+                .background(Color(.secondarySystemBackground)) // Subtle background for code
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .markdownMargin(top: .em(0.5), bottom: .em(0.5))
+            }
+    }
+}
+// --- End Custom Theme ---
+
 struct MessageView: View {
     @Environment(LLMEvaluator.self) var llm
     @EnvironmentObject var appManager: AppManager
+    
+    // Thinking state
     @State private var collapsed = true
+    var isThinking: Bool { !message.content.contains("</think>") }
+
+    // Animation states
+    @State private var shouldAnimate = false
     @State private var animationProgress = 0.0
     @State private var typewriterText = ""
-    @State private var shouldAnimate = false
     @State private var cursorVisible = true
+    
+    // Terminal effect states
+    @State private var flickerOpacity: Double = 0.0
+    @State private var jitterOffset: CGSize = .zero
+    @State private var staticOpacity: Double = 0.0
+    @State private var isHovering = false
+    
     let message: Message
+    let isGenerating: Bool
 
-    var isThinking: Bool {
-        !message.content.contains("</think>")
+    // Timers
+    let cursorTimer = Timer.publish(every: 0.6, on: .main, in: .common).autoconnect()
+    let effectsTimer = Timer.publish(every: 0.12, on: .main, in: .common).autoconnect()
+    
+    // Computed properties for colors based on scheme
+    private var textColor: Color { appManager.terminalColorScheme.textColor }
+    private var bgColor: Color { appManager.terminalColorScheme.backgroundColor }
+    private var userPromptColor: Color { appManager.terminalColorScheme.promptUserColor }
+    private var aiPromptColor: Color { appManager.terminalColorScheme.promptAiColor }
+
+    // --- Body --- 
+    var body: some View {
+        // Conditionally apply custom styling or plain text
+        Group {
+            if appManager.chatInterfaceStyleEnabled {
+                styledMessageBody // Use the styled version
+            } else {
+                plainMessageBody // Use the plain version
+            }
+        }
+        // Move modifiers that apply regardless of style here
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .onChange(of: llm.elapsedTime, perform: { _ in updateThinkingTimeIfNeeded() })
+        .onChange(of: isThinking, perform: { _ in updateLLMThinkingStateIfNeeded() })
+    } // End body
+    
+    // --- Styled Terminal Body --- 
+    private var styledMessageBody: some View {
+        HStack(alignment: .top) {
+            if message.role == .user { Spacer() }
+
+            VStack(alignment: .leading, spacing: 4) {
+                // Conditionally show window controls header
+                if appManager.terminalWindowControlsEnabled {
+                    windowControlsHeader
+                }
+                
+                // Thinking label + Content
+                if message.role == .assistant {
+                    let (thinking, afterThink) = processThinkingContent(message.content)
+                    if let thinking = thinking { thinkingLabelView(thinking: thinking) }
+                    if let afterThink = afterThink { terminalMessageContent(content: afterThink) }
+                } else {
+                    terminalMessageContent(content: message.content)
+                }
+            }
+            .padding(.vertical, appManager.terminalWindowControlsEnabled ? 4 : 8) // Adjust padding based on header
+            .padding(.horizontal, 8)
+            .frame(maxWidth: .infinity, alignment: message.role == .user ? .trailing : .leading)
+            .background(
+                 bgColor
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .shadow(color: textColor.opacity(appManager.terminalBloomEnabled ? 0.5 : 0), radius: appManager.terminalBloomEnabled ? 9 : 0, x: 0, y: 0)
+             )
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(textColor.opacity(0.5), lineWidth: 1)
+            )
+            .onAppear(perform: startAnimationIfNeeded)
+            
+            if message.role == .assistant { Spacer() }
+        }
+        // Modifiers specific to the styled view can remain here if needed
+    }
+    
+    // --- Plain Text Body --- 
+    private var plainMessageBody: some View {
+        HStack(alignment: .top) {
+            if message.role == .user { Spacer() } // Align user right
+
+            VStack(alignment: .leading, spacing: 4) {
+                // Show thinking label simply if present
+                if message.role == .assistant {
+                    let (thinking, afterThink) = processThinkingContent(message.content)
+                    if let thinking = thinking, !collapsed {
+                        // Revert thinking label to simple Text
+                        Text("(Thinking...)")
+                            .font(.caption.monospaced()) // Use standard SwiftUI modifiers
+                            .foregroundColor(.secondary)
+                            .padding(.bottom, 2)
+                    }
+                    // Use Markdown view to render content with custom theme
+                    if let afterThink = afterThink {
+                        Markdown(afterThink)
+                            .textSelection(.enabled)
+                            .markdownTheme(.plain)
+                    }
+                } else {
+                    // Use Markdown view for user content too with custom theme
+                    Markdown(message.content)
+                        .textSelection(.enabled)
+                        .markdownTheme(.plain)
+                }
+            }
+            .padding(.vertical, 8) // Keep some vertical padding
+            .padding(.horizontal, 12) // Add some horizontal padding to prevent edge collision
+            .frame(maxWidth: .infinity, alignment: message.role == .user ? .trailing : .leading)
+            .onAppear {
+                shouldAnimate = false
+                animationProgress = 1.0
+            }
+            
+            if message.role == .assistant { Spacer() } // Align assistant left
+        }
+    }
+    
+    // --- New Window Controls Header --- 
+    @ViewBuilder
+    private var windowControlsHeader: some View {
+        HStack(spacing: 8) {
+            switch appManager.terminalWindowControlsStyle {
+            case .macOS:
+                Circle().fill(.red).frame(width: 10, height: 10)
+                Circle().fill(.yellow).frame(width: 10, height: 10)
+                Circle().fill(.green).frame(width: 10, height: 10)
+            case .windows:
+                Image(systemName: "minus")
+                    .font(.system(size: 8, weight: .black))
+                    .foregroundColor(.gray.opacity(0.8))
+                    .frame(width: 12, height: 12)
+                    .background(Color.gray.opacity(0.2))
+                
+                Image(systemName: "square")
+                    .font(.system(size: 7, weight: .black))
+                    .foregroundColor(.gray.opacity(0.8))
+                    .frame(width: 12, height: 12)
+                    .background(Color.gray.opacity(0.2))
+                
+                Image(systemName: "xmark")
+                    .font(.system(size: 8, weight: .black))
+                    .foregroundColor(.white.opacity(0.9))
+                    .frame(width: 12, height: 12)
+                    .background(Color.red.opacity(0.7))
+            }
+            Spacer()
+        }
+        .padding(.horizontal, 10)
+        .padding(.top, 8)
+        .padding(.bottom, 4)
+    }
+    
+    // --- Terminal Content View (Remains largely the same) --- 
+    @ViewBuilder
+    private func terminalMessageContent(content: String) -> some View {
+        ZStack {
+            // --- Optional Effects Layers (Bottom) ---
+            if appManager.terminalStaticEnabled {
+                Canvas { context, size in
+                    context.opacity = staticOpacity // Control overall noise visibility
+                    // Keep density relatively low for performance
+                    let density = 0.10 
+                    let dotCount = Int(size.width * size.height * density * 0.03) 
+                    
+                    for _ in 0..<dotCount {
+                        let x = CGFloat.random(in: 0..<size.width)
+                        let y = CGFloat.random(in: 0..<size.height)
+                        // Increase brightness range
+                        let grayValue = Double.random(in: 0.5...0.9) 
+                        // Slightly larger max dot size
+                        let dotSize = CGFloat.random(in: 0.5...1.8) 
+                        
+                        context.fill(Path(ellipseIn: CGRect(x: x, y: y, width: dotSize, height: dotSize)), 
+                                     with: .color(Color(white: grayValue)))
+                    }
+                }
+                .blendMode(.screen) 
+                // Increase base opacity slightly
+                .opacity(0.6) 
+                .allowsHitTesting(false)
+                .clipped()
+            }
+            
+            if appManager.terminalScanlinesEnabled {
+                 enhancedScanLinesEffect
+                    .allowsHitTesting(false)
+                    .clipped()
+            }
+            
+            if appManager.terminalFlickerEnabled {
+                Color.white.opacity(flickerOpacity)
+                    .blendMode(.screen)
+                    .allowsHitTesting(false)
+                    .clipped()
+            }
+            
+            // --- Main Text Content ---
+            HStack(alignment: .top, spacing: 4) {
+                Text(message.role == .user ? "USER>" : "AI>")
+                    .font(.system(.body, design: .monospaced).weight(.bold))
+                    .foregroundColor(message.role == .user ? userPromptColor : aiPromptColor)
+                    .padding(.leading, 8)
+                
+                Group {
+                    if shouldAnimate && animationProgress < 1.0 && message.role == .assistant {
+                        Text("\(typewriterText)\(cursorVisible ? "█" : " ")")
+                            .lineSpacing(4)
+                    } else {
+                        Text(content)
+                           .lineSpacing(4)
+                    }
+                }
+                .font(.system(.body, design: .monospaced))
+                .foregroundColor(textColor)
+                .offset(appManager.terminalJitterEnabled ? jitterOffset : .zero)
+                .blur(radius: appManager.terminalBloomEnabled ? 0.6 : 0)
+                .shadow(color: appManager.terminalBloomEnabled ? textColor.opacity(0.4) : .clear, radius: appManager.terminalBloomEnabled ? 0.8 : 0)
+                
+                Spacer()
+            }
+            .padding(.vertical, 8)
+            .padding(.trailing, 8)
+        }
+        .onReceive(cursorTimer, perform: { _ in updateCursorVisibility() })
+        .onReceive(effectsTimer) { _ in
+            updateFlicker()
+            updateJitter()
+        }
+        .onHover { hovering in
+            isHovering = hovering
+            updateStatic(isHovering: hovering)
+        }
+        .onChange(of: isGenerating) { _, newGeneratingState in
+            if !newGeneratingState {
+                updateStatic(isHovering: isHovering)
+            }
+        }
+        .textSelection(.enabled)
+    }
+    
+    // --- Effect Helper Views --- 
+    private var enhancedScanLinesEffect: some View {
+        GeometryReader { geo in
+            let lineHeight: CGFloat = 2.5
+            let lineSpacing: CGFloat = 1.5
+            let totalLines = Int(geo.size.height / (lineHeight + lineSpacing))
+            
+            VStack(spacing: lineSpacing) {
+                ForEach(0..<totalLines, id: \.self) { _ in
+                    Rectangle()
+                        .fill(bgColor)
+                        .frame(height: lineHeight)
+                        .opacity(0.15)
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            .blendMode(.multiply)
+            .allowsHitTesting(false)
+        }
+    }
+    
+    // --- Timer Update Functions (Check master toggle) --- 
+    private func updateFlicker() {
+        guard appManager.chatInterfaceStyleEnabled && appManager.terminalFlickerEnabled else {
+            if flickerOpacity != 0 { flickerOpacity = 0 } 
+            return
+        }
+        flickerOpacity = Double.random(in: 0.0...0.03)
+    }
+    
+    private func updateJitter() {
+        guard appManager.chatInterfaceStyleEnabled && appManager.terminalJitterEnabled else {
+            if jitterOffset != .zero { jitterOffset = .zero } 
+            return
+        }
+        jitterOffset = CGSize(width: CGFloat.random(in: -0.5...0.5), height: CGFloat.random(in: -0.5...0.5))
+    }
+    
+    private func updateStatic(isHovering: Bool) {
+        guard appManager.chatInterfaceStyleEnabled && appManager.terminalStaticEnabled else {
+            if staticOpacity != 0 { staticOpacity = 0 }
+            return
+        }
+        if isHovering || isGenerating {
+            staticOpacity = Double.random(in: 0.0...0.08)
+        } else {
+            withAnimation(.easeOut(duration: 0.3)) {
+                staticOpacity = 0.0
+            }
+        }
     }
 
-    // Animation timing
-    let animationDuration: Double = 0.8
+    // --- Thinking Label View (Keep as is) ---
+    @ViewBuilder
+    private func thinkingLabelView(thinking: String) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            thinkingLabel // The HStack with button and text
+            if !collapsed && !thinking.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                HStack(spacing: 12) {
+                    Capsule()
+                        .frame(width: 2)
+                        .padding(.vertical, 1)
+                        .foregroundStyle(.fill)
+                    Markdown(thinking)
+                        .textSelection(.enabled)
+                        .markdownTextStyle { ForegroundColor(.secondary) }
+                }
+                .padding(.leading, 5)
+            }
+        }
+        .contentShape(.rect)
+        .onTapGesture {
+            collapsed.toggle()
+            if isThinking { llm.collapsed = collapsed }
+        }
+    }
     
-    // Timer for blinking cursor
-    let cursorTimer = Timer.publish(every: 0.6, on: .main, in: .common).autoconnect()
+    // --- Core Logic Helpers (Keep as is) ---
+    private func startAnimationIfNeeded() {
+        // Simplified logic from original .onAppear
+        if llm.running { collapsed = false }
+        if message.role == .assistant && !isThinking {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { startAnimation() }
+        } else if message.role == .user {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { startAnimation() }
+        }
+    }
+    
+    private func updateThinkingTimeIfNeeded() {
+        if isThinking { llm.thinkingTime = llm.elapsedTime }
+    }
+    
+    private func updateLLMThinkingStateIfNeeded() {
+        if llm.running { llm.isThinking = isThinking }
+    }
     
     func processThinkingContent(_ content: String) -> (String?, String?) {
         guard let startRange = content.range(of: "<think>") else {
@@ -98,11 +446,29 @@ struct MessageView: View {
         guard shouldAnimate == false else { return }
         shouldAnimate = true
         
-        if appManager.chatAnimationStyle == "typewriter" {
-            typewriterAnimation()
-        } else {
-            withAnimation(.easeOut(duration: animationDuration)) {
+        let (_, afterThink) = processThinkingContent(message.content)
+        let finalText = afterThink ?? ""
+        
+        // Reset the typewriter text
+        typewriterText = ""
+        
+        // Calculate typing speed based on content length
+        let characterCount = finalText.count
+        let baseSpeed = max(0.01, min(0.05, Double(characterCount) * 0.0005))
+        
+        // Schedule a series of updates to simulate typing
+        for index in 0..<characterCount {
+            DispatchQueue.main.asyncAfter(deadline: .now() + Double(index) * baseSpeed) {
+                let stringIndex = finalText.index(finalText.startIndex, offsetBy: index)
+                typewriterText = String(finalText[...stringIndex])
+                
+                // Update animation progress for combined effects
+                animationProgress = Double(index) / Double(characterCount)
+                
+                // Ensure we mark it as complete at the end
+                if index == characterCount - 1 {
                 animationProgress = 1.0
+                }
             }
         }
     }
@@ -136,562 +502,13 @@ struct MessageView: View {
         }
     }
     
-    // Get terminal style text with blinking cursor
-    private var terminalText: some View {
-        let (_, afterThink) = processThinkingContent(message.content)
-        let finalText = afterThink ?? ""
-        
-        return VStack(alignment: .leading, spacing: 0) {
-            // Terminal header
-            HStack {
-                Circle()
-                    .fill(Color.red)
-                    .frame(width: 8, height: 8)
-                Circle()
-                    .fill(Color.yellow)
-                    .frame(width: 8, height: 8)
-                Circle()
-                    .fill(Color.green)
-                    .frame(width: 8, height: 8)
-                Spacer()
-                Text("Terminal")
-                    .font(.system(size: 10, design: .monospaced))
-                    .foregroundColor(.gray)
-                Spacer()
-            }
-            .padding(.top, 4)
-            .padding(.horizontal, 8)
-            
-            // Terminal line with prompt
-            HStack(alignment: .top, spacing: 4) {
-                Text("AI>")
-                    .font(.system(.body, design: .monospaced))
-                    .foregroundColor(.green)
-                
-                if shouldAnimate && animationProgress < 1.0 {
-                    Text("\(typewriterText)\(cursorVisible ? "█" : " ")")
-                        .font(.system(.body, design: .monospaced))
-                        .foregroundColor(.green)
-                } else {
-                    Text("\(finalText)")
-                        .font(.system(.body, design: .monospaced))
-                        .foregroundColor(.green)
-                }
-            }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-        }
-        .onReceive(cursorTimer) { _ in 
-            if shouldAnimate && animationProgress < 1.0 {
+    private func updateCursorVisibility() {
+        if message.role == .assistant && shouldAnimate && animationProgress < 1.0 {
                 cursorVisible.toggle()
             } else {
                 cursorVisible = false
             }
         }
-    }
-    
-    // Get minimalist animated text
-    private var minimalistText: some View {
-        let (_, afterThink) = processThinkingContent(message.content)
-        let finalText = afterThink ?? ""
-        
-        return VStack(alignment: .leading, spacing: 8) {
-            // Extract title and content if possible
-            let lines = finalText.split(separator: "\n", maxSplits: 1)
-            
-            if lines.count > 1 {
-                // Title
-                Text(String(lines[0]))
-                    .font(.system(.headline, design: .default))
-                    .fontWeight(.medium)
-                    .foregroundColor(.primary)
-                    .lineLimit(1)
-                    .padding(.bottom, 2)
-                
-                // Content with typing animation
-                if shouldAnimate && animationProgress < 1.0 {
-                    Text(typewriterText)
-                        .font(.system(.body, design: .default))
-                        .fontWeight(.light)
-                        .foregroundColor(.primary.opacity(0.9))
-                        .lineSpacing(6)
-                        .animation(.easeInOut, value: typewriterText)
-                } else {
-                    Text(String(lines[1]))
-                        .font(.system(.body, design: .default))
-                        .fontWeight(.light)
-                        .foregroundColor(.primary.opacity(0.9))
-                        .lineSpacing(6)
-                }
-            } else {
-                // Just content, no title
-                if shouldAnimate && animationProgress < 1.0 {
-                    Text(typewriterText)
-                        .font(.system(.body, design: .default))
-                        .fontWeight(.light)
-                        .foregroundColor(.primary.opacity(0.9))
-                        .lineSpacing(6)
-                } else {
-                    Text(finalText)
-                        .font(.system(.body, design: .default))
-                        .fontWeight(.light)
-                        .foregroundColor(.primary.opacity(0.9))
-                        .lineSpacing(6)
-                }
-            }
-        }
-        .padding(.horizontal, 4)
-        .padding(.vertical, 2)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color.primary.opacity(0.03))
-        )
-    }
-    
-    // Get retro text with pixelated styling
-    private var retroText: some View {
-        let (_, afterThink) = processThinkingContent(message.content)
-        let finalText = afterThink ?? message.content
-        
-        return VStack(alignment: .leading, spacing: 4) {
-            Text(finalText)
-                .font(.system(.body, design: .monospaced))
-                .foregroundColor(message.role == .assistant ? Color.green : Color.blue)
-                .padding(8)
-                .background(
-                    ZStack {
-                        // Scanlines effect
-                        LinearGradient(
-                            gradient: Gradient(colors: [Color.black.opacity(0.1), Color.black.opacity(0.3)]),
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                        .mask(
-                            VStack(spacing: 2) {
-                                ForEach(0..<20, id: \.self) { _ in
-                                    Color.white
-                                        .frame(height: 1)
-                                }
-                            }
-                        )
-                        
-                        // Base background
-                        Color.black
-                            .opacity(0.8)
-                    }
-                )
-                .cornerRadius(0)
-                .overlay(
-                    Rectangle()
-                        .strokeBorder(message.role == .assistant ? Color.green.opacity(0.6) : Color.blue.opacity(0.6), lineWidth: 2)
-                )
-                .shadow(color: message.role == .assistant ? Color.green.opacity(0.3) : Color.blue.opacity(0.3), radius: 8, x: 0, y: 0)
-        }
-        .scaleEffect(shouldAnimate ? 1.0 : 0.95)
-        .opacity(shouldAnimate ? 1.0 : 0.0)
-        .animation(.easeOut(duration: animationDuration), value: shouldAnimate)
-    }
-    
-    // Get futuristic text with modern styling
-    private var futuristicText: some View {
-        let (_, afterThink) = processThinkingContent(message.content)
-        let finalText = afterThink ?? message.content
-        
-        return VStack(alignment: .leading, spacing: 0) {
-            // Header bar
-            HStack {
-                Circle()
-                    .fill(message.role == .assistant ? Color.purple : Color.blue)
-                    .frame(width: 8, height: 8)
-                
-                Text(message.role == .assistant ? "AI" : "USER")
-                    .font(.system(size: 10, weight: .bold, design: .rounded))
-                    .foregroundColor(.secondary)
-                
-                Spacer()
-                
-                Text(Date(), style: .time)
-                    .font(.system(size: 10, weight: .light))
-                    .foregroundColor(.secondary)
-            }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 6)
-            .background(Color.primary.opacity(0.05))
-            
-            // Content
-            Text(finalText)
-                .font(.system(.body, design: .rounded))
-                .lineSpacing(6)
-                .padding(12)
-        }
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color.primary.opacity(0.02))
-                .shadow(color: Color.primary.opacity(0.05), radius: 10, x: 0, y: 2)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .strokeBorder(
-                    LinearGradient(
-                        gradient: Gradient(colors: [
-                            message.role == .assistant ? Color.purple : Color.blue,
-                            message.role == .assistant ? Color.blue : Color.cyan
-                        ]),
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    lineWidth: 1
-                )
-        )
-        .scaleEffect(shouldAnimate ? 1.0 : 0.9)
-        .opacity(shouldAnimate ? 1.0 : 0.0)
-        .animation(.spring(response: 0.5, dampingFraction: 0.7), value: shouldAnimate)
-    }
-    
-    // Get handwritten text style
-    private var handwrittenText: some View {
-        let (_, afterThink) = processThinkingContent(message.content)
-        let finalText = afterThink ?? message.content
-        
-        return Text(finalText)
-            .font(.custom("Noteworthy", size: 16))
-            .foregroundColor(message.role == .assistant ? Color.black : Color.blue)
-            .lineSpacing(8)
-            .padding(16)
-            .background(
-                RoundedRectangle(cornerRadius: 0)
-                    .fill(Color.yellow.opacity(0.2))
-            )
-            .rotationEffect(.degrees(shouldAnimate ? 0 : -1))
-            .scaleEffect(shouldAnimate ? 1.0 : 0.9)
-            .opacity(shouldAnimate ? 1.0 : 0.0)
-            .animation(.spring(response: 0.6, dampingFraction: 0.7), value: shouldAnimate)
-    }
-    
-    // Get comic style text with speech bubbles
-    private var comicText: some View {
-        let (_, afterThink) = processThinkingContent(message.content)
-        let finalText = afterThink ?? message.content
-        
-        return Text(finalText)
-            .font(.custom("Marker Felt", size: 16))
-            .foregroundColor(.black)
-            .lineSpacing(6)
-            .padding(16)
-            .background(
-                ZStack(alignment: message.role == .assistant ? .bottomLeading : .bottomTrailing) {
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(message.role == .assistant ? Color.white : Color.blue.opacity(0.2))
-                        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
-                    
-                    // Speech bubble tail
-                    if message.role == .assistant {
-                        Triangle()
-                            .fill(Color.white)
-                            .frame(width: 20, height: 20)
-                            .rotationEffect(.degrees(180))
-                            .offset(x: -5, y: 10)
-                    } else {
-                        Triangle()
-                            .fill(Color.blue.opacity(0.2))
-                            .frame(width: 20, height: 20)
-                            .offset(x: 5, y: 10)
-                    }
-                }
-            )
-            .scaleEffect(shouldAnimate ? 1.0 : 0.8)
-            .opacity(shouldAnimate ? 1.0 : 0.0)
-            .animation(.spring(response: 0.5, dampingFraction: 0.6), value: shouldAnimate)
-    }
-
-    var body: some View {
-        HStack {
-            if message.role == .user { Spacer() }
-
-            if message.role == .assistant {
-                let (thinking, afterThink) = processThinkingContent(message.content)
-                VStack(alignment: .leading, spacing: 16) {
-                    HStack(alignment: .top, spacing: 12) {
-                        // ChatGPT logo for assistant messages
-                        Image(systemName: "waveform.circle.fill")
-                            .resizable()
-                            .frame(width: 28, height: 28)
-                            .foregroundColor(.black)
-                            .background(Color.white)
-                            .clipShape(Circle())
-                            .padding(.top, 4)
-                        
-                        VStack(alignment: .leading, spacing: 16) {
-                            if let thinking {
-                                VStack(alignment: .leading, spacing: 12) {
-                                    thinkingLabel
-                                    if !collapsed {
-                                        if !thinking.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                                            HStack(spacing: 12) {
-                                                Capsule()
-                                                    .frame(width: 2)
-                                                    .padding(.vertical, 1)
-                                                    .foregroundStyle(.fill)
-                                                Markdown(thinking)
-                                                    .textSelection(.enabled)
-                                                    .markdownTextStyle {
-                                                        ForegroundColor(.secondary)
-                                                    }
-                                            }
-                                            .padding(.leading, 5)
-                                        }
-                                    }
-                                }
-                                .contentShape(.rect)
-                                .onTapGesture {
-                                    collapsed.toggle()
-                                    if isThinking {
-                                        llm.collapsed = collapsed
-                                    }
-                                }
-                            }
-
-                            if let afterThink {
-                                Group {
-                                    switch appManager.chatAnimationStyle {
-                                    case "fade":
-                                        Markdown(afterThink)
-                                            .textSelection(.enabled)
-                                            .opacity(shouldAnimate ? animationProgress : 1)
-                                    case "bounce":
-                                        Markdown(afterThink)
-                                            .textSelection(.enabled)
-                                            .scaleEffect(shouldAnimate ? (animationProgress < 1.0 ? 0.95 + (animationProgress * 0.05) : 1.0) : 1)
-                                            .opacity(shouldAnimate ? animationProgress : 1)
-                                            .animation(.spring(response: 0.5, dampingFraction: 0.7), value: animationProgress)
-                                            .transformEffect(.init(translationX: 0, y: shouldAnimate ? (animationProgress < 1.0 ? (1.0 - animationProgress) * 10 : 0) : 0))
-                                    case "typewriter":
-                                        if shouldAnimate && animationProgress < 1.0 {
-                                            Text(typewriterText)
-                                                .textSelection(.enabled)
-                                        } else {
-                                            Markdown(afterThink)
-                                                .textSelection(.enabled)
-                                        }
-                                    case "terminal":
-                                        ZStack {
-                                            RoundedRectangle(cornerRadius: 8)
-                                                .fill(Color.black)
-                                                
-                                            terminalText
-                                                .textSelection(.enabled)
-                                        }
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 8)
-                                                .stroke(Color.gray, lineWidth: 1)
-                                        )
-                                    case "minimalist":
-                                        minimalistText
-                                            .textSelection(.enabled)
-                                    case "retro":
-                                        retroText
-                                            .textSelection(.enabled)
-                                    case "futuristic":
-                                        futuristicText
-                                            .textSelection(.enabled)
-                                    case "handwritten":
-                                        handwrittenText
-                                            .textSelection(.enabled)
-                                    case "comic":
-                                        comicText
-                                            .textSelection(.enabled)
-                                    default: // "none" or any other value
-                                        Markdown(afterThink)
-                                            .textSelection(.enabled)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                .padding(.trailing, 48)
-                .onAppear {
-                    startAnimation()
-                }
-            } else {
-                HStack(alignment: .top, spacing: 12) {
-                    // User avatar for user messages
-                    Image(systemName: "person.circle.fill")
-                        .resizable()
-                        .frame(width: 28, height: 28)
-                        .foregroundColor(.white)
-                        .background(Color.gray.opacity(0.7))
-                        .clipShape(Circle())
-                        .padding(.top, 4)
-                    
-                    // Apply the same animation styles to user messages
-                    Group {
-                        switch appManager.chatAnimationStyle {
-                        case "fade":
-                            Markdown(message.content)
-                                .textSelection(.enabled)
-                                .opacity(shouldAnimate ? animationProgress : 1)
-                        case "bounce":
-                            Markdown(message.content)
-                                .textSelection(.enabled)
-                                .scaleEffect(shouldAnimate ? (animationProgress < 1.0 ? 0.95 + (animationProgress * 0.05) : 1.0) : 1)
-                                .opacity(shouldAnimate ? animationProgress : 1)
-                                .animation(.spring(response: 0.5, dampingFraction: 0.7), value: animationProgress)
-                                .transformEffect(.init(translationX: 0, y: shouldAnimate ? (animationProgress < 1.0 ? (1.0 - animationProgress) * 10 : 0) : 0))
-                        case "typewriter":
-                            if shouldAnimate && animationProgress < 1.0 {
-                                Text(typewriterText)
-                                    .textSelection(.enabled)
-                            } else {
-                                Markdown(message.content)
-                                    .textSelection(.enabled)
-                            }
-                        case "terminal":
-                            ZStack {
-                                RoundedRectangle(cornerRadius: 8)
-                                    .fill(Color.black)
-                                
-                                VStack(alignment: .leading, spacing: 0) {
-                                    // Terminal header
-                                    HStack {
-                                        Circle()
-                                            .fill(Color.red)
-                                            .frame(width: 8, height: 8)
-                                        Circle()
-                                            .fill(Color.yellow)
-                                            .frame(width: 8, height: 8)
-                                        Circle()
-                                            .fill(Color.green)
-                                            .frame(width: 8, height: 8)
-                                        Spacer()
-                                        Text("Terminal")
-                                            .font(.system(size: 10, design: .monospaced))
-                                            .foregroundColor(.gray)
-                                        Spacer()
-                                    }
-                                    .padding(.top, 4)
-                                    .padding(.horizontal, 8)
-                                    
-                                    HStack(alignment: .top, spacing: 4) {
-                                        Text("USER>")
-                                            .font(.system(.body, design: .monospaced))
-                                            .foregroundColor(.cyan)
-                                        
-                                        Text(message.content)
-                                            .font(.system(.body, design: .monospaced))
-                                            .foregroundColor(.cyan)
-                                    }
-                                    .padding(.horizontal, 12)
-                                    .padding(.vertical, 8)
-                                }
-                                .textSelection(.enabled)
-                            }
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .stroke(Color.gray, lineWidth: 1)
-                            )
-                        case "minimalist":
-                            VStack(alignment: .leading, spacing: 8) {
-                                // Extract title and content if possible
-                                let lines = message.content.split(separator: "\n", maxSplits: 1)
-                                
-                                if lines.count > 1 {
-                                    // Title
-                                    Text(String(lines[0]))
-                                        .font(.system(.headline, design: .default))
-                                        .fontWeight(.medium)
-                                        .foregroundColor(.primary)
-                                        .lineLimit(1)
-                                        .padding(.bottom, 2)
-                                    
-                                    Text(String(lines[1]))
-                                        .font(.system(.body, design: .default))
-                                        .fontWeight(.light)
-                                        .foregroundColor(.primary.opacity(0.9))
-                                        .lineSpacing(6)
-                                } else {
-                                    // Just content, no title
-                                    Text(message.content)
-                                        .font(.system(.body, design: .default))
-                                        .fontWeight(.light)
-                                        .foregroundColor(.primary.opacity(0.9))
-                                        .lineSpacing(6)
-                                }
-                            }
-                            .padding(.horizontal, 4)
-                            .padding(.vertical, 2)
-                            .background(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .fill(Color.primary.opacity(0.03))
-                            )
-                            .textSelection(.enabled)
-                        case "retro":
-                            retroText
-                                .textSelection(.enabled)
-                        case "futuristic":
-                            futuristicText
-                                .textSelection(.enabled)
-                        case "handwritten":
-                            handwrittenText
-                                .textSelection(.enabled)
-                        case "comic":
-                            comicText
-                                .textSelection(.enabled)
-                        default: // "none" or any other value
-                            Markdown(message.content)
-                                .textSelection(.enabled)
-                        }
-                    }
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 8)
-                }
-                .padding(.leading, 16)
-                .onAppear {
-                    // Start animation for user messages too
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                        startAnimation()
-                    }
-                }
-            }
-
-            if message.role == .assistant { Spacer() }
-        }
-        .padding(.horizontal)
-        .padding(.vertical, 8)
-        .background(message.role == .assistant ? Color(.systemBackground) : Color.clear)
-        .onAppear {
-            if llm.running {
-                collapsed = false
-            }
-            
-            if message.role == .assistant && !isThinking {
-                // Start animation when message appears and is not in thinking state
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    startAnimation()
-                }
-            }
-        }
-        .onChange(of: llm.elapsedTime) {
-            if isThinking {
-                llm.thinkingTime = llm.elapsedTime
-            }
-        }
-        .onChange(of: isThinking) {
-            if llm.running {
-                llm.isThinking = isThinking
-            }
-        }
-    }
-
-    let platformBackgroundColor: Color = {
-        #if os(iOS)
-        return Color(UIColor.secondarySystemBackground)
-        #elseif os(visionOS)
-        return Color(UIColor.separator)
-        #elseif os(macOS)
-        return Color(NSColor.secondarySystemFill)
-        #endif
-    }()
 }
 
 struct ConversationView: View {
@@ -710,7 +527,7 @@ struct ConversationView: View {
                 VStack(alignment: .leading, spacing: 0) {
                     ForEach(thread.sortedMessages) { message in
                         VStack(spacing: 0) {
-                        MessageView(message: message)
+                        MessageView(message: message, isGenerating: generatingThreadID == message.id)
                             .id(message.id.uuidString)
                             .animation(disableAllAnimations ? nil : .default, value: message.id)
                             
@@ -723,7 +540,7 @@ struct ConversationView: View {
 
                     if llm.running && !llm.output.isEmpty && thread.id == generatingThreadID {
                         VStack(spacing: 0) {
-                            MessageView(message: Message(role: .assistant, content: llm.output))
+                            MessageView(message: Message(role: .assistant, content: llm.output), isGenerating: true)
                             
                             HStack(spacing: 4) {
                                 Circle()

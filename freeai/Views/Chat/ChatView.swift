@@ -49,14 +49,18 @@ struct ExamplePromptsView: View {
 }
 // --- End Example Prompts View Definition ---
 
-// --- Chat Mode Enum ---
-fileprivate enum ChatMode: String, CaseIterable, Identifiable {
-    case chat = "Chat"
-    case freeDump = "FreeDump"
-    case reminders = "Reminders"
-    var id: String { self.rawValue }
+// --- Custom Button Style for Top Bar --- 
+struct DimmingButtonStyle: ButtonStyle {
+    @EnvironmentObject var appManager: AppManager
+    
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .foregroundColor(appManager.appTintColor.getColor()) // Use system tint color
+            .opacity(configuration.isPressed ? 0.6 : 1.0) // Dim on press
+            .contentShape(Rectangle()) // Ensure hit area is defined
+    }
 }
-// --- End Chat Mode Enum ---
+// --- End Custom Button Style --- 
 
 struct ChatView: View {
     @EnvironmentObject var appManager: AppManager
@@ -69,7 +73,6 @@ struct ChatView: View {
     @FocusState.Binding var isPromptFocused: Bool
     @Binding var showChats: Bool
     @Binding var showSettings: Bool
-    @Binding var showFreeMode: Bool
     
     @State var thinkingTime: TimeInterval?
     
@@ -80,10 +83,16 @@ struct ChatView: View {
     @State private var recognitionTask: SFSpeechRecognitionTask?
     @State private var audioEngine = AVAudioEngine()
     @State private var isRecording = false
+    // --- Input Cursor State ---
+    @State private var inputCursorVisible = true
+    let inputCursorTimer = Timer.publish(every: 0.6, on: .main, in: .common).autoconnect()
+    // --- End Input Cursor State ---
 
-    // --- Chat Mode State ---
-    @State private var selectedMode: ChatMode = .chat
-    // --- End Chat Mode State ---
+    // --- Context Management --- 
+    @State private var showingContextSelector = false
+    @State private var activeContextDescription: String? = nil // e.g., "Reminders" or "3 Notes"
+    @State private var selectedNoteIDs: Set<UUID> = []
+    @State private var useContextType: ContextType? = nil // :notes or :reminders
 
     // --- Example Prompts (Updated & Renamed) ---
     let chatExamples = [
@@ -132,7 +141,7 @@ struct ChatView: View {
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: isRecording ? 18 : 24, height: isRecording ? 18 : 24)
-                    .foregroundColor(isRecording ? appManager.appTintColor.getColor() : .gray) // Use tint color for recording icon
+                    .foregroundColor(appManager.appTintColor.getColor())
                     .animation(.spring(duration: 0.3), value: isRecording)
             }
             .overlay(
@@ -149,41 +158,52 @@ struct ChatView: View {
     // Updated Chat Input with Alignment Fixes
     var chatInput: some View {
         HStack(alignment: .bottom, spacing: 6) { // Reduced spacing
-            // New Chat Button
-                Button {
-                 newChat()
-                } label: {
-                 Image(systemName: "plus.circle.fill")
-                     .font(.title2)
-                     .foregroundColor(.secondary)
-             }
-             .frame(width: 30, height: 30) // Fixed frame
-             .padding(.leading, 4)
+            // Context Button
+            Button {
+                showingContextSelector = true
+            } label: {
+                Image(systemName: "plus.circle.fill") // Keep icon for now
+                    .font(.title2)
+                    .foregroundColor(appManager.appTintColor.getColor())
+            }
+            .frame(width: 30, height: 30) // Verified size
+            .padding(.leading, 4)
             
             // Mic Button OR Keyboard Dismiss
             Group { // Group to apply frame consistently
                  if isPromptFocused {
                      Button { hideKeyboard() } label: {
                     Image(systemName: "keyboard.chevron.compact.down")
-                        .foregroundColor(.gray)
+                        .foregroundColor(appManager.appTintColor.getColor())
                         .font(.system(size: 18))
                 }
             } else {
                      micButton // micButton already includes sizing/padding logic
                  }
             }
-            .frame(width: 30, height: 30) // Fixed frame for this slot
+            .frame(width: 30, height: 30) // Verified size matches context button
             
-            // Main TextField
-            TextField("freely ask anything...", text: $prompt, axis: .vertical) // Updated placeholder
-                .submitLabel(.send)
-                .focused($isPromptFocused)
-                .textFieldStyle(.plain)
-                // Give it some vertical padding within the background
-                .padding(.vertical, 8)
-                // Horizontal padding applied by the outer HStack padding now
-                .onSubmit { generate() }
-                .frame(minHeight: 36) // Ensure minimum height matches buttons
+            // Main TextField with Blinking Cursor Overlay
+            ZStack(alignment: .leading) {
+                TextField("freely ask anything...", text: $prompt, axis: .vertical)
+                    .submitLabel(.send)
+                    .focused($isPromptFocused)
+                    .textFieldStyle(.plain)
+                    .padding(.vertical, 8)
+                    .onSubmit { generate() }
+                    .frame(minHeight: 36)
+                
+                // Blinking Cursor (only shows when focused and prompt is empty)
+                if isPromptFocused && prompt.isEmpty && inputCursorVisible {
+                    Rectangle()
+                        .fill(appManager.appTintColor.getColor())
+                        .frame(width: 2, height: 18) // Adjust size as needed
+                        .offset(y: -1) // Adjust vertical position slightly
+                        .transition(.opacity)
+                        .id(UUID()) // Add ID to help with transitions
+                }
+            }
+            // --- End TextField with Blinking Cursor ---
             
             // Send / Stop Button Slot
              Group {
@@ -199,11 +219,21 @@ struct ChatView: View {
                 .fill(Color(.secondarySystemBackground))
                 .shadow(color: Color.black.opacity(0.1), radius: 2, x: 0, y: 1)
         )
+        // Add timer listener for input cursor
+        .onReceive(inputCursorTimer) { _ in
+             if isPromptFocused {
+                 withAnimation(.easeInOut(duration: 0.1)) { // Faster blink transition
+                     inputCursorVisible.toggle()
+                 }
+             } else {
+                 inputCursorVisible = true // Ensure cursor is ready when refocused
+             }
+         }
     }
 
     // Updated example prompts view
     var examplePromptsView: some View {
-        let currentExamples = switch selectedMode {
+        let currentExamples = switch appManager.selectedChatMode {
         case .chat: chatExamples
         case .freeDump: freeDumpExamples
         case .reminders: reminderExamples
@@ -332,177 +362,191 @@ struct ChatView: View {
                     }
                 
                 VStack(spacing: 0) {
-                    // --- Custom Minimalist Mode Selector ---
-                    HStack(spacing: 10) { // Adjust spacing as needed
-                        ForEach(ChatMode.allCases) { mode in
-                            Button {
-                                // Only allow changing mode if conversation hasn't started
-                                if currentThread == nil || currentThread?.messages.isEmpty ?? true {
-                                    selectedMode = mode
-                                }
-                            } label: {
-                                 Text(mode.rawValue)
-                                     .font(.subheadline) // Use a slightly smaller font
-                                     .padding(.vertical, 6)
-                                     .padding(.horizontal, 12)
-                                     .foregroundColor(selectedMode == mode ? Color.primary : Color.secondary)
-                                     .background(selectedMode == mode ? Color.gray.opacity(0.15) : Color.clear) // Subtle background for selected
-                                     .clipShape(Capsule())
-                            }
-                            .buttonStyle(.plain)
-                            .disabled(currentThread != nil && !(currentThread?.messages.isEmpty ?? true)) // Disable button itself
-                        }
-                    }
-                    .fontDesign(appManager.appFontDesign.getFontDesign()) // Apply font design to the HStack
-                    .padding(.horizontal) // Keep horizontal padding for the group
-                    .padding(.vertical, 8)
-                    // --- End Custom Minimalist Mode Selector ---
-                    
-                    // Model picker at the top
-                    if appManager.userInterfaceIdiom == .phone {
-                        // REMOVED: Phone top bar with model picker
-                    }
-                    
+                    // --- New Top Bar Area --- 
+                    topBarContent // Add the new HStack here
+                    // --- End New Top Bar Area ---
+
                     // --- Conversation View --- 
                     // Takes up remaining space
                     if let currentThread = currentThread {
                         ConversationView(thread: currentThread, generatingThreadID: generatingThreadID)
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .overlay(alignment: .topTrailing) {
-                                if appManager.userInterfaceIdiom != .phone {
-                                    HStack {
-                                        Spacer()
-                                    }
-                                    .padding()
-                                }
-                            }
+                           // Removed overlay as top elements are now inline
                     } else {
                          // Empty state when no thread exists 
                         Spacer()
                     }
                     
-                     // --- Example Prompts View (Moved Above Input) --- 
+                     // --- Example Prompts View (Only show if no messages yet) --- 
+                    if currentThread == nil || currentThread?.messages.isEmpty ?? true {
                         examplePromptsView
-                         .padding(.bottom, 4) // Padding above input
-                         .transition(.opacity.combined(with: .move(edge: .bottom)))
+                           .padding(.bottom, 4) // Padding above input
+                           .transition(.opacity.combined(with: .move(edge: .bottom)))
+                           .id("ExamplePrompts") // Add ID for transition stability
+                    }
                     
                      // --- Chat Input Area --- 
+                    // Active Context Indicator (Optional)
+                    if let contextDesc = activeContextDescription {
+                        HStack {
+                            Text("Context: \(contextDesc)")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 4)
+                                .background(Color(.systemGray5))
+                                .clipShape(Capsule())
+                            Button {
+                                // Clear context
+                                activeContextDescription = nil
+                                selectedNoteIDs = []
+                                useContextType = nil
+                            } label: {
+                                Image(systemName: "xmark.circle.fill")
+                                    .foregroundColor(.secondary)
+                            }
+                            Spacer()
+                        }
+                        .padding(.horizontal)
+                        .padding(.bottom, 2) // Small spacing before input
+                    }
+                    
                     HStack {
                         chatInput
                     }
                     .padding() // Keep padding around input box
                 }
             }
-            .navigationTitle(chatTitle)
-            #if os(iOS) || os(visionOS)
-                .navigationBarTitleDisplayMode(.inline)
-            #endif
-                .sheet(isPresented: $showModelPicker) {
-                    NavigationStack {
-                        ModelsSettingsView()
-                            .environment(llm)
-                        #if os(visionOS)
-                            .toolbar {
-                                ToolbarItem(placement: .topBarLeading) {
-                                    Button(action: { showModelPicker.toggle() }) {
-                                        Image(systemName: "xmark")
-                                    }
+            .sheet(isPresented: $showModelPicker) {
+                NavigationStack {
+                    ModelsSettingsView()
+                        .environment(llm)
+                    #if os(visionOS)
+                        .toolbar {
+                            ToolbarItem(placement: .topBarLeading) {
+                                Button(action: { showModelPicker.toggle() }) {
+                                    Image(systemName: "xmark")
                                 }
                             }
-                        #endif
-                    }
-                    #if os(iOS)
-                    .presentationDragIndicator(.visible)
-                    .if(appManager.userInterfaceIdiom == .phone) { view in
-                        view.presentationDetents([.fraction(0.4)])
-                    }
-                    #elseif os(macOS)
-                    .toolbar {
-                        ToolbarItem(placement: .destructiveAction) {
-                            Button(action: { showModelPicker.toggle() }) {
-                                Text("close")
-                            }
                         }
-                    }
                     #endif
                 }
+                #if os(iOS)
+                .presentationDragIndicator(.visible)
+                .if(appManager.userInterfaceIdiom == .phone) { view in
+                    view.presentationDetents([.fraction(0.4)])
+                }
+                #elseif os(macOS)
                 .toolbar {
-                    #if os(iOS) || os(visionOS)
-                    // --- Conditional Toolbar Layout ---
-                    if appManager.showAnimatedEyes {
-                        // Eyes Centered, Model Picker & Chats Leading, Settings Trailing
-                        ToolbarItemGroup(placement: .navigationBarLeading) {
-                             if appManager.userInterfaceIdiom == .phone {
-                                 Button(action: {
-                                     appManager.playHaptic()
-                                     showChats.toggle()
-                                 }) {
-                                     Image(systemName: "line.3.horizontal")
-                                         .font(.system(size: 16, weight: .medium))
-                                 }
-                             }
-                             // Keep Model picker here, maybe make it smaller/icon only?
-                             modelPickerButton
-                                .font(.caption) // Make picker smaller when leading
-                        }
-                        ToolbarItem(placement: .principal) {
-                            // Eyes Centered
-                            AnimatedEyesView(isGenerating: llm.running)
-                        }
-                        ToolbarItem(placement: .navigationBarTrailing) {
-                            // Settings Trailing
-                            Button(action: {
-                                appManager.playHaptic()
-                                showSettings.toggle()
-                            }) {
-                                Image(systemName: "gearshape")
-                                    .font(.system(size: 18))
-                            }
-                        }
-                    } else {
-                        // No Eyes: Default Layout Restored
-                        if appManager.userInterfaceIdiom == .phone {
-                            ToolbarItem(placement: .navigationBarLeading) {
-                                // Chats Leading
-                                Button(action: {
-                                    appManager.playHaptic()
-                                    showChats.toggle()
-                                }) {
-                                    Image(systemName: "line.3.horizontal")
-                                        .font(.system(size: 16, weight: .medium))
-                                }
-                            }
-                        }
-                        ToolbarItem(placement: .principal) {
-                             // Model Centered
-                            modelPickerButton
-                        }
-                        ToolbarItem(placement: .navigationBarTrailing) {
-                                // Settings Trailing
-                                Button(action: {
-                                    appManager.playHaptic()
-                                    showSettings.toggle()
-                                }) {
-                                    Image(systemName: "gearshape")
-                                        .font(.system(size: 18))
-                            }
+                    ToolbarItem(placement: .destructiveAction) {
+                        Button(action: { showModelPicker.toggle() }) {
+                            Text("close")
                         }
                     }
-                    // --- End Conditional Toolbar Layout ---
-                    #elseif os(macOS)
-                    // macOS Toolbar (Keep as is for now, or adjust if needed)
-                    ToolbarItem(placement: .primaryAction) {
-                            Button(action: {
-                                appManager.playHaptic()
-                                showSettings.toggle()
-                            }) {
-                                Label("Settings", systemImage: "gear")
-                        }
-                    }
-                    #endif
                 }
+                #endif
+            }
+            .sheet(isPresented: $showingContextSelector) {
+                ContextSelectorView(
+                    activeContextDescription: $activeContextDescription,
+                    selectedNoteIDs: $selectedNoteIDs,
+                    useContextType: $useContextType
+                )
+                .environmentObject(appManager) // Pass environment objects
+            }
         }
     }
+
+    // --- New Top Bar Content View --- 
+    @ViewBuilder
+    private var topBarContent: some View {
+        ZStack {
+            // Left and right side buttons in an HStack
+            HStack {
+                // --- Left Side --- 
+                if appManager.userInterfaceIdiom == .phone {
+                     Button(action: {
+                         appManager.playHaptic()
+                         showChats.toggle()
+                     }) {
+                         // Add padding around the image
+                         Image(systemName: "line.3.horizontal")
+                             .font(.system(size: 18, weight: .medium))
+                             .padding(8) // Increase tap area
+                     }
+                     .buttonStyle(DimmingButtonStyle())
+                }
+                
+                Spacer()
+                
+                // --- Right Side --- 
+                HStack(spacing: 16) {
+                    // New Chat button
+                     Button { newChat() } label: {
+                         // Add padding around the image
+                         Image(systemName: "square.and.pencil")
+                             .font(.system(size: 18))
+                             .padding(8) // Increase tap area
+                     }
+                     .buttonStyle(DimmingButtonStyle())
+                     
+                     // Settings Trailing
+                     Button(action: {
+                         appManager.playHaptic()
+                         showSettings.toggle()
+                     }) {
+                         // Add padding around the image
+                         Image(systemName: "gearshape")
+                             .font(.system(size: 18))
+                             .padding(8) // Increase tap area
+                     }
+                     .buttonStyle(DimmingButtonStyle())
+                }
+            }
+            
+            // Centered eyes or model picker
+            if appManager.showAnimatedEyes {
+                Button { 
+                    showModelPicker.toggle()
+                    appManager.playHaptic()
+                } label: {
+                    AnimatedEyesView(
+                        isGenerating: llm.running,
+                        isThinking: generatingThreadID != nil,
+                        isListening: isRecording
+                    )
+                }
+                .buttonStyle(DimmingButtonStyle())
+            } else {
+                 modelPickerButton
+            }
+        }
+        .padding(.horizontal) // Keep outer padding
+        .padding(.top, 8)
+        .padding(.bottom, 4)
+        .frame(height: 50) // Slightly increased height to accommodate padding
+    }
+
+    // --- Context Selection Sheet --- 
+    @ViewBuilder
+    private func contextSelectorSheet() -> some View {
+        // Placeholder - build ContextSelectorView next
+        NavigationStack {
+            VStack {
+                Text("Select Context")
+                    .font(.title2)
+                Spacer()
+                Text("TODO: Build Note/Reminder Selection UI")
+                Spacer()
+            }
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Cancel") { showingContextSelector = false }
+                }
+            }
+        }
+    }
+    // --- End Context Selection Sheet ---
 
     private func generate() {
         if !isPromptEmpty {
@@ -522,193 +566,92 @@ struct ChatView: View {
                     prompt = ""
                     appManager.playHaptic()
 
-                    sendMessage(Message(role: .user, content: message, thread: currentThread))
-                    
-                    // --- Mode-Specific Logic --- 
-                    switch selectedMode {
-                    case .chat:
-                         print("Generating standard chat response...")
+                    // --- Context Prep --- 
+                    var contextString = ""
+                    var systemPrompt = appManager.systemPrompt // Default system prompt
+
+                    if let contextType = useContextType {
+                        switch contextType {
+                        case .reminders:
+                            print("Preparing Reminder Context...")
+                            // Fetch reminders (using logic similar to the old .reminders case)
+                            // Basic fetch for now - could be refined based on `message` keywords later if needed
+                            let descriptor = FetchDescriptor<Reminder>(predicate: #Predicate { !$0.isCompleted }, 
+                                                                   sortBy: [SortDescriptor(\.scheduledDate, order: .forward)])
+                            let fetchedReminders = (try? modelContext.fetch(descriptor)) ?? []
+
+                            if !fetchedReminders.isEmpty {
+                                contextString += "CONTEXT: The user has provided the following relevant reminders:\n"
+                                let dateFormatter = DateFormatter()
+                                dateFormatter.dateStyle = .short
+                                dateFormatter.timeStyle = .short
+                                for reminder in fetchedReminders {
+                                    let dateStr = reminder.scheduledDate != nil ? dateFormatter.string(from: reminder.scheduledDate!) : "Someday"
+                                    let status = reminder.isCompleted ? "Completed" : (reminder.scheduledDate != nil && reminder.scheduledDate! < Date() ? "Overdue" : "Pending")
+                                    contextString += "- \(reminder.taskDescription) (Due: \(dateStr), Status: \(status))\n"
+                                }
+                                systemPrompt = "You are an assistant discussing the user's reminders. Use the provided context to answer the user's query. \(appManager.systemPrompt)"
+                            }
+                            
+                        case .notes:
+                            if !selectedNoteIDs.isEmpty {
+                                print("Preparing Note Context for IDs: \(selectedNoteIDs)")
+                                // Fetch *only* the selected notes by ID
+                                let selectedIDs = selectedNoteIDs // Capture for predicate
+                                let descriptor = FetchDescriptor<DumpNote>(predicate: #Predicate { selectedIDs.contains($0.id) },
+                                                                     sortBy: [SortDescriptor(\.timestamp, order: .reverse)])
+                                let selectedNotes = (try? modelContext.fetch(descriptor)) ?? []
+
+                                if !selectedNotes.isEmpty {
+                                    contextString += "CONTEXT: The user has provided the following selected notes:\n"
+                                    let dateFormatter = DateFormatter()
+                                    dateFormatter.dateStyle = .short
+                                    for note in selectedNotes {
+                                        let dateStr = dateFormatter.string(from: note.timestamp)
+                                        let tagsStr = note.tags.isEmpty ? "" : " Tags: [\(note.tags.joined(separator: ", "))]"
+                                        let titlePrefix = note.title.isEmpty ? "Note Content:" : "Title: \"\(note.title)\" Content:"
+                                        contextString += "- \(titlePrefix) \(note.rawContent) (Created: \(dateStr))\(tagsStr)\n\n"
+                                    }
+                                    systemPrompt = "You are an assistant discussing specific notes provided by the user. Use the provided context to answer the user's query. \(appManager.systemPrompt)"
+                                }
+                            }
+                        }
+                        contextString += "\nUSER QUERY: " // Separator before the actual user message
+                        print("Context String Prepared:\n\(contextString)")
+                    }
+
+                    // Prepend context to the message
+                    let finalMessageContent = contextString + message
+                    sendMessage(Message(role: .user, content: finalMessageContent, thread: currentThread))
+
+                    // --- LLM Call --- 
                     if let modelName = appManager.currentModelName {
-                        // Fetch profile (no memories)
+                        // Fetch profile (if no specific context was added, use profile)
                         let descriptor = FetchDescriptor<UserProfile>()
                         let profiles = try? modelContext.fetch(descriptor)
                         let userProfile = profiles?.first
 
-                            // Create augmented system prompt
-                        let augmentedPrompt = appManager.createAugmentedSystemPrompt(
-                            originalPrompt: appManager.systemPrompt,
-                            userProfile: userProfile
-                        )
+                        // Use augmented prompt ONLY if no specific context was added
+                        let finalSystemPrompt = (useContextType == nil && userProfile != nil) ? 
+                            appManager.createAugmentedSystemPrompt(originalPrompt: systemPrompt, userProfile: userProfile) : 
+                            systemPrompt
 
+                        // Generate response using the current thread
                         let output = await llm.generate(
                             modelName: modelName,
-                                 thread: currentThread, // Pass the actual thread
-                            systemPrompt: augmentedPrompt
+                            thread: currentThread, // Pass the actual thread
+                            systemPrompt: finalSystemPrompt
                         )
-                            sendMessage(Message(role: .assistant, content: output, thread: currentThread, generatingTime: llm.thinkingTime))
-                         }
-                         
-                    case .freeDump:
-                         print("Generating response based on FreeDump...")
-                         // --- Notes Logic --- 
-                         // 1. Parse Query (Simple keywords for now)
-                         let noteQuery = message.lowercased()
-                         var notePredicate: Predicate<DumpNote>? = nil
-                         // TODO: Add more sophisticated tag/date parsing
-                         if noteQuery.contains("today") { 
-                             let startOfToday = Calendar.current.startOfDay(for: Date())
-                             notePredicate = #Predicate<DumpNote> { $0.timestamp >= startOfToday }
-                         } else if noteQuery.contains("last week") {
-                              let oneWeekAgo = Calendar.current.date(byAdding: .day, value: -7, to: Date())!
-                              notePredicate = #Predicate<DumpNote> { $0.timestamp >= oneWeekAgo }
-                         } else {
-                             // Basic text search (can be slow on large datasets)
-                             // Consider adding specific tag search later: #Predicate { $0.tags.contains("#tag") }
-                             if !noteQuery.isEmpty {
-                                 notePredicate = #Predicate<DumpNote> { $0.rawContent.contains(noteQuery) || $0.title.contains(noteQuery) }
-                             }
-                         }
-                         
-                         // 2. Fetch Notes (Metadata only initially)
-                         var noteDescriptor = FetchDescriptor<DumpNote>(predicate: notePredicate)
-                         noteDescriptor.fetchLimit = 20 // Limit context size
-                         noteDescriptor.sortBy = [SortDescriptor(\.timestamp, order: .reverse)]
-                         
-                         let fetchedNotes = (try? modelContext.fetch(noteDescriptor)) ?? []
-                         
-                         // 3. Prepare Notes Context (Titles, Tags, Timestamps)
-                         var notesContextString = "User\'s Notes based on query:\\n"
-                         if fetchedNotes.isEmpty {
-                             notesContextString += "- No relevant notes found.\\n"
-                         } else {
-                             let dateFormatter = DateFormatter()
-                             dateFormatter.dateStyle = .short
-                             for note in fetchedNotes {
-                                // Simplify string construction to avoid complex interpolation issues
-                                 let dateStr = dateFormatter.string(from: note.timestamp)
-                                 let tagsStr = note.tags.isEmpty ? "" : " Tags: [\(note.tags.joined(separator: ", "))]"
-                                 let titleStr = note.title.isEmpty ? String(note.rawContent.prefix(30)) + "..." : note.title
-                                 let noteLine = "- \"\(titleStr)\" (\(dateStr))\(tagsStr)\n"
-                                 notesContextString += noteLine // Append the constructed line
-                             }
-                         }
-                         print("Notes Context:\\n\\(notesContextString)")
-
-                         // 4. Call LLM with Notes Context
-                         if let modelName = appManager.currentModelName {
-                             let notesSystemPrompt = "You are discussing the user\'s notes from FreeDump. Use the provided list of note titles, dates, and tags to answer their query. Do not assume you have the full note content unless explicitly asked to retrieve it later. Keep responses concise."
-
-                              // Revert to multi-line string construction
-                             let combinedNotePrompt = """
-                             \(notesSystemPrompt)
-
-                             Context:
-                             \(notesContextString)
-                             User Query: \(message)
-                             """ // Ensure closing quotes are on a new line
-                             
-                             print("Notes Combined Prompt (Multi-line):\n\(combinedNotePrompt)") // Debugging print
-
-                             let tempNotesThread = Thread()
-                             tempNotesThread.messages = [Message(role: .user, content: combinedNotePrompt)]
-                             
-                             let output = await llm.generate(
-                                 modelName: modelName,
-                                 thread: tempNotesThread,
-                                 systemPrompt: "" // System prompt embedded in message
-                             )
-                             sendMessage(Message(role: .assistant, content: output, thread: currentThread))
-                         } else {
-                             sendMessage(Message(role: .assistant, content: "Error: No AI model selected.", thread: currentThread))
-                         }
-                         // --- End Notes Logic ---
-                         
-                    case .reminders:
-                         print("Generating response based on reminders...")
-                         // 1. Parse user query (Simple keyword check for now)
-                         let query = message.lowercased()
-                         var filterPredicate: Predicate<Reminder>? = nil
-                         var fetchLimit = 50 // Limit fetched reminders
-                         
-                         if query.contains("overdue") {
-                             // Fetch incomplete reminders scheduled before the start of today
-                             let startOfToday = Calendar.current.startOfDay(for: Date())
-                             filterPredicate = #Predicate<Reminder> { !$0.isCompleted && $0.scheduledDate != nil && $0.scheduledDate! < startOfToday }
-                         } else if query.contains("today") {
-                             // Fetch incomplete reminders scheduled for today
-                             let startOfToday = Calendar.current.startOfDay(for: Date())
-                             let startOfTomorrow = Calendar.current.date(byAdding: .day, value: 1, to: startOfToday)!
-                             filterPredicate = #Predicate<Reminder> { !$0.isCompleted && $0.scheduledDate != nil && $0.scheduledDate! >= startOfToday && $0.scheduledDate! < startOfTomorrow }
-                         } else if query.contains("later") || query.contains("upcoming") {
-                             // Fetch incomplete reminders scheduled after today (including someday)
-                             let startOfTomorrow = Calendar.current.startOfDay(for: Date()) // Start of today to compare
-                             // Fetch future dated OR nil date reminders that are not complete
-                             filterPredicate = #Predicate<Reminder> { !$0.isCompleted && ($0.scheduledDate == nil || $0.scheduledDate! >= startOfTomorrow) }
-                         } else if query.contains("someday") {
-                             filterPredicate = #Predicate<Reminder> { !$0.isCompleted && $0.scheduledDate == nil }
-                         } else if query.contains("completed") {
-                             filterPredicate = #Predicate<Reminder> { $0.isCompleted }
-                         } else {
-                            // Default: Fetch all non-completed for general queries
-                             filterPredicate = #Predicate<Reminder> { !$0.isCompleted }
-                             fetchLimit = 20 // Lower limit for general queries
-                         }
-                         
-                         // 2. Fetch relevant Reminder objects
-                         var descriptor = FetchDescriptor<Reminder>(predicate: filterPredicate)
-                         descriptor.fetchLimit = fetchLimit
-                         // Add sorting if desired
-                         descriptor.sortBy = [SortDescriptor(\Reminder.scheduledDate, order: .forward)]
-                         
-                         let fetchedReminders = (try? modelContext.fetch(descriptor)) ?? []
-                         
-                         // 3. Prepare context
-                         var contextString = "User's Reminders based on query:\n"
-                         if fetchedReminders.isEmpty {
-                             contextString += "- No relevant reminders found.\n"
-                         } else {
-                             let dateFormatter = DateFormatter()
-                             dateFormatter.dateStyle = .short
-                             dateFormatter.timeStyle = .short
-                             for reminder in fetchedReminders {
-                                 let dateStr = reminder.scheduledDate != nil ? dateFormatter.string(from: reminder.scheduledDate!) : "Someday"
-                                 let status = reminder.isCompleted ? "Completed" : (reminder.scheduledDate != nil && reminder.scheduledDate! < Date() ? "Overdue" : "Pending")
-                                 contextString += "- \(reminder.taskDescription) (Due: \(dateStr), Status: \(status))\n"
-                             }
-                         }
-                         print("Reminder Context:\n\(contextString)")
-                         
-                         // 4. Call LLM (Revised Prompting AGAIN)
-                         if let modelName = appManager.currentModelName {
-                             // Stricter System Prompt
-                             let reminderSystemPrompt = "You are an assistant that ONLY answers questions about a list of reminders provided below. Use ONLY the information in the \'REMINDER LIST CONTEXT\' section to answer the \'USER QUERY\". Do not infer or discuss anything else. If the list doesn't contain the answer, say so clearly."
-                             
-                             // Revised User Message Content Format with Markers
-                             let userMessageContent = """
-                             [CONTEXT START]
-                             REMINDER LIST CONTEXT:
-                             \(contextString)
-                             [CONTEXT END]
-                             
-                             [QUERY START]
-                             USER QUERY: \(message)
-                             [QUERY END]
-                             """
-                             
-                             let tempRemindersThread = Thread()
-                             tempRemindersThread.messages = [Message(role: .user, content: userMessageContent)]
-                             
-                             let output = await llm.generate(
-                                 modelName: modelName,
-                                 thread: tempRemindersThread,
-                                 systemPrompt: reminderSystemPrompt 
-                             )
-                             sendMessage(Message(role: .assistant, content: output, thread: currentThread))
-                         } else {
-                             sendMessage(Message(role: .assistant, content: "Error: No AI model selected.", thread: currentThread))
-                         }
+                        sendMessage(Message(role: .assistant, content: output, thread: currentThread, generatingTime: llm.thinkingTime))
+                    } else {
+                        sendMessage(Message(role: .assistant, content: "Error: No AI model selected.", thread: currentThread))
                     }
-                    // --- End Mode-Specific Logic ---
+
+                    // --- Reset Context State --- 
+                    activeContextDescription = nil
+                    selectedNoteIDs = []
+                    useContextType = nil
+                    // --- End Context State Reset --- 
                     
                     generatingThreadID = nil
                 }
@@ -823,7 +766,7 @@ struct ChatView: View {
     private func newChat() {
          currentThread = nil // Clear the current thread
          prompt = "" // Clear any text in the input field
-         selectedMode = .chat // Optionally reset mode to default chat
+         appManager.selectedChatMode = .chat // Reset global mode to default chat
          isPromptFocused = false // Dismiss keyboard if open
          // TODO: Maybe reset LLM state if needed?
          appManager.playHaptic()
@@ -834,5 +777,5 @@ struct ChatView: View {
 
 #Preview {
     @FocusState var isPromptFocused: Bool
-    ChatView(currentThread: .constant(nil), isPromptFocused: $isPromptFocused, showChats: .constant(false), showSettings: .constant(false), showFreeMode: .constant(false))
+    ChatView(currentThread: .constant(nil), isPromptFocused: $isPromptFocused, showChats: .constant(false), showSettings: .constant(false))
 }

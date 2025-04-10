@@ -64,25 +64,45 @@ struct AppearanceSettingsView: View {
                 #endif
             }
             
-            Section(header: Text("chat interface design")) {
-                Picker("Style", selection: $appManager.chatAnimationStyle) {
-                    Text("None").tag("none")
-                    Text("Fade In").tag("fade")
-                    Text("Bounce").tag("bounce")
-                    Text("Typewriter").tag("typewriter")
-                    Text("Terminal").tag("terminal")
-                    Text("Minimalist").tag("minimalist")
-                    Text("Retro").tag("retro")
-                    Text("Futuristic").tag("futuristic")
-                    Text("Handwritten").tag("handwritten")
-                    Text("Comic").tag("comic")
-                }
-                .pickerStyle(.navigationLink)
+            // --- UPDATED: Chat Message Style Settings Section ---
+            Section(header: Text("Chat Message Style")) {
+                Toggle("Enable Custom Terminal Style", isOn: $appManager.chatInterfaceStyleEnabled.animation())
                 
-                Text("Animation styles (Fade, Bounce, Typewriter) enhance the streaming effect of chat responses.")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                // Show terminal settings only if the master toggle is on
+                if appManager.chatInterfaceStyleEnabled {
+                    Group {
+                        Picker("Color Scheme", selection: $appManager.terminalColorScheme) {
+                            ForEach(TerminalColorScheme.allCases) { scheme in
+                                Text(scheme.rawValue).tag(scheme)
+                            }
+                        }
+                        .pickerStyle(.navigationLink)
+                        
+                        // Effects
+                        Toggle("Scan Lines", isOn: $appManager.terminalScanlinesEnabled)
+                        Toggle("Flicker Effect", isOn: $appManager.terminalFlickerEnabled)
+                        Toggle("Text Jitter", isOn: $appManager.terminalJitterEnabled)
+                        Toggle("Static Noise", isOn: $appManager.terminalStaticEnabled)
+                        Toggle("Bloom/Glow", isOn: $appManager.terminalBloomEnabled)
+                        
+                        // Window Controls
+                        Toggle("Show Window Controls", isOn: $appManager.terminalWindowControlsEnabled.animation())
+                        
+                        if appManager.terminalWindowControlsEnabled {
+                            Picker("Control Style", selection: $appManager.terminalWindowControlsStyle) {
+                                ForEach(WindowControlStyle.allCases) { style in
+                                    Text(style.rawValue).tag(style)
+                                }
+                            }
+                            // Consider using .segmented picker style if appropriate on the platform
+                            // .pickerStyle(.segmented)
+                        }
+                    }
+                    // Apply a transition to the group
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+                }
             }
+            // --- End Chat Message Style Settings ---
         }
         .formStyle(.grouped)
         .navigationTitle("appearance")

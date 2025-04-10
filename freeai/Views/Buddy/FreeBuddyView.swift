@@ -73,20 +73,37 @@ struct FreeBuddyView: View {
          reminders.filter { $0.isCompleted }
     }
     
+    // --- Example Reminder Prompts ---
+    let reminderExamples = [
+        "Call mom on Sunday at 5pm",
+        "Go to church this Sunday at 10am",
+        "Buy groceries tomorrow",
+        "Water plants every Tuesday 8am",
+        "Doctor appointment on May 15 at 2pm"
+    ]
+    // --- End Example Reminder Prompts ---
+
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) { // Use spacing 0 for tighter control
                 // --- Eyes & Level Display ---
+                ZStack {
+                    // Centered eyes that ignore other elements
+                    if appManager.showAnimatedEyes {
+                        AnimatedEyesView(
+                            isGenerating: isProcessing,
+                            isThinking: isProcessing,
+                            isListening: isRecording
+                        )
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+                 // --- End Eyes & Level Display ---
+
+                // Level Display
                 HStack {
                     Spacer()
-                    // Eyes (if enabled)
-                    if appManager.showAnimatedEyes {
-                        AnimatedEyesView(isGenerating: isProcessing)
-                            // Pass level info later if needed for eye changes
-                            // .environment(\.buddyLevel, appManager.buddyLevel)
-                    }
-                    Spacer()
-                    // Level Display
                     VStack(alignment: .center) {
                          Text("Level \(appManager.buddyLevel)")
                              .font(.headline)
@@ -99,14 +116,11 @@ struct FreeBuddyView: View {
                                 .foregroundColor(.secondary)
                          }
                          .progressViewStyle(.linear)
-                         .frame(width: 80) // Adjust width as needed
+                         .frame(width: 120) // Adjust width as needed
                     }
-                    .padding(.horizontal)
-                     Spacer()
+                    Spacer()
                 }
-                .padding(.top)
-                .padding(.bottom, 10) // Reduced bottom padding slightly
-                 // --- End Eyes & Level Display ---
+                .padding(.bottom, 10)
 
                 // --- Reminder List (With Sections) --- 
                 List {
@@ -172,6 +186,32 @@ struct FreeBuddyView: View {
                 .frame(maxHeight: .infinity) 
                 .background(Color.clear.contentShape(Rectangle()).onTapGesture { isInputFocused = false })
 
+                // --- Example Reminder Prompts ---
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        ForEach(reminderExamples, id: \.self) { example in
+                            Button {
+                                reminderInput = example
+                                isInputFocused = true
+                            } label: {
+                                Text(example)
+                                    .font(.footnote)
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 8)
+                                    .background(Color(.tertiarySystemBackground))
+                                    .foregroundColor(.primary)
+                                    .cornerRadius(16)
+                                    .lineLimit(1)
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                        }
+                    }
+                    .padding(.horizontal)
+                }
+                .frame(height: 40)
+                .padding(.bottom, 4)
+                // --- End Example Reminder Prompts ---
+
                 // --- Input Area ---
                 HStack(spacing: 8) {
                     // Mic Button
@@ -221,7 +261,7 @@ struct FreeBuddyView: View {
                 .padding() // Padding around the input box
 
             }
-            .navigationTitle("FreeBuddy")
+            .navigationTitle("")
             #if os(iOS) || os(visionOS)
             .navigationBarTitleDisplayMode(.inline) // Keep consistent title style
             #endif
@@ -371,6 +411,10 @@ struct FreeBuddyView: View {
              // Depends on desired game design - for now, let's keep it awarded once.
              // reminder.xpAwarded = false 
         }
+        
+        // Comment out unused message constants 
+        // let message1 = "toggled completion for reminder: \(reminder.id) to \(reminder.isCompleted)"
+        // let message2 = "Error saving toggled reminder: \(error)"
         
         do {
             try modelContext.save()
@@ -663,12 +707,16 @@ struct ReminderRow: View {
             }
             Spacer()
             
+            // Improve delete button with larger tap target
             Button {
+                appManager.playHaptic() // Add haptic feedback
                 deleteAction(reminder)
             } label: {
                 Image(systemName: "xmark.circle.fill")
-                    .foregroundColor(.gray.opacity(0.7)) 
-                    .font(.title3)
+                    .foregroundColor(.gray.opacity(0.7))
+                    .font(.system(size: 20))
+                    .frame(width: 44, height: 44) // Larger hit area
+                    .contentShape(Rectangle()) // Ensure entire frame is tappable
             }
             .buttonStyle(.plain)
         }

@@ -24,10 +24,6 @@ struct SettingsView: View {
                         Label("chats", systemImage: "message")
                     }
                     
-                    NavigationLink(destination: FreeModeSettingsView()) {
-                        Label("freestyle", systemImage: "square.text.square")
-                    }
-
                     NavigationLink(destination: ModelsSettingsView()) {
                         Label {
                             Text("models")
@@ -46,6 +42,19 @@ struct SettingsView: View {
                 Section {
                     NavigationLink(destination: CreditsView()) {
                         Text("credits")
+                    }
+                }
+                
+                // Add "Made by" section at the bottom with version number
+                Section {
+                    HStack {
+                        Text("Made by Jimi Olaoya")
+                            .font(.footnote)
+                            .foregroundColor(.secondary)
+                        Spacer()
+                        Text("v\(Bundle.main.releaseVersionNumber ?? "1.0").\(Bundle.main.buildVersionNumber ?? "0")")
+                            .font(.footnote)
+                            .foregroundColor(.secondary)
                     }
                 }
             }

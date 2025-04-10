@@ -6,29 +6,97 @@
 //
 
 import SwiftUI
-import SwiftData
+@preconcurrency import SwiftData
+import LinkPresentation
+
+// --- NEW: Terminal Style Settings (Moved outside AppManager) ---
+enum TerminalColorScheme: String, CaseIterable, Identifiable {
+    case green = "Classic Green"
+    case amber = "Amber"
+    case dosBlue = "IBM DOS Blue"
+    case matrix = "Matrix"
+    case vintagePaper = "Vintage Paper"
+    case futuristic = "Futuristic"
+    case windows95 = "Windows 95"
+    
+    var id: String { self.rawValue }
+    
+    // Define colors for each scheme
+    var textColor: Color {
+        switch self {
+        case .green: return .green
+        case .amber: return .orange
+        case .dosBlue: return Color(red: 0.7, green: 0.7, blue: 1.0) // Light blue/white
+        case .matrix: return Color(red: 0.1, green: 1.0, blue: 0.1) // Bright Green
+        case .vintagePaper: return Color(hue: 0.1, saturation: 0.6, brightness: 0.3) // Dark Sepia
+        case .futuristic: return .cyan // Bright Cyan
+        case .windows95: return .black
+        }
+    }
+    
+    var backgroundColor: Color {
+        switch self {
+        case .green, .amber: return .black.opacity(0.9)
+        case .dosBlue: return Color(red: 0, green: 0, blue: 0.6) // Dark blue
+        case .matrix: return .black // , .hacker removed
+        case .vintagePaper: return Color(hue: 0.1, saturation: 0.05, brightness: 0.95) // Light Beige
+        case .futuristic: return Color(red: 0.05, green: 0.05, blue: 0.15) // Very Dark Blue/Black
+        case .windows95: return Color(red: 0.75, green: 0.75, blue: 0.75)
+        }
+    }
+    
+    var promptUserColor: Color {
+        switch self {
+        case .green: return .cyan
+        case .amber: return Color(red: 1.0, green: 0.8, blue: 0.2)
+        case .dosBlue: return .yellow
+        case .matrix: return Color(red: 0.4, green: 1.0, blue: 0.4) // Match text for Matrix
+        case .vintagePaper: return Color(hue: 0.1, saturation: 0.7, brightness: 0.2) // Darker Brown
+        case .futuristic: return Color(red: 0.8, green: 0.8, blue: 1.0) // Lighter Electric Blue
+        case .windows95: return .black
+        }
+    }
+    
+    // AI prompt color can often match text color, but can be customized
+    var promptAiColor: Color {
+        switch self {
+            case .futuristic: return Color(red: 0.6, green: 1.0, blue: 1.0) // Slightly different cyan/teal for AI
+            case .windows95: return .black
+            // Default to text color for most
+            default: return textColor
+        }
+    }
+}
+// --- End Terminal Style Settings ---
+
+// --- NEW: Window Control Style Enum ---
+enum WindowControlStyle: String, CaseIterable, Identifiable {
+    case macOS = "macOS"
+    case windows = "Windows"
+    var id: String { self.rawValue }
+}
+// --- End Window Control Style Enum ---
 
 class AppManager: ObservableObject {
     @AppStorage("systemPrompt") var systemPrompt = "you are a helpful assistant"
     @AppStorage("appTintColor") var appTintColor: AppTintColor = .monochrome
-    @AppStorage("appFontDesign") var appFontDesign: AppFontDesign = .standard
+    // --- Set Default Font Design to Monospaced --- 
+    @AppStorage("appFontDesign") var appFontDesign: AppFontDesign = .monospaced
+    // --- End Default Font Change ---
     @AppStorage("appFontSize") var appFontSize: AppFontSize = .medium
     @AppStorage("appFontWidth") var appFontWidth: AppFontWidth = .standard
     @AppStorage("currentModelName") var currentModelName: String?
     @AppStorage("shouldPlayHaptics") var shouldPlayHaptics = true
     @AppStorage("numberOfVisits") var numberOfVisits = 0
     @AppStorage("numberOfVisitsOfLastRequest") var numberOfVisitsOfLastRequest = 0
-    @AppStorage("freeModeTopic") var freeModeTopic: String = ""
-    @AppStorage("freeModePreferences") var freeModePreferences: String = ""
-    @AppStorage("freeModeModelName") var freeModeModelName: String?
-    @AppStorage("topicsCombinationMode") var topicsCombinationMode: String = "single" // Options: single, pair, triple
-    @AppStorage("contentLengthMode") var contentLengthMode: String = "medium" // Options: minimalist, brief, medium, detailed
-    @AppStorage("chatAnimationStyle") var chatAnimationStyle: String = "fade" // Options: fade, bounce, typewriter, terminal, minimalist, retro, futuristic, handwritten, comic, none
-    @AppStorage("freestyleCardStyle") var freestyleCardStyle: String = "minimalist" // Options: fade, bounce, typewriter, terminal, minimalist, retro, futuristic, handwritten, comic, none
     
     // --- Add Toggle State for Eyes --- 
     @Published var showAnimatedEyes: Bool = true
     // --- End Toggle State ---
+    
+    // --- Chat Mode State (Moved from ChatView) ---
+    @Published var selectedChatMode: ChatMode = .chat
+    // --- End Chat Mode State ---
     
     // --- Eye Customization Settings ---
     @AppStorage("eyeShape") var eyeShape: EyeShapeType = .circle
@@ -70,6 +138,10 @@ class AppManager: ObservableObject {
     @Published var currentUserName: String? = nil
     // --- End Store Current User Name ---
     
+    // --- NEW: Transient State for Note Color Pulse ---
+    @Published var transientNoteColorTag: String? = nil
+    // --- End Transient State ---
+    
     var userInterfaceIdiom: LayoutType {
         #if os(visionOS)
         return .vision
@@ -93,6 +165,18 @@ class AppManager: ObservableObject {
             saveInstalledModelsToUserDefaults()
         }
     }
+    
+    // --- Terminal Style Properties (References the enum defined outside) ---
+    @AppStorage("chatInterfaceStyleEnabled") var chatInterfaceStyleEnabled: Bool = true // Master Toggle
+    @AppStorage("terminalColorScheme") var terminalColorScheme: TerminalColorScheme = .green
+    @AppStorage("terminalScanlinesEnabled") var terminalScanlinesEnabled: Bool = true
+    @AppStorage("terminalFlickerEnabled") var terminalFlickerEnabled: Bool = true
+    @AppStorage("terminalJitterEnabled") var terminalJitterEnabled: Bool = false
+    @AppStorage("terminalStaticEnabled") var terminalStaticEnabled: Bool = false
+    @AppStorage("terminalBloomEnabled") var terminalBloomEnabled: Bool = false
+    @AppStorage("terminalWindowControlsEnabled") var terminalWindowControlsEnabled: Bool = false // Window Buttons Toggle
+    @AppStorage("terminalWindowControlsStyle") var terminalWindowControlsStyle: WindowControlStyle = .macOS // Window Button Style
+    // --- End Terminal Style Properties ---
     
     init() {
         loadInstalledModelsFromUserDefaults()
@@ -184,6 +268,19 @@ class AppManager: ObservableObject {
         }
     }
 }
+
+// --- Chat Mode Enum (Moved from ChatView) ---
+enum ChatMode: String, CaseIterable, Identifiable {
+    case chat = "Chat"
+    case freeDump = "FreeDump"
+    case reminders = "Reminders"
+    var id: String { self.rawValue }
+}
+// --- End Chat Mode Enum ---
+
+// --- Context Type Enum (Moved from ChatView) ---
+enum ContextType { case notes, reminders }
+// --- End Context Type Enum ---
 
 enum Role: String, Codable {
     case assistant
@@ -432,7 +529,19 @@ class DumpNote {
     var isProcessing: Bool
     var isPinned: Bool
     
-    init(rawContent: String, structuredContent: String = "", title: String = "", tags: [String] = [], modelName: String? = nil) {
+    // --- New Properties for Google Keep features ---
+    var colorTag: String? // Store hex color string or a predefined key
+    var linkURL: String?
+    var linkTitle: String?
+    var linkImageURL: String?
+    // --- End New Properties ---
+    
+    // --- NEW: Audio Note Properties ---
+    var audioFilename: String? // Store filename relative to Documents dir
+    var transcription: String?
+    // --- End Audio Note Properties ---
+    
+    init(rawContent: String, structuredContent: String = "", title: String = "", tags: [String] = [], modelName: String? = nil, isPinned: Bool = false, colorTag: String? = nil, audioFilename: String? = nil, transcription: String? = nil) {
         self.id = UUID()
         self.rawContent = rawContent
         self.structuredContent = structuredContent
@@ -441,15 +550,92 @@ class DumpNote {
         self.timestamp = Date()
         self.modelName = modelName
         self.isProcessing = false
-        self.isPinned = false
+        self.isPinned = isPinned
+        self.colorTag = colorTag
+        // Link properties will be populated later by a separate process
+        self.audioFilename = audioFilename // Initialize audio filename
+        self.transcription = transcription // Initialize transcription
     }
 }
+
+// --- Link Metadata Fetcher --- 
+class LinkMetadataFetcher {
+    // Function to detect the first URL in a string
+    static func detectURL(in text: String) -> URL? {
+        let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
+        let matches = detector?.matches(in: text, options: [], range: NSRange(location: 0, length: text.utf16.count))
+
+        // Find the first match that is a valid URL
+        for match in matches ?? [] {
+            if let url = match.url {
+                return url
+            }
+        }
+        return nil
+    }
+
+    // Function to fetch metadata for a given URL
+    @MainActor // Ensure metadata updates happen on the main thread
+    static func fetchMetadata(for url: URL) async -> (title: String?, imageURL: String?) {
+        let provider = LPMetadataProvider()
+        do {
+            let metadata = try await provider.startFetchingMetadata(for: url)
+            var fetchedImageURL: String? = nil
+
+            // Try to get an image provider and save it temporarily to get a URL
+            if let imageProvider = metadata.imageProvider {
+                 let tempImageURL = await saveImageTemporarily(imageProvider: imageProvider)
+                 fetchedImageURL = tempImageURL?.absoluteString
+             }
+
+            return (metadata.title, fetchedImageURL)
+        } catch {
+            print("Error fetching link metadata for \(url): \(error)")
+            return (nil, nil)
+        }
+    }
+    
+    // Helper to save image from NSItemProvider to a temporary file
+    private static func saveImageTemporarily(imageProvider: NSItemProvider) async -> URL? {
+        guard imageProvider.hasItemConformingToTypeIdentifier("public.image") else { return nil }
+        
+        do {
+            let item = try await imageProvider.loadItem(forTypeIdentifier: "public.image", options: nil)
+            
+            var imageData: Data? = nil
+            if let data = item as? Data {
+                imageData = data
+            } else if let image = item as? UIImage {
+                imageData = image.pngData() // Or jpegData
+            } else if let imageURL = item as? URL,
+                      let dataFromURL = try? Data(contentsOf: imageURL) {
+                imageData = dataFromURL
+            }
+            
+            guard let finalImageData = imageData else { return nil }
+            
+            // Create a unique temporary file URL
+            let tempDirectory = FileManager.default.temporaryDirectory
+            let fileName = UUID().uuidString + ".png" // Assume png for simplicity
+            let fileURL = tempDirectory.appendingPathComponent(fileName)
+            
+            // Write the data
+            try finalImageData.write(to: fileURL)
+            return fileURL
+        } catch {
+            print("Error processing image provider: \(error)")
+            return nil
+        }
+    }
+}
+// --- End Link Metadata Fetcher ---
 
 // --- Eye Customization Enums ---
 
 enum EyeShapeType: String, CaseIterable, Identifiable {
     case circle = "Circle"
     case oval = "Oval"
+    case square = "Square"
     var id: String { self.rawValue }
 }
 

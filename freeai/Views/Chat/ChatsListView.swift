@@ -173,7 +173,15 @@ struct ChatsListView: View {
                 setCurrentThread(nil)
             }
         }
+        // Comment out unused message constants
+        // let message1 = "deleted thread: \(thread.id)"
+        // let message2 = "error deleting thread: \(error)"
         modelContext.delete(thread)
+        do {
+            // ... rest of function
+        } catch {
+            // ... handle error
+        }
     }
 
     private func setCurrentThread(_ thread: Thread? = nil) {

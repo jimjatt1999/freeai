@@ -7,7 +7,6 @@ An on-device AI assistant for iPhone, iPad and Mac with chat, content generation
 - **Integrated Chat**: Conversational AI that can also discuss your notes and reminders.
 - **FreeBuddy Reminders**: Set reminders using natural language (e.g., "call mom tomorrow 5pm"). Includes notification scheduling and completion tracking.
 - **FreeDump Notes**: Process and organize your notes with AI assistance.
-- **Freestyle Content**: Generate creative content on any topic, in various styles.
 - **Gamified Reminders**: Level up your "Buddy" by completing tasks and receive philosophical insights.
 - **Customizable Animated Eyes**: Fun, interactive visual feedback (optional).
 - **Voice Input**: Dictate notes, reminders, or chat messages.

@@ -20,14 +20,13 @@ struct ContentView: View {
     @State var showSettings = false
     @State var showChats = false
     @State var currentThread: Thread?
-    @State var showFreeMode = false
     @State var showFreeDump = false
     @State var showFreeBuddy = false
     @FocusState var isPromptFocused: Bool
     
     // Combined state for navigation
     private var showChat: Bool {
-        return !showFreeMode && !showFreeDump && !showFreeBuddy
+        return !showFreeDump && !showFreeBuddy
     }
 
     var body: some View {
@@ -44,24 +43,21 @@ struct ContentView: View {
                 } detail: {
                     VStack(spacing: 0) {
                         // Main content area
-                        if showFreeMode {
-                            FreeModeView(showChat: $showFreeMode, currentThread: $currentThread)
-                        } else if showFreeDump {
+                        if showFreeDump {
                             FreeDumpView(showFreeDump: $showFreeDump, currentThread: $currentThread)
                         } else if showFreeBuddy {
                             FreeBuddyView()
                                 .environmentObject(appManager)
                         } else {
-                            ChatView(currentThread: $currentThread, isPromptFocused: $isPromptFocused, showChats: $showChats, showSettings: $showSettings, showFreeMode: $showFreeMode)
+                            ChatView(currentThread: $currentThread, isPromptFocused: $isPromptFocused, showChats: $showChats, showSettings: $showSettings)
                         }
                         
                         // Bottom navigation
                         BottomNavBar(
                             showChat: Binding(
-                                get: { !showFreeMode && !showFreeDump && !showFreeBuddy },
-                                set: { if $0 { showFreeMode = false; showFreeDump = false; showFreeBuddy = false } }
+                                get: { !showFreeDump && !showFreeBuddy },
+                                set: { if $0 { showFreeDump = false; showFreeBuddy = false } }
                             ),
-                            showFreeMode: $showFreeMode,
                             showFreeDump: $showFreeDump,
                             showFreeBuddy: $showFreeBuddy
                         )
@@ -71,10 +67,7 @@ struct ContentView: View {
                 // iPhone layout
                 ZStack(alignment: .bottom) {
                     // Main content area
-                    if showFreeMode {
-                        FreeModeView(showChat: $showFreeMode, currentThread: $currentThread)
-                            .padding(.bottom, 50) // Add padding for the navigation bar
-                    } else if showFreeDump {
+                    if showFreeDump {
                         FreeDumpView(showFreeDump: $showFreeDump, currentThread: $currentThread)
                             .padding(.bottom, 50) // Add padding for the navigation bar
                     } else if showFreeBuddy {
@@ -82,7 +75,7 @@ struct ContentView: View {
                             .environmentObject(appManager)
                             .padding(.bottom, 50) // Add padding for the navigation bar
                     } else {
-                        ChatView(currentThread: $currentThread, isPromptFocused: $isPromptFocused, showChats: $showChats, showSettings: $showSettings, showFreeMode: $showFreeMode)
+                        ChatView(currentThread: $currentThread, isPromptFocused: $isPromptFocused, showChats: $showChats, showSettings: $showSettings)
                             .padding(.bottom, 50) // Add padding for the navigation bar
                     }
                     
@@ -90,10 +83,9 @@ struct ContentView: View {
                     VStack(spacing: 0) {
                         BottomNavBar(
                             showChat: Binding(
-                                get: { !showFreeMode && !showFreeDump && !showFreeBuddy },
-                                set: { if $0 { showFreeMode = false; showFreeDump = false; showFreeBuddy = false } }
+                                get: { !showFreeDump && !showFreeBuddy },
+                                set: { if $0 { showFreeDump = false; showFreeBuddy = false } }
                             ),
-                            showFreeMode: $showFreeMode,
                             showFreeDump: $showFreeDump,
                             showFreeBuddy: $showFreeBuddy
                         )

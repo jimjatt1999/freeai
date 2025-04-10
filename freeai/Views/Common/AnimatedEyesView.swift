@@ -18,11 +18,12 @@ struct AnimatedEyesView: View {
     @State private var currentMessage: String? = nil
     @State private var messageTask: Task<Void, Never>? = nil
     
-    // --- Add Thinking State --- 
-    @State private var isThinking = false 
-    // --- End Thinking State --- 
-
-    var isGenerating: Bool = false // Input property
+    // --- Input properties --- 
+    var isGenerating: Bool = false // For Jiggle effect
+    var isThinking: Bool = false   // For pupil movement/squint effect
+    var isListening: Bool = false  // For listening effect
+    var persistentBackgroundColor: Color? = nil // NEW: To override background color
+    // --- End Input properties ---
     
     // Predefined messages for tap action - Expanded List
     let predefinedMessages = [
@@ -48,7 +49,11 @@ struct AnimatedEyesView: View {
     
     // --- Calculated properties based on AppManager settings ---
     private var currentEyeWidth: CGFloat { 
-        appManager.eyeShape == .circle ? 20 : 25 // Oval wider
+        switch appManager.eyeShape {
+            case .circle: return 20
+            case .oval: return 25
+            case .square: return 20 // Same size as circle for now
+        }
     }
     private var currentEyeHeight: CGFloat {
         20 // Keep height consistent for now
@@ -77,6 +82,12 @@ struct AnimatedEyesView: View {
             case .adaptive: return Color(.systemBackground) // Adapts
         }
     }
+    // --- NEW: Computed property for effective background ---
+    private var effectiveBackgroundColor: Color {
+        // Priority: Pulse -> Persistent Override -> Default
+        return pulseColor ?? persistentBackgroundColor ?? currentEyeBackgroundColor
+    }
+    // --- END NEW ---
     private var currentIrisColor: Color {
         // Use primary/black/white for monochrome, otherwise the tint
         appManager.eyeIrisColor == .monochrome ? 
@@ -97,6 +108,11 @@ struct AnimatedEyesView: View {
     @State private var irisScaleY: CGFloat = 1.0 // Added for squint/wide effect
     // --- End added states ---
     
+    // --- NEW: State for Color Pulse Animation ---
+    @State private var pulseColor: Color? = nil
+    @State private var pulseTask: Task<Void, Never>? = nil
+    // --- End Color Pulse State ---
+    
     var body: some View {
         // Use a ZStack for layering eyes and message independently
         ZStack(alignment: .top) { 
@@ -104,34 +120,68 @@ struct AnimatedEyesView: View {
             HStack(spacing: eyeSpacing) {
                 // Left Eye
                 ZStack {
-                    EyeShape(isClosed: false, strokeWidth: currentStrokeWidth, isOval: appManager.eyeShape == .oval)
-                        .fill(currentEyeBackgroundColor)
-                    EyeShape(isClosed: isBlinking, strokeWidth: currentStrokeWidth, isOval: appManager.eyeShape == .oval)
+                    EyeShape(isClosed: false, strokeWidth: currentStrokeWidth, isOval: appManager.eyeShape == .oval, isSquare: appManager.eyeShape == .square)
+                        // Apply pulse color to background temporarily
+                        .fill(effectiveBackgroundColor)
+                    EyeShape(isClosed: isBlinking, strokeWidth: currentStrokeWidth, isOval: appManager.eyeShape == .oval, isSquare: appManager.eyeShape == .square)
                         .stroke(currentEyeOutlineColor, lineWidth: currentStrokeWidth)
                     
+                    // --- Conditional Iris/Thinking/Listening --- 
                     if isThinking {
-                        ThinkingIndicator(color: currentIrisColor)
-                    } else {
-                        IrisView(irisOffset: irisOffset - crossEyedOffset, irisOffsetY: irisOffsetY, isVisible: !isBlinking, irisSize: currentIrisSize, irisColor: currentIrisColor)
-                            .scaleEffect(y: irisScaleY)
+                        // Thinking: Focused/Squinted Iris
+                        IrisView(
+                            irisOffset: -crossEyedOffset, // Use cross-eye offset for focus
+                            irisOffsetY: 0, // Keep centered vertically
+                            isVisible: !isBlinking, 
+                            irisSize: currentIrisSize, 
+                            irisColor: currentIrisColor
+                        )
+                        .scaleEffect(y: 0.8) // Apply squint scale
+                    } else if isListening {
+                        // Listening: Placeholder for now (e.g., slightly wider pupils?)
+                         IrisView(
+                             irisOffset: irisOffset, // Use normal random offset
+                             irisOffsetY: irisOffsetY,
+                             isVisible: !isBlinking, 
+                             irisSize: currentIrisSize * 1.1, // Slightly larger iris
+                             irisColor: currentIrisColor
+                         )
+                         .opacity(0.7) // Maybe slightly faded?
+                    } else if !isBlinking { // Default Idle Iris
+                        IrisView(
+                            irisOffset: irisOffset - crossEyedOffset, 
+                            irisOffsetY: irisOffsetY, 
+                            isVisible: true, // Always visible when not blinking/thinking/listening
+                            irisSize: currentIrisSize, 
+                            irisColor: currentIrisColor
+                        )
+                        .scaleEffect(y: irisScaleY) // Use normal scale
                     }
+                    // --- End Conditional Iris --- 
                 }
                 .frame(width: currentEyeWidth, height: currentEyeHeight)
                 .clipped()
 
                 // Right Eye
                 ZStack {
-                    EyeShape(isClosed: false, strokeWidth: currentStrokeWidth, isOval: appManager.eyeShape == .oval)
-                        .fill(currentEyeBackgroundColor)
-                    EyeShape(isClosed: isBlinking, strokeWidth: currentStrokeWidth, isOval: appManager.eyeShape == .oval)
+                    EyeShape(isClosed: false, strokeWidth: currentStrokeWidth, isOval: appManager.eyeShape == .oval, isSquare: appManager.eyeShape == .square)
+                         // Apply pulse color to background temporarily
+                        .fill(effectiveBackgroundColor)
+                    EyeShape(isClosed: isBlinking, strokeWidth: currentStrokeWidth, isOval: appManager.eyeShape == .oval, isSquare: appManager.eyeShape == .square)
                         .stroke(currentEyeOutlineColor, lineWidth: currentStrokeWidth)
                         
-                    if isThinking {
-                        ThinkingIndicator(color: currentIrisColor)
-                    } else {
-                        IrisView(irisOffset: irisOffset + crossEyedOffset, irisOffsetY: irisOffsetY, isVisible: !isBlinking, irisSize: currentIrisSize, irisColor: currentIrisColor)
-                            .scaleEffect(y: irisScaleY)
-                    }
+                    // --- Conditional Iris/Thinking/Listening --- 
+                     if isThinking {
+                         IrisView(irisOffset: crossEyedOffset, irisOffsetY: 0, isVisible: !isBlinking, irisSize: currentIrisSize, irisColor: currentIrisColor)
+                         .scaleEffect(y: 0.8) // Squint
+                     } else if isListening {
+                         IrisView(irisOffset: irisOffset, irisOffsetY: irisOffsetY, isVisible: !isBlinking, irisSize: currentIrisSize * 1.1, irisColor: currentIrisColor)
+                         .opacity(0.7)
+                     } else if !isBlinking { // Default Idle Iris
+                         IrisView(irisOffset: irisOffset + crossEyedOffset, irisOffsetY: irisOffsetY, isVisible: true, irisSize: currentIrisSize, irisColor: currentIrisColor)
+                         .scaleEffect(y: irisScaleY)
+                     }
+                     // --- End Conditional Iris --- 
                 }
                 .frame(width: currentEyeWidth, height: currentEyeHeight)
                 .clipped()
@@ -168,6 +218,12 @@ struct AnimatedEyesView: View {
         .onAppear { startAnimations() }
         .onDisappear { cancelAnimations() }
         .onChange(of: isGenerating) { _, newValue in handleGenerationChange(newValue) }
+        // Pause random movement when thinking or listening
+        .onChange(of: isThinking) { _, newValue in handleThinkingListeningChange(newValue || isListening) }
+        .onChange(of: isListening) { _, newValue in handleThinkingListeningChange(newValue || isThinking) }
+        .onChange(of: appManager.transientNoteColorTag) { _, newValue in
+             triggerColorPulse(colorTag: newValue)
+        }
     }
 
     // --- Animation Setup/Teardown Helpers --- 
@@ -347,8 +403,8 @@ struct AnimatedEyesView: View {
                         performCrossEyedAnimation()
                     }
                 }
-            default:
-                performBlinkAnimation() // Fallback
+            default: // Add default case for the Int switch
+                break // Do nothing as a fallback
             }
 
         // Removed .shortLLM case entirely
@@ -445,13 +501,70 @@ struct AnimatedEyesView: View {
         }
     }
     // --- End New Tap Animation Helpers ---
+
+    // NEW: Handle pausing random movement
+    private func handleThinkingListeningChange(_ isBusy: Bool) {
+        if isBusy {
+            cancelIrisMovement() // Stop random movement
+            // Optionally reset iris position for thinking/listening start
+            withAnimation(.easeOut(duration: 0.2)) {
+                 irisOffset = 0 
+                 irisOffsetY = 0
+                 irisScaleY = 1.0 // Reset scale unless overridden by thinking/listening logic
+                 // Set cross-eye focus for thinking
+                 crossEyedOffset = isThinking ? currentIrisMaxOffset * 0.6 : 0 
+             }
+        } else {
+            // Resume random movement when not busy
+            startIrisMovement()
+        }
+    }
+
+    // --- NEW: Color Pulse Logic --- 
+    private func triggerColorPulse(colorTag: String?) {
+        pulseTask?.cancel() // Cancel any existing pulse
+        pulseColor = nil // Reset immediately
+        
+        guard let tag = colorTag, let targetColor = colorForKey(tag) else { return }
+        
+        pulseTask = Task {
+            // Phase 1: Quickly fade in the pulse color
+            withAnimation(.easeIn(duration: 0.15)) {
+                 pulseColor = targetColor.opacity(0.6) // Use helper for consistency
+             }
+            
+            // Hold duration
+            try? await Task.sleep(nanoseconds: 300_000_000) // 0.3 seconds hold
+            guard !Task.isCancelled else { return }
+            
+            // Phase 2: Fade out
+             withAnimation(.easeOut(duration: 0.4)) {
+                 pulseColor = nil
+             }
+            pulseTask = nil
+        }
+    }
+    
+    // Helper to get color from tag (can be shared or local)
+    private func colorForKey(_ key: String?) -> Color? {
+        switch key?.lowercased() {
+            case "red": return Color.red
+            case "blue": return Color.blue
+            case "green": return Color.green
+            case "yellow": return Color.yellow
+            case "purple": return Color.purple
+            default: return nil
+        }
+    }
+    // --- End Color Pulse Logic --- 
 }
 
 // Shape for a single eye that can be open or closed
 struct EyeShape: Shape {
     var isClosed: Bool
     var strokeWidth: CGFloat
-    var isOval: Bool // Added property
+    var isOval: Bool
+    var isSquare: Bool // Add isSquare property
 
     func path(in rect: CGRect) -> Path {
         var path = Path()
@@ -461,8 +574,10 @@ struct EyeShape: Shape {
         if isClosed {
             path.move(to: CGPoint(x: insetRect.minX, y: insetRect.midY))
             path.addLine(to: CGPoint(x: insetRect.maxX, y: insetRect.midY))
-        } else {
-            // Draw ellipse (circle if width==height, oval otherwise)
+        } else if isSquare { // Check for square
+            // Draw rounded rectangle for square shape
+            path.addRoundedRect(in: insetRect, cornerSize: CGSize(width: 3, height: 3)) // Adjust corner radius as needed
+        } else { // Draw ellipse (circle or oval)
             path.addEllipse(in: insetRect)
         }
         return path

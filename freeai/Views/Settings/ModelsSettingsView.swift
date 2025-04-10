@@ -11,7 +11,6 @@ struct ModelsSettingsView: View {
     @EnvironmentObject var appManager: AppManager
     @Environment(LLMEvaluator.self) var llm
     @State var showOnboardingInstallModelView = false
-    var isForFreeMode: Bool = false
     
     var body: some View {
         List {
@@ -34,9 +33,7 @@ struct ModelsSettingsView: View {
                             
                             Spacer()
                             
-                            if isForFreeMode ? 
-                               (appManager.freeModeModelName == modelName) : 
-                               (appManager.currentModelName == modelName) {
+                            if appManager.currentModelName == modelName {
                                 Image(systemName: "checkmark")
                                     .foregroundColor(.blue)
                             }
@@ -63,7 +60,7 @@ struct ModelsSettingsView: View {
             }
         }
         .listStyle(.insetGrouped)
-        .navigationTitle(isForFreeMode ? "Free Mode Model" : "Chat Model")
+        .navigationTitle("Chat Model")
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif
@@ -94,14 +91,9 @@ struct ModelsSettingsView: View {
         if let model = ModelConfiguration.availableModels.first(where: {
             $0.name == modelName
         }) {
-            if isForFreeMode {
-                appManager.freeModeModelName = modelName
-                appManager.playHaptic()
-            } else {
-                appManager.currentModelName = modelName
-                appManager.playHaptic()
-                await llm.switchModel(model)
-            }
+            appManager.currentModelName = modelName
+            appManager.playHaptic()
+            await llm.switchModel(model)
         }
     }
     
@@ -118,4 +110,6 @@ struct ModelsSettingsView: View {
 
 #Preview {
     ModelsSettingsView()
+        .environmentObject(AppManager())
+        .environment(LLMEvaluator())
 }
