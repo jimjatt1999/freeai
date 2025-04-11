@@ -101,27 +101,6 @@ struct FreeBuddyView: View {
                 .padding(.vertical, 12)
                  // --- End Eyes & Level Display ---
 
-                // Level Display
-                HStack {
-                    Spacer()
-                    VStack(alignment: .center) {
-                         Text("Level \(appManager.buddyLevel)")
-                             .font(.headline)
-                             .foregroundColor(.primary)
-                         ProgressView(value: Float(appManager.xpTowardsNextLevel), total: Float(appManager.xpForNextLevel)) {
-                            // Label (optional)
-                         } currentValueLabel: {
-                             Text("XP: \(appManager.xpTowardsNextLevel)/\(appManager.xpForNextLevel)")
-                                .font(.caption2)
-                                .foregroundColor(.secondary)
-                         }
-                         .progressViewStyle(.linear)
-                         .frame(width: 120) // Adjust width as needed
-                    }
-                    Spacer()
-                }
-                .padding(.bottom, 10)
-
                 // --- Reminder List (With Sections) --- 
                 List {
                     // Check if there are ANY reminders before showing sections
@@ -362,7 +341,7 @@ struct FreeBuddyView: View {
         }
 
         let content = UNMutableNotificationContent()
-        content.title = "FreeBuddy Reminder"
+        content.title = "Neural AI Reminder"
         content.body = reminder.taskDescription
         content.sound = .default
 
@@ -392,39 +371,85 @@ struct FreeBuddyView: View {
         showingAlert = true
     }
 
-    private func toggleCompletion(reminder: Reminder) {
-        let wasCompleted = reminder.isCompleted
-        reminder.isCompleted.toggle()
-        
-        // Grant XP only when completing a task for the *first* time
-        if reminder.isCompleted && !wasCompleted && !reminder.xpAwarded { 
-             let xpGained = 10 // Grant 10 XP per task for now
-             appManager.buddyXP += xpGained
-             reminder.xpAwarded = true // Set the flag
-             print("Gained \(xpGained) XP! Total: \(appManager.buddyXP)")
-             
-             // Check for level up AFTER awarding XP
-             checkForLevelUp(previousXP: appManager.buddyXP - xpGained, currentXP: appManager.buddyXP)
-             
-        } else if !reminder.isCompleted && wasCompleted {
-             // Optional: If needed, reset xpAwarded flag if task is unmarked?
-             // Depends on desired game design - for now, let's keep it awarded once.
-             // reminder.xpAwarded = false 
+    private func toggleCompletion(for reminder: Reminder) { 
+        let oldCompletionState = reminder.isCompleted
+
+        if !oldCompletionState { // Toggling from Incomplete to Complete
+            // Check for recurrence
+            if reminder.recurrence != .none, let currentDueDate = reminder.scheduledDate {
+                var nextDueDate: Date? = nil
+                var calendar = Calendar.current
+                calendar.timeZone = TimeZone.current // Ensure correct timezone
+
+                // Calculate next date based on rule
+                switch reminder.recurrence ?? .none {
+                case .daily:
+                    nextDueDate = calendar.date(byAdding: .day, value: 1, to: currentDueDate)
+                case .weekly:
+                    nextDueDate = calendar.date(byAdding: .weekOfYear, value: 1, to: currentDueDate)
+                case .monthly:
+                    nextDueDate = calendar.date(byAdding: .month, value: 1, to: currentDueDate)
+                case .none:
+                    break // Should not happen here, but good practice
+                }
+
+                // Ensure the next date is in the future relative to NOW, not just the old date
+                // (e.g., if completing a daily reminder from yesterday, next is today)
+                if let calculatedNextDate = nextDueDate, calculatedNextDate < Date() {
+                     // If the calculated next date is still in the past, keep advancing
+                     // until it's in the future (or handle edge cases differently)
+                     // This simple logic just sets it to the next occurrence after today.
+                     // More complex logic might be needed for specific scenarios.
+                     var advancedDate = calculatedNextDate
+                     while advancedDate < Date() {
+                        var maybeNewDate: Date?
+                         switch reminder.recurrence ?? .none {
+                         case .daily: maybeNewDate = calendar.date(byAdding: .day, value: 1, to: advancedDate)
+                         case .weekly: maybeNewDate = calendar.date(byAdding: .weekOfYear, value: 1, to: advancedDate)
+                         case .monthly: maybeNewDate = calendar.date(byAdding: .month, value: 1, to: advancedDate)
+                         case .none: maybeNewDate = nil; break // Stop loop if recurrence is none
+                         }
+                         // Safely unwrap and update, or break if calculation fails
+                         if let newDate = maybeNewDate {
+                            advancedDate = newDate
+                         } else {
+                            print("Error calculating next recurrence date for reminder: \(reminder.id). Breaking loop.")
+                            break // Exit while loop if date calculation fails
+                         }
+                     }
+                     nextDueDate = advancedDate
+                }
+
+                // Update date and keep incomplete
+                reminder.scheduledDate = nextDueDate
+                reminder.xpAwarded = false // Reset XP awarded status for recurring task
+                print("Recurring reminder '\(reminder.taskDescription)' rescheduled to \(nextDueDate?.description ?? "error")")
+                
+                // Reschedule notification for the new date
+                rescheduleNotification(for: reminder)
+
+            } else {
+                // Not recurring or no date, just mark as complete
+                reminder.isCompleted = true
+                cancelNotification(for: reminder) // Cancel notification if completed manually
+            }
+
+            // Award XP only when completing (not un-completing)
+            if !reminder.xpAwarded { // Check if XP was already awarded
+                let points = 10 // Award 10 XP for completing a task
+                appManager.awardXP(points: points, trigger: "Reminder Completed")
+                reminder.xpAwarded = true
+                // checkForLevelUp() // Check for level up after awarding XP
+            }
+
+        } else { // Toggling from Complete to Incomplete
+            reminder.isCompleted = false
+            reminder.xpAwarded = false // Reset XP if marked incomplete
+            // Reschedule notification if it now has a future date
+            rescheduleNotification(for: reminder)
         }
         
-        // Comment out unused message constants 
-        // let message1 = "toggled completion for reminder: \(reminder.id) to \(reminder.isCompleted)"
-        // let message2 = "Error saving toggled reminder: \(error)"
-        
-        do {
-            try modelContext.save()
-            print("Toggled completion for reminder: \(reminder.id) to \(reminder.isCompleted)")
-            appManager.playHaptic()
-        } catch {
-            print("Error saving toggled reminder: \(error)")
-            reminder.isCompleted.toggle() // Revert state on error
-            showUserAlert(title: "Error", message: "Could not update reminder status.")
-        }
+        appManager.playHaptic()
     }
     
     private func deleteReminder(reminder: Reminder) {
@@ -457,17 +482,20 @@ struct FreeBuddyView: View {
             try modelContext.save()
             print("Reminder saved: \(newReminder.taskDescription) scheduled: \(newReminder.scheduledDate?.description ?? "nil")")
             
-            var notificationMessage = "Reminder set!"
             // Use safe unwrapping and comparison for scheduling check
             if let validDate = scheduledDate, validDate > Date() {
                 scheduleNotification(reminder: newReminder) // Pass the valid reminder object
-                notificationMessage = "Reminder set and scheduled!"
+                // Toast notification removed
             } else if scheduledDate != nil { // Date exists but is past or now
-                 notificationMessage = "Reminder set! (Time is not in the future, no notification scheduled)"
+                 // Past date notification removed
             } else { // scheduledDate is nil
-                notificationMessage = "Reminder set! (No specific time)"
+                // No date notification removed
             }
-            showUserAlert(title: "Success", message: notificationMessage)
+            // Removed showUserAlert for success
+            
+            // Award XP for creating a reminder
+            appManager.awardXP(points: 2, trigger: "Reminder Created")
+            appManager.playHaptic()
             
         } catch {
             print("Error saving reminder to SwiftData: \(error)")
@@ -616,6 +644,21 @@ struct FreeBuddyView: View {
         appManager.playHaptic() // Extra feedback for level up
     }
     // --- End Level Up Logic ---
+
+    // Helper specifically for rescheduling recurring/incomplete tasks
+    private func rescheduleNotification(for reminder: Reminder) {
+        // Always remove existing first
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [reminder.id.uuidString])
+        // Schedule if incomplete and has a future date
+        if !reminder.isCompleted, let date = reminder.scheduledDate, date > Date() {
+            scheduleNotification(reminder: reminder)
+        }
+    }
+
+    private func cancelNotification(for reminder: Reminder) {
+         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [reminder.id.uuidString])
+         print("Cancelled notification for reminder: \(reminder.id)")
+    }
 }
 
 // --- Add Reminder Model (Placeholder) ---
@@ -656,7 +699,25 @@ struct ReminderRow: View {
 
     var isOverdue: Bool {
         guard let date = reminder.scheduledDate, !reminder.isCompleted else { return false }
-        return date < Calendar.current.startOfDay(for: Date())
+        return date < Date() // Compare with current time, not just start of day
+    }
+    
+    var isDueToday: Bool {
+        guard let date = reminder.scheduledDate, !reminder.isCompleted, !isOverdue else { return false }
+        return Calendar.current.isDateInToday(date)
+    }
+    
+    // Computed property to check which tag to show
+    var reminderTag: (show: Bool, text: String, color: Color) {
+        if reminder.isCompleted {
+            return (show: false, text: "", color: .clear)
+        } else if isOverdue {
+            return (show: true, text: "overdue", color: .red)
+        } else if isDueToday {
+            return (show: true, text: "due", color: .secondary)
+        } else {
+            return (show: false, text: "", color: .clear)
+        }
     }
 
     var body: some View {
@@ -682,8 +743,9 @@ struct ReminderRow: View {
                     .foregroundColor(reminder.isCompleted ? .secondary : .primary)
                 
                 // HStack for date and separate edit button
-                HStack(spacing: 4) { 
+                HStack(spacing: 6) { // Increased spacing slightly
                     if let date = reminder.scheduledDate {
+                        // Only show date/time without "Overdue" text
                         Text("\(date, style: .date) \(date, style: .time)")
                             .font(.caption)
                             .foregroundColor(isOverdue ? .red : .secondary)
@@ -703,13 +765,25 @@ struct ReminderRow: View {
                              .font(.caption) // Match font size
                     }
                     .buttonStyle(.plain)
+                    
+                    // --- Enhanced Tag Logic ---
+                    if reminderTag.show {
+                        Text(reminderTag.text)
+                            .font(.system(.caption2, weight: .medium))
+                            .padding(.horizontal, 5)
+                            .padding(.vertical, 1)
+                            .background(reminderTag.color.opacity(0.15))
+                            .foregroundColor(reminderTag.color)
+                            .clipShape(Capsule())
+                            .padding(.leading, 4) // Add some spacing
+                    }
+                    // --- End Enhanced Tag Logic ---
                 }
             }
             Spacer()
             
             // Improve delete button with larger tap target
             Button {
-                appManager.playHaptic() // Add haptic feedback
                 deleteAction(reminder)
             } label: {
                 Image(systemName: "xmark.circle.fill")

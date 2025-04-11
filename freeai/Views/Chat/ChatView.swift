@@ -93,6 +93,9 @@ struct ChatView: View {
     @State private var activeContextDescription: String? = nil // e.g., "Reminders" or "3 Notes"
     @State private var selectedNoteIDs: Set<UUID> = []
     @State private var useContextType: ContextType? = nil // :notes or :reminders
+    // --- NEW: State for Calendar Fetch Parameters ---
+    @State private var calendarFetchParams: (range: Calendar.Component, value: Int)? = nil
+    // --- END NEW ---
 
     // --- Example Prompts (Updated & Renamed) ---
     let chatExamples = [
@@ -450,7 +453,8 @@ struct ChatView: View {
                 ContextSelectorView(
                     activeContextDescription: $activeContextDescription,
                     selectedNoteIDs: $selectedNoteIDs,
-                    useContextType: $useContextType
+                    useContextType: $useContextType,
+                    calendarFetchParams: $calendarFetchParams
                 )
                 .environmentObject(appManager) // Pass environment objects
             }
@@ -568,7 +572,8 @@ struct ChatView: View {
 
                     // --- Context Prep --- 
                     var contextString = ""
-                    var systemPrompt = appManager.systemPrompt // Default system prompt
+                    // Use the default system prompt, it might be overridden by context
+                    var systemPrompt = "you are a helpful assistant" 
 
                     if let contextType = useContextType {
                         switch contextType {
@@ -590,7 +595,8 @@ struct ChatView: View {
                                     let status = reminder.isCompleted ? "Completed" : (reminder.scheduledDate != nil && reminder.scheduledDate! < Date() ? "Overdue" : "Pending")
                                     contextString += "- \(reminder.taskDescription) (Due: \(dateStr), Status: \(status))\n"
                                 }
-                                systemPrompt = "You are an assistant discussing the user's reminders. Use the provided context to answer the user's query. \(appManager.systemPrompt)"
+                                // Update system prompt for reminder context
+                                systemPrompt = "You are an assistant discussing the user's reminders. Use the provided context to answer the user's query. Base prompt: \(systemPrompt)"
                             }
                             
                         case .notes:
@@ -612,9 +618,26 @@ struct ChatView: View {
                                         let titlePrefix = note.title.isEmpty ? "Note Content:" : "Title: \"\(note.title)\" Content:"
                                         contextString += "- \(titlePrefix) \(note.rawContent) (Created: \(dateStr))\(tagsStr)\n\n"
                                     }
-                                    systemPrompt = "You are an assistant discussing specific notes provided by the user. Use the provided context to answer the user's query. \(appManager.systemPrompt)"
+                                    // Update system prompt for notes context
+                                    systemPrompt = "You are an assistant discussing specific notes provided by the user. Use the provided context to answer the user's query. Base prompt: \(systemPrompt)"
                                 }
                             }
+                        
+                        // --- Add Calendar Case --- 
+                        case .calendar:
+                            if appManager.calendarAccessEnabled {
+                                print("Preparing Calendar Context...")
+                                // Fetch calendar events using selected parameters
+                                let params = calendarFetchParams ?? (.month, 1) // Default if nil
+                                let calendarContext = await appManager.fetchCalendarEvents(for: params.range, value: params.value)
+                                if !calendarContext.isEmpty {
+                                    contextString += "CONTEXT: The user has provided the following calendar context:\n"
+                                    contextString += calendarContext // Append fetched events
+                                    // Update system prompt for calendar context
+                                     systemPrompt = "You are an assistant discussing the user's schedule. Use the provided calendar context to answer the user's query. Base prompt: \(systemPrompt)"
+                                }
+                            }
+                        // --- End Calendar Case ---
                         }
                         contextString += "\nUSER QUERY: " // Separator before the actual user message
                         print("Context String Prepared:\n\(contextString)")
@@ -643,6 +666,7 @@ struct ChatView: View {
                             systemPrompt: finalSystemPrompt
                         )
                         sendMessage(Message(role: .assistant, content: output, thread: currentThread, generatingTime: llm.thinkingTime))
+                        appManager.awardXP(points: 5, trigger: "Chat Response") // Increased to 5 XP
                     } else {
                         sendMessage(Message(role: .assistant, content: "Error: No AI model selected.", thread: currentThread))
                     }
@@ -651,7 +675,8 @@ struct ChatView: View {
                     activeContextDescription = nil
                     selectedNoteIDs = []
                     useContextType = nil
-                    // --- End Context State Reset --- 
+                    calendarFetchParams = nil // <-- Reset params
+                    // --- End Reset ---
                     
                     generatingThreadID = nil
                 }

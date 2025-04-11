@@ -8,6 +8,30 @@
 import SwiftUI
 import SwiftData
 
+// --- NEW: Calendar Range Enum ---
+enum CalendarRangeOption: Identifiable, CaseIterable {
+    case today, week, month
+    
+    var id: Self { self }
+    
+    var displayName: String {
+        switch self {
+        case .today: "Today"
+        case .week: "Next 7 Days"
+        case .month: "This Month"
+        }
+    }
+    
+    var fetchParams: (range: Calendar.Component, value: Int) {
+        switch self {
+        case .today: return (.day, 1)
+        case .week: return (.day, 7)
+        case .month: return (.month, 1)
+        }
+    }
+}
+// --- END NEW ---
+
 struct ContextSelectorView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
@@ -17,6 +41,9 @@ struct ContextSelectorView: View {
     @Binding var activeContextDescription: String?
     @Binding var selectedNoteIDs: Set<UUID>
     @Binding var useContextType: ContextType? // Use global enum
+    // --- Add Binding for Calendar Params --- 
+    @Binding var calendarFetchParams: (range: Calendar.Component, value: Int)?
+    // --- End Add Binding --- 
 
     // State for this view
     @State private var selectionMode: ContextSelectionMode = .chooseType
@@ -36,7 +63,8 @@ struct ContextSelectorView: View {
     }
     // --- End Filter State ---
 
-    private enum ContextSelectionMode { case chooseType, selectNotes }
+    // Extend selection modes
+    private enum ContextSelectionMode { case chooseType, selectNotes, chooseCalendarRange }
 
     // Fetch descriptor for notes (sorted by timestamp)
     private var notesFetchDescriptor: FetchDescriptor<DumpNote> {
@@ -53,6 +81,10 @@ struct ContextSelectorView: View {
                     chooseContextTypeView
                 case .selectNotes:
                     noteSelectionListView
+                // --- Add Calendar Range Case --- 
+                case .chooseCalendarRange:
+                    chooseCalendarRangeView
+                // --- End Calendar Range Case --- 
                 }
             }
             .navigationTitle(navigationTitle)
@@ -82,16 +114,42 @@ struct ContextSelectorView: View {
                 } label: {
                     Label("Add Reminder Context", systemImage: "list.bullet.clipboard")
                 }
-            }
-
-            Button {
-                initiallySelectedNoteIDs = selectedNoteIDs // Store initial state
-                selectionMode = .selectNotes // Switch to note selection
-            } label: {
-                Label("Select Notes for Context", systemImage: "note.text")
+                
+                // --- Add Calendar Button --- 
+                Button {
+                    // Switch to calendar range selection mode
+                    selectionMode = .chooseCalendarRange
+                    // prepareAndDismiss(type: .calendar) // Old behavior removed
+                } label: {
+                    Label("Add Calendar Context", systemImage: "calendar")
+                }
+                .disabled(!appManager.calendarAccessEnabled)
+                
+                Button {
+                    initiallySelectedNoteIDs = selectedNoteIDs // Store initial state
+                    selectionMode = .selectNotes // Switch to note selection
+                } label: {
+                    Label("Select Notes for Context", systemImage: "note.text")
+                }
             }
         }
     }
+
+    // --- NEW: View for Calendar Range Selection --- 
+    private var chooseCalendarRangeView: some View {
+        List {
+            Section("Select Calendar Range") {
+                ForEach(CalendarRangeOption.allCases) { option in
+                     Button {
+                         prepareAndDismiss(type: .calendar, rangeOption: option)
+                     } label: {
+                         Text(option.displayName)
+                     }
+                }
+            }
+        }
+    }
+    // --- END NEW ---
 
     private var noteSelectionListView: some View {
         VStack(spacing: 0) {
@@ -157,6 +215,9 @@ struct ContextSelectorView: View {
         switch selectionMode {
         case .chooseType: "Add Context"
         case .selectNotes: "Select Notes (\(selectedNoteIDs.count))"
+        // --- Add Calendar Range Title --- 
+        case .chooseCalendarRange: "Select Range"
+        // --- End Calendar Range Title --- 
         }
     }
 
@@ -165,13 +226,15 @@ struct ContextSelectorView: View {
         switch selectionMode {
         case .chooseType:
             Button("Cancel") { dismiss() }
-        case .selectNotes:
+        // --- Add Calendar Range Back Button --- 
+        case .selectNotes, .chooseCalendarRange:
             Button { // Back to type selection
-                selectedNoteIDs = initiallySelectedNoteIDs // Revert changes
+                // selectedNoteIDs = initiallySelectedNoteIDs // Only needed for notes
                 selectionMode = .chooseType
             } label: {
                 Label("Back", systemImage: "chevron.left")
             }
+        // --- End Calendar Range Back Button --- 
         }
     }
 
@@ -185,6 +248,10 @@ struct ContextSelectorView: View {
                 prepareAndDismiss(type: .notes)
             }
             .disabled(selectedNoteIDs.isEmpty) // Disable if no notes selected
+        // --- Add Calendar Range Case --- 
+        case .chooseCalendarRange:
+            EmptyView() // No trailing button needed when selecting range
+        // --- End Calendar Range Case --- 
         }
     }
 
@@ -220,7 +287,7 @@ struct ContextSelectorView: View {
         }
     }
 
-    private func prepareAndDismiss(type: ContextType) {
+    private func prepareAndDismiss(type: ContextType, rangeOption: CalendarRangeOption? = nil) {
         useContextType = type
         switch type {
         case .reminders:
@@ -235,6 +302,16 @@ struct ContextSelectorView: View {
             } else {
                 activeContextDescription = "\(selectedNoteIDs.count) Notes"
             }
+        case .calendar:
+            guard let option = rangeOption else { 
+                // This shouldn't happen if called correctly from chooseCalendarRangeView
+                print("Error: Calendar context chosen without specifying range.")
+                dismiss()
+                return 
+            }
+            activeContextDescription = "Calendar (\(option.displayName))"
+            calendarFetchParams = option.fetchParams // Set the fetch params
+            selectedNoteIDs = [] // Ensure notes are cleared
         }
         dismiss()
     }

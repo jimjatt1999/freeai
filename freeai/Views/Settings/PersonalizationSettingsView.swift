@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import EventKit
 
 struct PersonalizationSettingsView: View {
     @EnvironmentObject var appManager: AppManager
@@ -17,6 +18,12 @@ struct PersonalizationSettingsView: View {
     
     @State private var userProfile: UserProfile?
     @State private var showCustomizeView = false
+    
+    // State for calendar permission alert
+    @State private var showingCalendarAlert = false
+    @State private var calendarAlertMessage = ""
+    
+    private let eventStore = EKEventStore() // Instance of EventStore
     
     var body: some View {
         Form {
@@ -52,6 +59,21 @@ struct PersonalizationSettingsView: View {
                     }
                 }
             }
+            
+            // --- NEW: Integrations Section --- 
+            Section(header: Text("INTEGRATIONS"), footer: Text("Allow the AI to access local data for better context. Access requires your explicit permission.")) {
+                 Toggle(isOn: $appManager.calendarAccessEnabled) { // Bind to AppManager state
+                     Label("Calendar Access", systemImage: "calendar")
+                 }
+                 // --- Add .onChange to request permission --- 
+                 .onChange(of: appManager.calendarAccessEnabled) { _, newValue in
+                     if newValue {
+                         requestCalendarAccess()
+                     }
+                 }
+                 // --- End .onChange --- 
+            }
+            // --- END NEW --- 
         }
         .formStyle(.grouped)
         .navigationTitle("Personalization")
@@ -81,6 +103,13 @@ struct PersonalizationSettingsView: View {
                 .environment(\.modelContext, modelContext)
                 .environmentObject(appManager)
         }
+        // --- Add Alert for Calendar Permission --- 
+        .alert("Calendar Access", isPresented: $showingCalendarAlert) {
+            Button("OK") { }
+        } message: {
+            Text(calendarAlertMessage)
+        }
+        // --- End Alert --- 
     }
     
     private func printDebugInfo() {
@@ -183,6 +212,64 @@ struct PersonalizationSettingsView: View {
          }
         print("Created default profile")
     }
+    
+    // --- NEW: Calendar Permission Logic --- 
+    private func requestCalendarAccess() {
+        let status = EKEventStore.authorizationStatus(for: .event)
+        
+        switch status {
+        case .notDetermined:
+            // Request access
+            Task { // Use Task for async operation
+                 do {
+                     let granted = try await eventStore.requestFullAccessToEvents()
+                     if !granted {
+                         // User denied access, toggle back off on main thread
+                         DispatchQueue.main.async {
+                             appManager.calendarAccessEnabled = false
+                             calendarAlertMessage = "Calendar access was denied. You can enable it later in the Settings app."
+                             showingCalendarAlert = true
+                         }
+                     } else {
+                         print("Calendar access granted.")
+                     }
+                 } catch {
+                     // Handle error, toggle back off
+                     print("Error requesting calendar access: \(error)")
+                     DispatchQueue.main.async {
+                         appManager.calendarAccessEnabled = false
+                         calendarAlertMessage = "An error occurred while requesting calendar access."
+                         showingCalendarAlert = true
+                     }
+                 }
+             }
+        case .restricted:
+            // Access restricted, likely parental controls
+            appManager.calendarAccessEnabled = false // Ensure toggle is off
+            calendarAlertMessage = "Calendar access is restricted on this device."
+            showingCalendarAlert = true
+        case .denied:
+            // User previously denied access
+            appManager.calendarAccessEnabled = false // Ensure toggle is off
+            calendarAlertMessage = "Calendar access was previously denied. Please enable it in the Settings app if you want to use this feature."
+            showingCalendarAlert = true
+        case .fullAccess, .writeOnly: // Treat writeOnly as sufficient for reading context
+            // Already authorized
+            print("Calendar access already authorized.")
+            // Ensure toggle state matches authorization
+            if !appManager.calendarAccessEnabled {
+                 DispatchQueue.main.async {
+                     appManager.calendarAccessEnabled = true
+                 }
+            }
+        @unknown default:
+            // Future case
+            appManager.calendarAccessEnabled = false
+            calendarAlertMessage = "An unknown calendar authorization status was encountered."
+            showingCalendarAlert = true
+        }
+    }
+    // --- END NEW ---
 }
 
 struct CustomizeAIView: View {
@@ -197,32 +284,10 @@ struct CustomizeAIView: View {
     @State private var customInstructions = "You are a helpful assistant."
     @State private var interests = ""
     @State private var selectedTraits: [String] = []
-    @State private var systemPrompt = ""
     
     var body: some View {
         NavigationStack {
             Form {
-                Section {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("System prompt")
-                            .font(.headline)
-                            .foregroundColor(.primary)
-                        
-                        Text("This is the initial instruction that defines ai's behavior")
-                            .font(.system(size: 14))
-                            .foregroundColor(.secondary)
-                        
-                        TextEditor(text: $systemPrompt)
-                            .frame(minHeight: 100)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .stroke(Color.gray.opacity(0.2), lineWidth: 1)
-                            )
-                            .padding(.top, 4)
-                    }
-                    .padding(.vertical, 4)
-                }
-                
                 Section {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("What should ai call you?")
@@ -325,8 +390,6 @@ struct CustomizeAIView: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
                         saveProfile()
-                        // Save the system prompt in AppManager
-                        appManager.systemPrompt = systemPrompt
                         dismiss()
                     }
                     .foregroundColor(.red)
@@ -334,8 +397,6 @@ struct CustomizeAIView: View {
             }
             .onAppear {
                 loadProfileData()
-                // Load the current system prompt
-                systemPrompt = appManager.systemPrompt
             }
         }
     }

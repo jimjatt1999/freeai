@@ -85,7 +85,7 @@ struct OnboardingDownloadingModelProgressView: View {
                         .foregroundStyle(Color.primary)
                         .multilineTextAlignment(.center)
                     
-                    Text(installed ? "Ready to use \(appManager.modelDisplayName(selectedModel.name))" : "Installing \(selectedModel.name.contains("3B") ? "Free 3B" : "Free 1B")")
+                    Text(installed ? "Ready to use \(appManager.modelDisplayName(selectedModel.name))" : "downloading \(selectedModel.name.contains("3B") ? "Core 3B" : "Core 1B")")
                         .font(.headline)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)

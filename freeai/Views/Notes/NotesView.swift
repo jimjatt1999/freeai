@@ -17,13 +17,13 @@ enum NoteTypeFilter: String, CaseIterable {
     case audio = "Audio"
 }
 
-struct FreeDumpView: View {
+struct NotesView: View {
     @EnvironmentObject var appManager: AppManager
     @Environment(\.modelContext) var modelContext
     @Environment(LLMEvaluator.self) var llm
     @Query private var dumpNotes: [DumpNote]
     
-    @Binding var showFreeDump: Bool
+    @Binding var showNotes: Bool
     @Binding var currentThread: Thread?
     
     @State private var showSettings = false
@@ -42,8 +42,8 @@ struct FreeDumpView: View {
     @Environment(\.colorScheme) var colorScheme
     
     // Fix: Add explicit empty initializer for Preview accessibility
-    init(showFreeDump: Binding<Bool>, currentThread: Binding<Thread?>) {
-        _showFreeDump = showFreeDump
+    init(showNotes: Binding<Bool>, currentThread: Binding<Thread?>) {
+        _showNotes = showNotes
         _currentThread = currentThread
         // @Query property `dumpNotes` is initialized automatically by SwiftData
     }
@@ -755,10 +755,11 @@ struct FreeDumpView: View {
 // Preview provider (should now work with the explicit init)
 #Preview {
     // Ensure the required bindings are provided correctly
-    @State var showDump = true
+    @State var showNotes = true
     @State var thread: Thread? = nil
     
-    return FreeDumpView(showFreeDump: $showDump, currentThread: $thread)
+    // Make sure initializer matches the one in NotesView
+    return NotesView(showNotes: $showNotes, currentThread: $thread) 
         .environmentObject(AppManager())
         .modelContainer(for: DumpNote.self, inMemory: true)
         .environment(LLMEvaluator())

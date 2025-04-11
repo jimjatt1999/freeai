@@ -9,6 +9,7 @@ import SwiftUI
 
 struct BottomNavBar: View {
     @EnvironmentObject var appManager: AppManager
+    @Binding var showHome: Bool
     @Binding var showChat: Bool
     @Binding var showFreeDump: Bool
     @Binding var showFreeBuddy: Bool
@@ -22,8 +23,28 @@ struct BottomNavBar: View {
                 .frame(height: 1)
             
             HStack(spacing: 0) {
+                // Home button
+                Button {
+                    showHome = true
+                    showChat = false
+                    showFreeDump = false
+                    showFreeBuddy = false
+                } label: {
+                    VStack(spacing: 4) {
+                        Image(systemName: "house.fill")
+                            .font(.system(size: 20))
+                            .foregroundColor(showHome ? appManager.appTintColor.getColor() : .gray.opacity(0.7))
+                        
+                        Text("Home")
+                            .font(.caption2)
+                            .foregroundColor(showHome ? appManager.appTintColor.getColor() : .gray.opacity(0.7))
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+                
                 // Chat button
                 Button {
+                    showHome = false
                     showChat = true
                     showFreeDump = false
                     showFreeBuddy = false
@@ -42,17 +63,18 @@ struct BottomNavBar: View {
                 
                 // FreeDump button
                 Button {
+                    showHome = false
                     showChat = false
                     showFreeDump = true
                     showFreeBuddy = false
                 } label: {
                     VStack(spacing: 4) {
-                        Image(systemName: "note.text")
-                            .font(.system(size: 20))
+                        Image(systemName: "doc.text.fill")
+                            .font(.title2)
                             .foregroundColor(showFreeDump ? appManager.appTintColor.getColor() : .gray.opacity(0.7))
                         
-                        Text("FreeDump")
-                            .font(.caption2)
+                        Text("Notes")
+                            .font(.caption)
                             .foregroundColor(showFreeDump ? appManager.appTintColor.getColor() : .gray.opacity(0.7))
                     }
                     .frame(maxWidth: .infinity)
@@ -60,17 +82,18 @@ struct BottomNavBar: View {
                 
                 // FreeBuddy button
                 Button {
+                    showHome = false
                     showChat = false
                     showFreeDump = false
                     showFreeBuddy = true
                 } label: {
                     VStack(spacing: 4) {
-                        Image(systemName: "face.smiling")
-                            .font(.system(size: 20))
+                        Image(systemName: "bell.fill")
+                            .font(.title2)
                             .foregroundColor(showFreeBuddy ? appManager.appTintColor.getColor() : .gray.opacity(0.7))
                         
-                        Text("Buddy")
-                            .font(.caption2)
+                        Text("Reminders")
+                            .font(.caption)
                             .foregroundColor(showFreeBuddy ? appManager.appTintColor.getColor() : .gray.opacity(0.7))
                     }
                     .frame(maxWidth: .infinity)
@@ -90,7 +113,8 @@ struct BottomNavBar: View {
 
 #Preview {
     BottomNavBar(
-        showChat: .constant(true),
+        showHome: .constant(true),
+        showChat: .constant(false),
         showFreeDump: .constant(false),
         showFreeBuddy: .constant(false)
     )

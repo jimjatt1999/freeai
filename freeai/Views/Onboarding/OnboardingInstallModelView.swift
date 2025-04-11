@@ -95,9 +95,9 @@ struct OnboardingInstallModelView: View {
                             title: "Choose a Model",
                             delay: 0.1
                         ) {
-                            // Free 1B (previously Llama 3.2 1B)
+                            // Core 1B (previously Llama 3.2 1B)
                             ModelRow(
-                                title: "Free 1B",
+                                title: "Core 1B",
                                 subtitle: "Light and zippy - the AI that fits in your pocket",
                                 isSelected: selectedModel.name == suggestedModel.name,
                                 isDisabled: false,
@@ -105,10 +105,10 @@ struct OnboardingInstallModelView: View {
                                 action: { selectedModel = suggestedModel }
                             )
                             
-                            // Free 3B (previously Llama 3.2 3B)
+                            // Core 3B (previously Llama 3.2 3B)
                             if let model3b = ModelConfiguration.getModelByName("mlx-community/Llama-3.2-3B-Instruct-4bit") {
                                 ModelRow(
-                                    title: "Free 3B",
+                                    title: "Core 3B",
                                     subtitle: "The big brain that lives in your phone - no cloud needed",
                                     isSelected: selectedModel.name == model3b.name,
                                     isDisabled: false,
@@ -130,15 +130,15 @@ struct OnboardingInstallModelView: View {
                             )
                             
                             AppFeatureRow(
-                                title: "freestyle",
-                                description: "Generate creative content faster than you can say 'writer's block'",
-                                iconName: "square.text.square.fill"
-                            )
-                            
-                            AppFeatureRow(
-                                title: "freedump",
-                                description: "Turn your brain dumps into organized notes, because your thoughts deserve better",
+                                title: "Neural Notes",
+                                description: "Turn your thoughts into organized notes with AI assistance",
                                 iconName: "doc.text.fill"
+                            )
+
+                            AppFeatureRow(
+                                title: "Neural Reminders",
+                                description: "Set reminders using natural language and get things done",
+                                iconName: "bell.fill"
                             )
                         }
                         

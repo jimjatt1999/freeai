@@ -36,7 +36,7 @@ struct OnboardingView: View {
                             .padding(.bottom, 5)
                         
                         // App title
-                        Text("free ai")
+                        Text("Neural AI")
                             .font(.system(.largeTitle, design: .monospaced))
                             .fontWeight(.bold)
                             .scaleEffect(animationTrigger ? 1 : 0.8)
@@ -45,7 +45,7 @@ struct OnboardingView: View {
                             .padding(.bottom, 5)
                         
                         // App subtitle
-                        Text("local intelligence, unlimited freedom")
+                        Text("Private on-device AI assistant")
                             .font(.system(.headline, design: .monospaced))
                             .foregroundStyle(.secondary)
                             .multilineTextAlignment(.center)
@@ -58,9 +58,9 @@ struct OnboardingView: View {
                         VStack(alignment: .leading, spacing: 20) {
                             FeatureRow(icon: "message.fill", title: "chat", description: "Have private conversations that stay on your device")
                             
-                            FeatureRow(icon: "doc.text.fill", title: "freedump", description: "Transform your thoughts into organized notes with AI")
+                            FeatureRow(icon: "doc.text.fill", title: "Notes", description: "Transform your thoughts into organized notes with AI")
                             
-                            FeatureRow(icon: "bell.fill", title: "freebuddy", description: "Create natural language reminders and get things done")
+                            FeatureRow(icon: "bell.fill", title: "Reminders", description: "Create natural language reminders and get things done")
                             
                             FeatureRow(icon: "lock.shield.fill", title: "privacy first", description: "Everything runs locally, no data ever leaves your device")
                         }

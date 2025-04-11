@@ -50,6 +50,18 @@ struct ReminderEditView: View {
                             #endif
                     }
                 }
+
+                // --- Recurrence Section ---
+                Section("Recurrence") {
+                    Picker("Repeat", selection: $reminder.recurrence) { // Bind directly
+                        ForEach(RecurrenceRule.allCases) { rule in
+                            Text(rule.rawValue).tag(rule)
+                        }
+                    }
+                    .disabled(!includeDate) // Disable if no date is included
+                    .opacity(!includeDate ? 0.5 : 1.0) // Visually indicate disabled state
+                }
+                // --- End Recurrence Section ---
             }
             .navigationTitle("Edit Reminder")
             .navigationBarTitleDisplayMode(.inline)
@@ -79,10 +91,11 @@ struct ReminderEditView: View {
         if includeDate {
             // Only update if the date actually changed or was toggled on
             if reminder.scheduledDate != selectedDate || reminder.scheduledDate == nil {
-                 reminder.scheduledDate = selectedDate
+                reminder.scheduledDate = selectedDate
             }
         } else {
             reminder.scheduledDate = nil
+            reminder.recurrence = .none // Also reset recurrence if date is removed
         }
 
         // --- Reschedule/Cancel Notification ---
@@ -106,10 +119,13 @@ struct ReminderEditView: View {
     // Copy scheduleNotification here for now (Needs refactoring ideally)
     private func scheduleNotification(reminder: Reminder) {
         guard let scheduledDate = reminder.scheduledDate else { return }
-        guard scheduledDate > Date() else { return } // Ensure future date
+        guard scheduledDate > Date() else { 
+            print("Skipping notification scheduling for past date: \(scheduledDate)")
+            return 
+        } // Ensure future date
 
         let content = UNMutableNotificationContent()
-        content.title = "FreeBuddy Reminder"
+        content.title = "Neural AI Reminder"
         content.body = reminder.taskDescription
         content.sound = .default
 
@@ -119,7 +135,6 @@ struct ReminderEditView: View {
 
         UNUserNotificationCenter.current().add(request) { error in
             if let error = error { print("Error rescheduling notification: \(error.localizedDescription)") }
-            else { print("Notification rescheduled successfully for reminder: \(reminder.id)") }
         }
     }
 }

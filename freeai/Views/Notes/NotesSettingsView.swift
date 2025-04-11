@@ -58,7 +58,7 @@ struct FreeDumpSettingsView: View {
                     }
                 }
             }
-            .navigationTitle("FreeDump Settings")
+            .navigationTitle("Notes Settings")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -333,12 +333,12 @@ struct FreeDumpSettingsView: View {
     }
     
     private var aboutSection: some View {
-        Section(header: Text("ABOUT")) {
+        Section(header: Text("About Notes")) {
             VStack(alignment: .leading, spacing: 8) {
-                Text("FreeDump")
+                Text("Notes")
                     .font(.headline)
                 
-                Text("FreeDump helps you organize your thoughts with AI. Just dump your unstructured notes, and the AI will help structure them into a coherent format with headings, bullet points, and tags.")
+                Text("Notes helps you organize your thoughts with AI. Just dump your unstructured notes, and the AI will help structure them into a coherent format with headings, bullet points, and tags.")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }

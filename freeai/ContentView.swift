@@ -20,13 +20,14 @@ struct ContentView: View {
     @State var showSettings = false
     @State var showChats = false
     @State var currentThread: Thread?
-    @State var showFreeDump = false
+    @State var showNotes = false
     @State var showFreeBuddy = false
+    @State var showHome = true // Default view
     @FocusState var isPromptFocused: Bool
     
     // Combined state for navigation
     private var showChat: Bool {
-        return !showFreeDump && !showFreeBuddy
+        !showHome && !showNotes && !showFreeBuddy
     }
 
     var body: some View {
@@ -43,8 +44,12 @@ struct ContentView: View {
                 } detail: {
                     VStack(spacing: 0) {
                         // Main content area
-                        if showFreeDump {
-                            FreeDumpView(showFreeDump: $showFreeDump, currentThread: $currentThread)
+                        if showHome {
+                            NavigationView {
+                                DailyDigestView()
+                            }
+                        } else if showNotes {
+                            NotesView(showNotes: $showNotes, currentThread: $currentThread)
                         } else if showFreeBuddy {
                             FreeBuddyView()
                                 .environmentObject(appManager)
@@ -54,11 +59,12 @@ struct ContentView: View {
                         
                         // Bottom navigation
                         BottomNavBar(
+                            showHome: $showHome,
                             showChat: Binding(
-                                get: { !showFreeDump && !showFreeBuddy },
-                                set: { if $0 { showFreeDump = false; showFreeBuddy = false } }
+                                get: { self.showChat },
+                                set: { if $0 { showHome = false; showNotes = false; showFreeBuddy = false } }
                             ),
-                            showFreeDump: $showFreeDump,
+                            showFreeDump: $showNotes,
                             showFreeBuddy: $showFreeBuddy
                         )
                     }
@@ -67,8 +73,13 @@ struct ContentView: View {
                 // iPhone layout
                 ZStack(alignment: .bottom) {
                     // Main content area
-                    if showFreeDump {
-                        FreeDumpView(showFreeDump: $showFreeDump, currentThread: $currentThread)
+                    if showHome {
+                        NavigationView {
+                            DailyDigestView()
+                        }
+                        .padding(.bottom, 50) // Keep padding outside NavigationView
+                    } else if showNotes {
+                        NotesView(showNotes: $showNotes, currentThread: $currentThread)
                             .padding(.bottom, 50) // Add padding for the navigation bar
                     } else if showFreeBuddy {
                         FreeBuddyView()
@@ -82,11 +93,12 @@ struct ContentView: View {
                     // Bottom navigation
                     VStack(spacing: 0) {
                         BottomNavBar(
+                            showHome: $showHome,
                             showChat: Binding(
-                                get: { !showFreeDump && !showFreeBuddy },
-                                set: { if $0 { showFreeDump = false; showFreeBuddy = false } }
+                                get: { self.showChat },
+                                set: { if $0 { showHome = false; showNotes = false; showFreeBuddy = false } }
                             ),
-                            showFreeDump: $showFreeDump,
+                            showFreeDump: $showNotes,
                             showFreeBuddy: $showFreeBuddy
                         )
                     }
@@ -126,14 +138,14 @@ struct ContentView: View {
                     view.presentationDetents([.medium, .large])
                 }
         }
+        // Settings Sheet (Reverted to Sheet)
         .sheet(isPresented: $showSettings) {
             SettingsView(currentThread: $currentThread)
                 .environmentObject(appManager)
                 .environment(llm)
-                .presentationDragIndicator(.hidden)
-                .if(appManager.userInterfaceIdiom == .phone) { view in
-                    view.presentationDetents([.medium])
-                }
+                .presentationDragIndicator(.visible) // Add drag indicator
+                // Allow medium and large detents
+                .presentationDetents([.medium, .large]) 
         }
         .fullScreenCover(isPresented: $showOnboarding, onDismiss: dismissOnboarding) {
             OnboardingView(showOnboarding: $showOnboarding)
@@ -148,6 +160,7 @@ struct ContentView: View {
         .fontWidth(appManager.appFontWidth.getFontWidth())
         .onAppear {
             appManager.incrementNumberOfVisits()
+            appManager.awardXP(points: 1, trigger: "App Opened") // Award 1 XP for opening
         }
     }
     

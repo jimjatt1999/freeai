@@ -14,7 +14,22 @@ struct LaunchView: View {
     @State private var pulseScale: CGFloat = 1.0
     @State private var showMainContent = false
     @EnvironmentObject var appManager: AppManager
-    @State private var launchMessage: String = ""
+    @State private var currentSubtitle: String = ""
+    
+    // Predefined subtitles (no "free", no emojis)
+    private let subtitles = [
+        "Just predicting tokens...",
+        "Don't worry, I don't dream of electric sheep.",
+        "Running fully on your device.",
+        "Warming up the neural nets.",
+        "Keeping your data local.",
+        "Thinking probabilistically.",
+        "Calculating the meaning of life... almost.",
+        "Making the transistors sweat.",
+        "On-device intelligence loading...",
+        "Engaging cognitive subroutines.",
+        "Analyzing the user's awesomeness."
+    ]
     
     var body: some View {
         ZStack {
@@ -32,13 +47,13 @@ struct LaunchView: View {
                         // Optional: Add a scale animation if desired, replacing pulseScale
                         // .scaleEffect(scale) 
                     
-                    Text("free ai")
+                    Text("Neural AI")
                         .font(.system(size: 42, weight: .bold, design: .rounded))
                         .foregroundColor(.primary)
                         .opacity(opacity1)
                         .scaleEffect(scale)
                     
-                    Text(launchMessage)
+                    Text(currentSubtitle)
                         .font(.system(size: 20, weight: .medium, design: .rounded))
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
@@ -57,8 +72,8 @@ struct LaunchView: View {
             }
         }
         .onAppear {
-            // Load the random message
-            launchMessage = UserDefaults.standard.string(forKey: "currentLaunchMessage") ?? "completely free forever"
+            // Select a random subtitle
+            currentSubtitle = subtitles.randomElement() ?? "Initializing..."
             
             // Eyes/Opacity animation
             withAnimation(.easeOut(duration: 0.8).delay(0.2)) {

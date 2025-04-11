@@ -358,6 +358,9 @@ struct DumpInputView: View {
                         try modelContext.save()
                         onCompletion(note) // Pass the successfully saved note back
                         dismiss() // Dismiss after successful save
+
+                        // Award XP for saving a note
+                        appManager.awardXP(points: 10, trigger: "Note Saved")
                     } catch {
                         processingError = "Failed to save note: \(error.localizedDescription)"
                         // Optionally delete the inserted note if save fails?
@@ -707,6 +710,9 @@ struct AudioInputView: View {
              try modelContext.save()
              onCompletion(note)
              dismiss()
+
+             // Award XP for saving a note
+             appManager.awardXP(points: 10, trigger: "Note Saved")
          } catch {
              print("Error saving audio note: \(error)")
              processingError = "Failed to save audio note."

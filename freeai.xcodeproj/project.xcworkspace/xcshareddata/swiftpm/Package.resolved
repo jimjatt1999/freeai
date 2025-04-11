@@ -1,5 +1,5 @@
 {
-  "originHash" : "5dd190788ce1e31096f8f089d05641bc9cf7e46bd83028915af2dcffcf0eee32",
+  "originHash" : "b49b7e1b80666f1deb9cff0974dc6e90d4c715519c2e44dd8b986cd5b0d4ac25",
   "pins" : [
     {
       "identity" : "gzipswift",
@@ -98,6 +98,15 @@
       "state" : {
         "revision" : "be855fac725dbae27264e47a3eb535cc422a4ba8",
         "version" : "0.1.18"
+      }
+    },
+    {
+      "identity" : "zip",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/marmelroy/Zip.git",
+      "state" : {
+        "revision" : "67fa55813b9e7b3b9acee9c0ae501def28746d76",
+        "version" : "2.1.2"
       }
     }
   ],

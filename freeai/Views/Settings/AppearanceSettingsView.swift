@@ -28,8 +28,16 @@ struct AppearanceSettingsView: View {
             // --- ADD NavigationLink to Eyes Settings --- 
              Section(header: Text("Interface Elements")) {
                  NavigationLink(destination: EyesSettingsView()) {
-                     Label("Animated Eyes", systemImage: "eyes")
+                     Label("Neuron", systemImage: "eyes")
                  }
+
+                 // --- NEW: Generation Animation Picker ---
+                 Picker("Generation Animation", selection: $appManager.generationAnimationStyle) {
+                     ForEach(GenerationAnimationStyle.allCases) { style in
+                         Text(style.rawValue).tag(style)
+                     }
+                 }
+                 // --- END NEW ---
              }
             // --- END NavigationLink --- 
             

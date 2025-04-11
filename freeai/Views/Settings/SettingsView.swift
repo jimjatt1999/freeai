@@ -37,6 +37,14 @@ struct SettingsView: View {
                     NavigationLink(destination: PersonalizationSettingsView()) {
                         Label("personalization", systemImage: "person.crop.circle.badge.questionmark")
                     }
+                    
+                    NavigationLink(destination: DailyDigestSettingsView()) {
+                        Label("daily digest", systemImage: "newspaper")
+                    }
+                    
+                    NavigationLink(destination: GamificationSettingsView()) {
+                        Label("gamification", systemImage: "gamecontroller")
+                    }
                 }
 
                 Section {

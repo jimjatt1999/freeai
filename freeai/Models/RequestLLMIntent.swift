@@ -56,7 +56,7 @@ struct RequestLLMIntent: AppIntent {
             
             let message = Message(role: .user, content: prompt, thread: thread)
             thread.messages.append(message)
-            var output = await llm.generate(modelName: modelName, thread: thread, systemPrompt: appManager.systemPrompt + systemPrompt)
+            var output = await llm.generate(modelName: modelName, thread: thread, systemPrompt: "you are a helpful assistant" + systemPrompt)
             
             let maxCharacters = maxCharacters ?? .max
             

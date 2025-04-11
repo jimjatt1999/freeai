@@ -8,6 +8,7 @@
 import SwiftUI
 @preconcurrency import SwiftData
 import LinkPresentation
+import EventKit
 
 // --- NEW: Terminal Style Settings (Moved outside AppManager) ---
 enum TerminalColorScheme: String, CaseIterable, Identifiable {
@@ -77,8 +78,28 @@ enum WindowControlStyle: String, CaseIterable, Identifiable {
 }
 // --- End Window Control Style Enum ---
 
+// --- NEW: Generation Animation Style Enum ---
+enum GenerationAnimationStyle: String, CaseIterable, Identifiable {
+    case thinking = "Thinking Indicator"
+    case glow = "Pulsating Glow"
+    case random = "Random" // Keep random as an option
+    var id: String { self.rawValue }
+}
+// --- END NEW ---
+
+// --- NEW: Reminder Recurrence Enum ---
+enum RecurrenceRule: String, Codable, CaseIterable, Identifiable {
+    case none = "Never"
+    case daily = "Daily"
+    case weekly = "Weekly"
+    case monthly = "Monthly"
+    // case yearly = "Yearly" // Add if needed
+    var id: String { self.rawValue }
+}
+// --- END NEW ---
+
 class AppManager: ObservableObject {
-    @AppStorage("systemPrompt") var systemPrompt = "you are a helpful assistant"
+    // @AppStorage("systemPrompt") var systemPrompt = "you are a helpful assistant" // Removed system prompt setting
     @AppStorage("appTintColor") var appTintColor: AppTintColor = .monochrome
     // --- Set Default Font Design to Monospaced --- 
     @AppStorage("appFontDesign") var appFontDesign: AppFontDesign = .monospaced
@@ -107,8 +128,12 @@ class AppManager: ObservableObject {
     @AppStorage("eyeStrokeWidth") var eyeStrokeWidth: EyeStrokeWidthType = .medium
     // --- End Eye Customization Settings ---
     
+    // --- NEW: Generation Animation Setting ---
+    @AppStorage("generationAnimationStyle") var generationAnimationStyle: GenerationAnimationStyle = GenerationAnimationStyle.thinking // Fully qualified default
+    // --- END NEW ---
+    
     // --- Eye Tap Action Setting ---
-    @AppStorage("eyeTapAction") var eyeTapAction: EyeTapActionType = .blink // Default to blink
+    @AppStorage("eyeTapAction") var eyeTapAction: EyeTapActionType = EyeTapActionType.blink // Fully qualified default
     // --- End Eye Tap Action Setting ---
     
     // --- Buddy Gamification ---
@@ -132,7 +157,11 @@ class AppManager: ObservableObject {
         // XP needed for the *next* level is 100
         return 100 // Simple fixed 100 XP per level for now
     }
-    // --- End Buddy Gamification ---
+    
+    // --- NEW: Gamification Settings ---
+    @AppStorage("xpSystemEnabled") var xpSystemEnabled: Bool = true
+    @AppStorage("showXpInUI") var showXpInUI: Bool = true
+    // --- END NEW ---
     
     // --- Store Current User Name --- 
     @Published var currentUserName: String? = nil
@@ -167,7 +196,7 @@ class AppManager: ObservableObject {
     }
     
     // --- Terminal Style Properties (References the enum defined outside) ---
-    @AppStorage("chatInterfaceStyleEnabled") var chatInterfaceStyleEnabled: Bool = true // Master Toggle
+    @AppStorage("chatInterfaceStyleEnabled") var chatInterfaceStyleEnabled: Bool = false // Master Toggle, default to false
     @AppStorage("terminalColorScheme") var terminalColorScheme: TerminalColorScheme = .green
     @AppStorage("terminalScanlinesEnabled") var terminalScanlinesEnabled: Bool = true
     @AppStorage("terminalFlickerEnabled") var terminalFlickerEnabled: Bool = true
@@ -178,8 +207,40 @@ class AppManager: ObservableObject {
     @AppStorage("terminalWindowControlsStyle") var terminalWindowControlsStyle: WindowControlStyle = .macOS // Window Button Style
     // --- End Terminal Style Properties ---
     
+    // --- NEW: Calendar Integration State ---
+    @AppStorage("calendarAccessEnabled") var calendarAccessEnabled: Bool = false
+    
+    // --- NEW: Data Structures for Topic Management ---
+    let commonDiscoverTopics: [String] = [
+        "Science", "History", "Technology", "Art", "Nature", "Space", "Philosophy", "Psychology", "Literature", "Music"
+    ]
+    
+    @Published var selectedCommonDiscoverTopics: Set<String> = [] { // Use @Published to update UI
+        didSet {
+            saveSelectedCommonTopics()
+        }
+    }
+    // --- END NEW ---
+    
+    // --- NEW: Daily Digest Settings ---
+    @AppStorage("dailyDigestShowDiscover") var dailyDigestShowDiscover: Bool = true
+    @AppStorage("dailyDigestDiscoverTopics") var dailyDigestDiscoverTopics: String = "science,history,random"
+    // --- Add Section Toggles ---
+    @AppStorage("dailyDigestShowCalendar") var dailyDigestShowCalendar: Bool = true
+    @AppStorage("dailyDigestShowReminders") var dailyDigestShowReminders: Bool = true
+    // --- End Section Toggles ---
+    // --- END Daily Digest Settings ---
+    
+    // --- NEW: Daily Digest Cache ---
+    @AppStorage("cachedDigestDiscoverContent") var cachedDigestDiscoverContent: String = "" // Default to empty string
+    @AppStorage("cachedDigestSummary") var cachedDigestSummary: String = "" // Default to empty string
+    @AppStorage("cachedDigestRangeRawValue") var cachedDigestRangeRawValue: String = "" // Default to empty string
+    @AppStorage("cachedDigestGenerationTimestamp") var cachedDigestGenerationTimestamp: TimeInterval = 0.0 // Default to 0.0
+    // --- END NEW: Daily Digest Cache ---
+    
     init() {
         loadInstalledModelsFromUserDefaults()
+        loadSelectedCommonTopics() // Load selected topics on init
     }
     
     func incrementNumberOfVisits() {
@@ -213,21 +274,72 @@ class AppManager: ObservableObject {
         }
     }
     
+    // --- NEW: Persistence for Selected Common Topics ---
+    private func saveSelectedCommonTopics() {
+        // Save the set as an array in UserDefaults
+        UserDefaults.standard.set(Array(selectedCommonDiscoverTopics), forKey: "selectedCommonDiscoverTopics")
+    }
+    
+    private func loadSelectedCommonTopics() {
+        // Load the array and convert back to a set
+        if let loadedArray = UserDefaults.standard.array(forKey: "selectedCommonDiscoverTopics") as? [String] {
+            self.selectedCommonDiscoverTopics = Set(loadedArray)
+        } else {
+            // Default selection if nothing is saved (e.g., first run)
+            self.selectedCommonDiscoverTopics = Set(["Science", "History", "Technology"]) 
+        }
+    }
+    // --- END NEW ---
+    
+    // --- NEW: Award XP Function ---
+    func awardXP(points: Int, trigger: String) {
+        // Only award if the system is enabled
+        guard xpSystemEnabled, points > 0 else { 
+            if !xpSystemEnabled { print("XP System Disabled - No XP awarded for \(trigger).") }
+            return 
+        }
+        
+        let oldXP = buddyXP
+        buddyXP += points
+        print("🏆 Awarded \(points) XP for \(trigger)! Total: \(buddyXP)")
+        playHaptic() // Provide feedback
+        
+        // Check for level up (can be moved to a separate function if needed)
+        let previousLevel = (oldXP / 100) + 1
+        let currentLevel = (buddyXP / 100) + 1
+        if currentLevel > previousLevel {
+            // TODO: Trigger level up notification/quote display
+            // This part currently happens in RemindersView, might need refactoring
+            // for a centralized level-up handler.
+            print("🎉 Level Up! Reached Level \(currentLevel)")
+        }
+    }
+    // --- END NEW ---
+    
+    // --- NEW: Reset XP Function ---
+    func resetXP() {
+        buddyXP = 0
+        print("XP Reset to 0.")
+        playHaptic()
+    }
+    // --- END NEW ---
+    
     func addInstalledModel(_ model: String) {
         if !installedModels.contains(model) {
             installedModels.append(model)
         }
     }
     
-    func modelDisplayName(_ modelName: String) -> String {
-        // Custom display names for more legitimate branding
-        if modelName.contains("Llama-3.2-1B") {
-            return "Free 1B"
-        } else if modelName.contains("Llama-3.2-3B") {
-            return "Free 3B"
-        } else {
-            // Default fallback for any other models
-            return modelName.replacingOccurrences(of: "mlx-community/", with: "")
+    func modelDisplayName(_ internalName: String) -> String {
+        switch internalName {
+        case "mlx-community/Llama-3.2-1B-Instruct-4bit":
+            // Rename "Free 1B" to "Core 1B"
+            return "Core 1B" // Originally: "Free 1B"
+        case "mlx-community/Llama-3.2-3B-Instruct-4bit":
+            // Rename "Free 3B" to "Core 3B"
+            return "Core 3B" // Originally: "Free 3B"
+        default:
+            return internalName // Fallback to internal name
         }
     }
     
@@ -279,7 +391,7 @@ enum ChatMode: String, CaseIterable, Identifiable {
 // --- End Chat Mode Enum ---
 
 // --- Context Type Enum (Moved from ChatView) ---
-enum ContextType { case notes, reminders }
+enum ContextType { case notes, reminders, calendar }
 // --- End Context Type Enum ---
 
 enum Role: String, Codable {
@@ -680,14 +792,145 @@ final class Reminder {
     var isCompleted: Bool
     var creationDate: Date
     var xpAwarded: Bool
-
-    init(id: UUID = UUID(), taskDescription: String, scheduledDate: Date?, isCompleted: Bool = false, creationDate: Date = Date(), xpAwarded: Bool = false) {
+    var recurrence: RecurrenceRule?
+    
+    init(id: UUID = UUID(), taskDescription: String, scheduledDate: Date?, isCompleted: Bool = false, creationDate: Date = Date(), xpAwarded: Bool = false, recurrence: RecurrenceRule? = nil) {
         self.id = id
         self.taskDescription = taskDescription
         self.scheduledDate = scheduledDate
         self.isCompleted = isCompleted
         self.creationDate = creationDate
         self.xpAwarded = xpAwarded
+        self.recurrence = recurrence
     }
 }
 // --- End Reminder Model ---
+
+// --- NEW: Calendar Event Fetching Logic --- 
+extension AppManager {
+    // Helper function to format events for the context string
+    private func formatEvent(_ event: EKEvent, relativeTo date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.timeStyle = .short // Only show time
+
+        // Use relative date formatting for today/tomorrow
+        formatter.dateStyle = .medium
+        formatter.doesRelativeDateFormatting = true
+
+        let title = event.title ?? "Untitled Event"
+        let start = formatter.string(from: event.startDate)
+        var eventString = "- \(title) on \(start)" // Changed 'at' to 'on' for clarity with relative dates
+        if let location = event.location, !location.isEmpty {
+             eventString += " (Location: \(location))"
+         }
+        return eventString + "\n"
+    }
+
+
+    func fetchCalendarEvents(for range: Calendar.Component = .month, value: Int = 1) async -> String { // Default to 1 month
+        guard calendarAccessEnabled else { return "" }
+
+        let eventStore = EKEventStore()
+        let status = EKEventStore.authorizationStatus(for: .event)
+
+        guard status == .fullAccess || status == .writeOnly else {
+            print("Calendar access not authorized during fetch attempt.")
+            return "" // Return empty if not authorized
+        }
+
+        // Define date ranges
+        let now = Date()
+        let todayStart = Calendar.current.startOfDay(for: now)
+        guard let todayEnd = Calendar.current.date(byAdding: .day, value: 1, to: todayStart),
+              let nextWeekEnd = Calendar.current.date(byAdding: .day, value: 7, to: todayStart),
+              let rangeEnd = Calendar.current.date(byAdding: range, value: value, to: todayStart) else { // Use the specified range
+            return ""
+        }
+
+        // Fetch events for the entire range
+        let calendars = eventStore.calendars(for: .event)
+        let predicate = eventStore.predicateForEvents(withStart: todayStart, end: rangeEnd, calendars: calendars)
+        let allEvents = eventStore.events(matching: predicate).sorted(by: { $0.startDate < $1.startDate })
+
+        // Filter events into time buckets
+        let todayEvents = allEvents.filter { $0.startDate >= todayStart && $0.startDate < todayEnd }
+        let thisWeekEvents = allEvents.filter { $0.startDate >= todayEnd && $0.startDate < nextWeekEnd } // Events after today but within 7 days
+        let laterEvents = allEvents.filter { $0.startDate >= nextWeekEnd && $0.startDate < rangeEnd } // Events after 7 days
+
+        var contextSections: [String] = []
+
+        // Format Today's Events
+        if !todayEvents.isEmpty {
+            var section = "## Today's Schedule\n"
+            todayEvents.prefix(20).forEach { section += formatEvent($0, relativeTo: now) } // Limit to 20
+            contextSections.append(section)
+        }
+
+        // Format Next 7 Days Events
+        if !thisWeekEvents.isEmpty {
+            var section = "## Next 7 Days (After Today)\n"
+            thisWeekEvents.prefix(20).forEach { section += formatEvent($0, relativeTo: now) } // Limit to 20
+            contextSections.append(section)
+        }
+
+        // Format Later Events (Rest of the Range)
+        if !laterEvents.isEmpty {
+            // Simplified title for the default month fetch range
+            let laterTitle = "Rest of the Month"
+            var section = "## \(laterTitle) (After Next 7 Days)\n"
+            laterEvents.prefix(20).forEach { section += formatEvent($0, relativeTo: now) } // Limit to 20
+            contextSections.append(section)
+        }
+
+        guard !contextSections.isEmpty else { return "No relevant events found in the upcoming schedule." }
+
+        return "CONTEXT: User's upcoming schedule:\n" + contextSections.joined(separator: "\n") // Add newline between sections
+    }
+    
+    // --- NEW: Reminder Fetching for Digest ---
+    func fetchRelevantReminders() async -> String {
+        // Note: This requires access to the ModelContext, which AppManager doesn't 
+        // have directly. This logic might be better placed in the View or passed 
+        // the ModelContext.
+        // For now, let's return a placeholder. We'll need to refactor this.
+        print("Placeholder: fetchRelevantReminders() called. Needs ModelContext.")
+        // TODO: Implement actual fetching using ModelContext
+        // Example structure:
+        // let now = Date()
+        // let todayStart = Calendar.current.startOfDay(for: now)
+        // guard let todayEnd = Calendar.current.date(byAdding: .day, value: 1, to: todayStart) else { return "" }
+        // let predicate = #Predicate<Reminder> { reminder in
+        //     !reminder.isCompleted && (reminder.scheduledDate == nil || reminder.scheduledDate! < todayEnd)
+        // }
+        // let descriptor = FetchDescriptor<Reminder>(predicate: predicate, sortBy: [SortDescriptor(\.scheduledDate)])
+        // let fetchedReminders = try? modelContext.fetch(descriptor) ... etc.
+        return "\n## Pending/Overdue Reminders\n- Reminder fetching needs ModelContext implementation.\n"
+    }
+    // --- END NEW ---
+    
+    // --- NEW: Recent Notes Fetching for Digest ---
+    func fetchYesterdaysNoteTitles() async -> String {
+        // Similar to reminders, this needs ModelContext.
+        print("Placeholder: fetchYesterdaysNoteTitles() called. Needs ModelContext.")
+        // TODO: Implement actual fetching using ModelContext
+        // Example structure:
+        // guard let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date()) else { return "" }
+        // let predicate = #Predicate<DumpNote> { $0.timestamp >= yesterday }
+        // let descriptor = FetchDescriptor<DumpNote>(predicate: predicate, sortBy: [SortDescriptor(\.timestamp, order: .reverse)])
+        // let fetchedNotes = try? modelContext.fetch(descriptor)
+        // let titles = fetchedNotes?.map { $0.title.isEmpty ? "Untitled Note" : $0.title } ... etc.
+        return "\n## Notes Created Yesterday\n- Note fetching needs ModelContext implementation.\n"
+    }
+    // --- END NEW ---
+}
+// --- END Calendar/Digest Fetching Logic ---
+
+// --- NEW: Digest Theme Enum ---
+enum DigestTheme: String, CaseIterable, Identifiable {
+    case system = "System Default"
+    case gameScreen = "Game Screen"
+    // Add more themes later if desired
+    
+    var id: String { self.rawValue }
+}
+// --- END NEW ---

@@ -4,5 +4,7 @@
 <dict>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>NSCalendarsUsageDescription</key>
+	<string>Neural AI needs access to your calendar to provide context about your schedule and answer questions about your events.</string>
 </dict>
 </plist>

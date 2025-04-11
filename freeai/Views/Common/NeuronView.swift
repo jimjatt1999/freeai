@@ -9,8 +9,6 @@ struct AnimatedEyesView: View {
     @State private var blinkTask: Task<Void, Never>? = nil
     @State private var irisOffset: CGFloat = 0 
     @State private var irisTask: Task<Void, Never>? = nil
-    @State private var jiggleOffset: CGFloat = 0
-    @State private var jiggleTask: Task<Void, Never>? = nil
     @State private var rollAngle: Angle = .degrees(0)
     @State private var irisOffsetY: CGFloat = 0 // Vertical offset
     
@@ -113,6 +111,13 @@ struct AnimatedEyesView: View {
     @State private var pulseTask: Task<Void, Never>? = nil
     // --- End Color Pulse State ---
     
+    // --- NEW: States for Generating Animation ---
+    @State private var generatingGlowOpacity: Double = 0.0
+    @State private var generatingAnimationTask: Task<Void, Never>? = nil
+    @State private var showGlowForGeneration = true // Randomly chosen on generation start
+    @State private var showThinkingIndicatorForGeneration = false // NEW: State for thinking indicator
+    // --- END NEW ---
+    
     var body: some View {
         // Use a ZStack for layering eyes and message independently
         ZStack(alignment: .top) { 
@@ -126,8 +131,10 @@ struct AnimatedEyesView: View {
                     EyeShape(isClosed: isBlinking, strokeWidth: currentStrokeWidth, isOval: appManager.eyeShape == .oval, isSquare: appManager.eyeShape == .square)
                         .stroke(currentEyeOutlineColor, lineWidth: currentStrokeWidth)
                     
-                    // --- Conditional Iris/Thinking/Listening --- 
-                    if isThinking {
+                    // --- Conditional Iris/Thinking/Listening/Generating --- 
+                    if isGenerating && showThinkingIndicatorForGeneration {
+                        ThinkingIndicator(color: currentIrisColor)
+                    } else if isThinking {
                         // Thinking: Focused/Squinted Iris
                         IrisView(
                             irisOffset: -crossEyedOffset, // Use cross-eye offset for focus
@@ -170,8 +177,10 @@ struct AnimatedEyesView: View {
                     EyeShape(isClosed: isBlinking, strokeWidth: currentStrokeWidth, isOval: appManager.eyeShape == .oval, isSquare: appManager.eyeShape == .square)
                         .stroke(currentEyeOutlineColor, lineWidth: currentStrokeWidth)
                         
-                    // --- Conditional Iris/Thinking/Listening --- 
-                     if isThinking {
+                    // --- Conditional Iris/Thinking/Listening/Generating --- 
+                    if isGenerating && showThinkingIndicatorForGeneration {
+                        ThinkingIndicator(color: currentIrisColor)
+                    } else if isThinking {
                          IrisView(irisOffset: crossEyedOffset, irisOffsetY: 0, isVisible: !isBlinking, irisSize: currentIrisSize, irisColor: currentIrisColor)
                          .scaleEffect(y: 0.8) // Squint
                      } else if isListening {
@@ -186,8 +195,14 @@ struct AnimatedEyesView: View {
                 .frame(width: currentEyeWidth, height: currentEyeHeight)
                 .clipped()
             }
-            .offset(y: jiggleOffset) // Apply jiggle offset to eyes HStack
             .rotationEffect(rollAngle) // Apply roll effect to eyes HStack
+            // --- NEW: Apply Glow Effect --- 
+            // Use primary color for glow to work in dark mode, reduce radius/opacity for subtlety
+            .shadow(color: Color.primary.opacity(generatingGlowOpacity * 0.5), radius: generatingGlowOpacity * 6, x: 0, y: 0) // Subtle glow
+            .shadow(color: Color.primary.opacity(generatingGlowOpacity * 0.25), radius: generatingGlowOpacity * 3, x: 0, y: 0)  // Inner glow
+            // Add repeating animation modifier directly to the glow opacity state change
+            .animation(generatingGlowOpacity > 0 ? .easeInOut(duration: 0.6).repeatForever(autoreverses: true) : .default, value: generatingGlowOpacity)
+            // --- END NEW ---
             // --- Remove Message Overlay from HStack ---
             // .overlay(...) { ... } 
 
@@ -230,21 +245,35 @@ struct AnimatedEyesView: View {
     private func startAnimations() {
         startBlinking()
         startIrisMovement()
-        if isGenerating { startJiggle() } // Start jiggle if generating on appear
+        if isGenerating { handleGenerationChange(true) } // Use handler on appear
     }
     
     private func cancelAnimations() {
         cancelBlinking()
         cancelIrisMovement()
-        cancelJiggle()
+        generatingAnimationTask?.cancel()
+        resetGenerationState() // Ensure state is reset on disappear
     }
     
-    private func handleGenerationChange(_ newValue: Bool) {
-         if newValue {
-             startJiggle()
-         } else {
-             cancelJiggle()
-         }
+    private func handleGenerationChange(_ isGenerating: Bool) {
+        generatingAnimationTask?.cancel() 
+        if isGenerating {
+            // Dispatch based on setting
+            switch appManager.generationAnimationStyle {
+            case .thinking:
+                startThinkingIndicatorAnimation()
+            case .glow:
+                startGlowAnimation()
+            case .random:
+                if Bool.random() {
+                    startThinkingIndicatorAnimation()
+                } else {
+                    startGlowAnimation()
+                }
+            }
+        } else {
+            resetGenerationState()
+        }
     }
     
     // --- Animation Tasks ---
@@ -330,34 +359,57 @@ struct AnimatedEyesView: View {
         }
     }
     
-    // --- Jiggle Animation ---
-    private func startJiggle() {
-        cancelJiggle()
-        jiggleTask = Task {
-            while !Task.isCancelled {
-                withAnimation(.interpolatingSpring(stiffness: 300, damping: 5).speed(2)) {
-                    jiggleOffset = CGFloat.random(in: -1.5...1.5)
+    // --- NEW: Generating Animation ---
+    private func startGlowAnimation() {
+        generatingAnimationTask?.cancel()
+        generatingAnimationTask = Task {
+            do {
+                // Only handle glow here
+                showThinkingIndicatorForGeneration = false
+                await MainActor.run {
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        generatingGlowOpacity = 1.0
+                    }
                 }
-                try? await Task.sleep(nanoseconds: 100_000_000)
-                if Task.isCancelled { break }
-                withAnimation(.interpolatingSpring(stiffness: 300, damping: 10).speed(2)) {
-                    jiggleOffset = 0
+                // Keep glow active while task runs (implicitly via opacity > 0)
+                // Wait indefinitely until cancelled
+                try await Task.sleep(nanoseconds: .max)
+            } catch is CancellationError {
+                // Reset on cancellation
+                await MainActor.run {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        generatingGlowOpacity = 0.0
+                    }
+                    showThinkingIndicatorForGeneration = false
                 }
-                try? await Task.sleep(nanoseconds: UInt64.random(in: 100_000_000...300_000_000))
+            } catch {
+                print("Error in generation animation task: \(error)")
             }
         }
     }
     
-    private func cancelJiggle() {
-        if jiggleTask != nil { // Only reset if task was active
-             withAnimation(.spring()) {
-                 jiggleOffset = 0
-             }
+    private func startThinkingIndicatorAnimation() {
+        generatingAnimationTask?.cancel()
+        generatingAnimationTask = Task {
+            do {
+                await MainActor.run {
+                    showThinkingIndicatorForGeneration = true
+                    // Ensure glow is off if switching
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        generatingGlowOpacity = 0.0 
+                    }
+                }
+                // Wait indefinitely until cancelled
+                try await Task.sleep(nanoseconds: .max)
+            } catch is CancellationError {
+                 await MainActor.run {
+                     showThinkingIndicatorForGeneration = false
+                 }
+            } catch {
+                print("Error in thinking indicator task: \(error)")
+            }
         }
-        jiggleTask?.cancel()
-        jiggleTask = nil
     }
-    // --- End Jiggle ---
     
     private func cancelBlinking() {
         blinkTask?.cancel()
@@ -557,6 +609,16 @@ struct AnimatedEyesView: View {
         }
     }
     // --- End Color Pulse Logic --- 
+
+    private func resetGenerationState() {
+        generatingAnimationTask?.cancel() // Ensure task is cancelled
+        Task { @MainActor in // Use Task for async main actor update
+            withAnimation(.easeInOut(duration: 0.2)) {
+                generatingGlowOpacity = 0.0
+            }
+            showThinkingIndicatorForGeneration = false
+        }
+    }
 }
 
 // Shape for a single eye that can be open or closed
