@@ -1,4 +1,3 @@
-# free ai
 # Neural AI
 
 An on-device AI assistant for iPhone, iPad and Mac with chat, content generation, note processing, reminders, and a daily digest - 100% private and offline.
@@ -19,7 +18,6 @@ An on-device AI assistant for iPhone, iPad and Mac with chat, content generation
 - **Core 1B** (0.7 GB): Fast, lightweight model for everyday use
 - **Core 3B** (1.8 GB): Enhanced model with better capabilities
 
-## What Sets Free AI Apart
 ## What Sets Neural AI Apart
 
 - **True Privacy**: Works offline with no external dependencies.

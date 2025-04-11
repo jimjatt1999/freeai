@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import MarkdownUI
 
 // Enum to represent the digest time range options
 enum DigestRange: String, CaseIterable, Identifiable {
@@ -36,9 +37,9 @@ struct DailyDigestView: View {
 
     var body: some View {
         VStack(spacing: 0) { // Reduce root spacing
-            // --- Top Bar with XP (Left) and Eyes (Center) --- 
-            HStack(alignment: .top) {
-                // --- XP Display (Top Left) ---
+            // --- Combined Top Bar with XP, Eyes, and Settings ---
+            HStack(alignment: .center) {
+                 // --- XP Display (Top Left) ---
                 if appManager.showXpInUI {
                     VStack(alignment: .leading, spacing: 2) {
                         Text("Level \(appManager.buddyLevel)")
@@ -51,10 +52,23 @@ struct DailyDigestView: View {
                             .foregroundColor(.secondary)
                     }
                     .transition(.opacity.combined(with: .scale(scale: 0.8)))
+                    .frame(width: 80, alignment: .leading) // Ensure XP takes space
+                } else {
+                    // Add a spacer if XP is hidden to maintain balance
+                    Spacer().frame(width: 80)
                 }
                 
                 Spacer()
                 
+                // --- Eyes (Centered) ---
+                AnimatedEyesView(
+                    isGenerating: isGenerating,
+                    isThinking: isGenerating
+                )
+                .frame(height: 50) // Match the height from ChatView
+
+                Spacer()
+
                 // --- Settings Button (Top Right) ---
                 Button {
                     showSettingsSheet = true
@@ -63,112 +77,107 @@ struct DailyDigestView: View {
                         .font(.system(size: 18))
                         .foregroundColor(appManager.appTintColor.getColor())
                 }
+                .frame(width: 80, alignment: .trailing) // Give settings button same width as XP for balance
+
             }
             .padding(.horizontal)
-            .padding(.top, 10)
-
-            // --- Eyes (Centered High) ---
-            HStack {
-                Spacer()
-                AnimatedEyesView(
-                isGenerating: isGenerating,
-                    isThinking: isGenerating
-                )
-                .frame(height: 100) // Match the height from ChatView
-                Spacer()
-            }
-
-            // --- Date Picker (Menu Style) ---
-            Picker("Digest Range", selection: $selectedRange) {
-                ForEach(DigestRange.allCases) { range in
-                    Text(range.rawValue).tag(range)
-                }
-            }
-            .pickerStyle(.menu)
-            .padding(.bottom, 15) // Space below picker
-            // --- End Date Picker ---
+            // Removed .padding(.top, 10) - Adjust spacing below instead
+            .frame(height: 60) // Keep a defined height for the top area
+            .padding(.top, 5) // Add small padding to push down slightly from safe area
 
             // --- Digest Display Area ---
             ScrollView {
-                  VStack(alignment: .leading, spacing: 15) {
+                  VStack(alignment: .center, spacing: 15) { // Center alignment for VStack
                       // --- Optional Discover Section --- 
-                      if appManager.dailyDigestShowDiscover, let content = discoverContent { // Use new setting/variable
-                          Text("Discover") // Updated title
-                               .font(.system(.headline, design: .monospaced))
-                          Text(.init(content)) // Use new variable
-                               .font(.system(.body, design: .monospaced))
+                      if appManager.dailyDigestShowDiscover, let content = discoverContent { 
+                          Text("Discover")
+                               .font(.system(.headline, design: .monospaced)) // Monospaced Title
+                          Markdown(content) // Use MarkdownUI
+                              .markdownTheme(.basic)
+                              .font(.body) // Use standard body font
+                              // .multilineTextAlignment(.center) // Apply center alignment to Markdown text
                              Divider().padding(.vertical, 5)
                       }
                       
-                      // --- Calendar Section Removed --- 
-                      
                       // Combined Summary Section
                       if let summary = digestSummary {
-                          Text("Your \(selectedRange.rawValue) Digest") // Correct title
-                             .font(.system(.headline, design: .monospaced))
-                          Text(.init(summary)) // Render Markdown
-                               .font(.system(.body, design: .monospaced))
-                               .frame(maxWidth: .infinity, alignment: .leading)
+                          Text("Your \(selectedRange.rawValue) Digest")
+                             .font(.system(.headline, design: .monospaced)) // Monospaced Title
+                          Markdown(summary) // Use MarkdownUI
+                              .markdownTheme(.basic)
+                              .font(.body) // Use standard body font
+                              // .multilineTextAlignment(.center) // Apply center alignment to Markdown text
+                              // Removed frame modifier to allow centering
                       }
                       
                       // --- Placeholder/Loading --- 
-                      // Calculate if all enabled sections are currently nil
-                     let allEnabledSectionsNil = 
-                         (!appManager.dailyDigestShowDiscover || discoverContent == nil) && // Check discover
-                         digestSummary == nil // Check main summary
-                         
-                     if isGenerating && allEnabledSectionsNil {
-                         // Show initial loading only if generating and all enabled sections are nil
-                         ProgressView()
+                      let allEnabledSectionsNil = 
+                          (!appManager.dailyDigestShowDiscover || discoverContent == nil) && 
+                          digestSummary == nil
+                          
+                      if isGenerating && allEnabledSectionsNil {
+                          ProgressView()
+                               .frame(maxWidth: .infinity, alignment: .center)
+                               .padding()
+                      } else if !isGenerating && allEnabledSectionsNil {
+                          Text("Tap 'Generate' for your \(selectedRange.rawValue) digest...")
+                              .font(.system(.body, design: .monospaced))
+                              .foregroundColor(.secondary)
                               .frame(maxWidth: .infinity, alignment: .center)
                               .padding()
-                     } else if !isGenerating && allEnabledSectionsNil {
-                         // If not generating and all enabled sections are still nil 
-                         Text("Tap 'Generate' for your \(selectedRange.rawValue) digest...")
-                             .font(.system(.body, design: .monospaced))
-                             .foregroundColor(.secondary)
-                             .frame(maxWidth: .infinity, alignment: .center)
-                             .padding()
-                      }
+                       }
                   }
+                  .padding(.top, 10) // Add padding above content
+                  .frame(maxWidth: .infinity) // Ensure VStack takes full width for centering
              }
-             // Apply basic styling directly now that the modifier is removed
              .foregroundStyle(Color.primary)
+             .padding(.top, 10) // Add space between top bar and scroll content
 
-             // --- Progress Message & Generate Button --- 
-             VStack(spacing: 5) {
-            HStack {
-                      Button(action: { generateDigest(for: selectedRange) }) {
-                           Text("Generate \(selectedRange.rawValue) Digest")
-                              .foregroundColor(.primary)
-                              .padding(.horizontal, 12)
-                              .padding(.vertical, 8)
-                              .background(Capsule().fill(Color(.systemGray6)))
-                      }
-                      .buttonStyle(.plain)
-                      .disabled(isGenerating)
-                  }
-                  .frame(height: 44)
-             }
-             .padding(.bottom)
+            // --- Bottom Control Area (Picker + Button) --- 
+            HStack(spacing: 15) {
+                // --- Date Picker (Moved Here) ---
+                Picker("Digest Range", selection: $selectedRange) {
+                    ForEach(DigestRange.allCases) { range in
+                        Text(range.rawValue).tag(range)
+                    }
+                }
+                .pickerStyle(.menu)
+                // Removed fixed width to allow natural sizing
+
+                Spacer() // Pushes picker left and button right
+
+                // --- Generate Button --- 
+                 Button(action: { generateDigest(for: selectedRange) }) {
+                    Text("Generate \(selectedRange.rawValue) Digest")
+                        .foregroundColor(.primary)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(Capsule().fill(Color(.systemGray6)))
+                }
+                .buttonStyle(.plain)
+                .disabled(isGenerating)
+            }
+            .padding(.horizontal) // Add horizontal padding to the HStack
+            .padding(.vertical, 10) // Add vertical padding
+            .frame(height: 50) // Give the bottom bar a defined height
+            // --- End Bottom Control Area ---
 
          }
-         .padding(.horizontal)
+         // Removed horizontal padding from root VStack
          .background(Color(.systemBackground))
-         .ignoresSafeArea(edges: .bottom)
-         .fontDesign(.monospaced)
+         .ignoresSafeArea(edges: [.bottom]) // Changed from [.top, .bottom] to allow top bar padding
          .foregroundColor(.primary)
          .onAppear {
              loadCachedDigestIfNeeded()
          }
          .sheet(isPresented: $showSettingsSheet) {
-             // Present the appropriate settings view
-             // Assuming SettingsView is the main container for settings
-             SettingsView(currentThread: .constant(nil)) // Pass nil or relevant thread if needed
-                 .environmentObject(appManager)
-                 .environment(llm)
-                 .presentationDragIndicator(.visible)
-                 .presentationDetents([.medium, .large])
+            // Present the appropriate settings view
+            // Assuming SettingsView is the main container for settings
+            SettingsView(currentThread: .constant(nil)) // Pass nil or relevant thread if needed
+                .environmentObject(appManager)
+                .environment(llm)
+                .presentationDragIndicator(.visible)
+                .presentationDetents([.medium, .large])
          }
     }
 
@@ -199,31 +208,31 @@ struct DailyDigestView: View {
             // --- 0. Fetch Discover Content (Optional & Conditional) --- 
             // Fetch this first so it appears above the summary
             if showDiscover {
-                 if let modelName = modelName {
-                     // Combine selected common and custom topics
-                     let customTopics = discoverTopicsRaw.split(separator: ",").map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }.filter { !$0.isEmpty }
-                     let allTopics = Array(appManager.selectedCommonDiscoverTopics) + customTopics // Combine Set and Array
-                     
-                     let selectedTopic = allTopics.isEmpty ? "anything interesting" : allTopics.randomElement()! // Force unwrap safe due to check
-                     
-                     let discoverPrompt = "Share a brief, interesting insight or fact about \(selectedTopic)."
-                     let discoverThread = Thread()
-                     discoverThread.messages.append(Message(role: .user, content: discoverPrompt))
-                     let discoverSystemPrompt = "You share brief, interesting insights or facts on various topics."
-                     
-                     let fetchedContent = await llm.generate(
-                         modelName: modelName,
-                         thread: discoverThread,
-                         systemPrompt: discoverSystemPrompt
-                     )
-                     if !fetchedContent.isEmpty {
-                         await MainActor.run { discoverContent = fetchedContent }
-                     }
-                 } else {
-                     print("Cannot fetch Discover content: No model selected.")
-                     await MainActor.run { discoverContent = "(Could not fetch Discover content: No model selected)" }
-                 }
-                 // No sleep needed here as it runs before the main summary fetch
+                if let modelName = modelName {
+                    // Combine selected common and custom topics
+                    let customTopics = discoverTopicsRaw.split(separator: ",").map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }.filter { !$0.isEmpty }
+                    let allTopics = Array(appManager.selectedCommonDiscoverTopics) + customTopics // Combine Set and Array
+                    
+                    let selectedTopic = allTopics.isEmpty ? "anything interesting" : allTopics.randomElement()! // Force unwrap safe due to check
+                    
+                    let discoverPrompt = "Share a brief, interesting insight or fact about \(selectedTopic)."
+                    let discoverThread = Thread()
+                    discoverThread.messages.append(Message(role: .user, content: discoverPrompt))
+                    let discoverSystemPrompt = "You share brief, interesting insights or facts on various topics."
+                    
+                    let fetchedContent = await llm.generate(
+                        modelName: modelName,
+                        thread: discoverThread,
+                        systemPrompt: discoverSystemPrompt
+                    )
+                    if !fetchedContent.isEmpty {
+                        await MainActor.run { discoverContent = fetchedContent }
+                    }
+                } else {
+                    print("Cannot fetch Discover content: No model selected.")
+                    await MainActor.run { discoverContent = "(Could not fetch Discover content: No model selected)" }
+                }
+                // No sleep needed here as it runs before the main summary fetch
             }
             
             // --- 1. Fetch Calendar (Conditional) --- 
@@ -305,7 +314,7 @@ struct DailyDigestView: View {
                         fetchedRemindersText = "Error fetching reminders."
                     }
                 } else {
-                     fetchedRemindersText = "Error calculating date range for reminders."
+                    fetchedRemindersText = "Error calculating date range for reminders."
                 }
                 
                 // Only add to context if useful reminders were found
@@ -325,10 +334,10 @@ struct DailyDigestView: View {
                     print("Digest context truncated to \(maxContextLength) chars.")
                 }
 
-                let summaryPrompt = "Summarize the following context for the user's \(currentRange.rawValue) digest. Be friendly and encouraging. \n\nContext:\n\(truncatedContext)" // Use truncated context
+                let summaryPrompt = "Summarize the following context for the user's \(currentRange.rawValue) digest. Be friendly and encouraging. Format the output using clean Markdown (e.g., use **bold** or *italics* for emphasis, not raw asterisks). \n\nContext:\n\(truncatedContext)" // Use truncated context
                 let summaryThread = Thread()
                 summaryThread.messages.append(Message(role: .user, content: summaryPrompt))
-                let summarySystemPrompt = "You are an AI assistant creating a personalized daily digest summary."
+                let summarySystemPrompt = "You are an AI assistant creating a personalized daily digest summary formatted in clean Markdown."
                 
                 let summaryResult = await llm.generate(
                     modelName: model,
@@ -389,7 +398,7 @@ struct DailyDigestView: View {
                     if let cachedRange = DigestRange(rawValue: loadedRangeValue) {
                         selectedRange = cachedRange
                     } else {
-                         selectedRange = .day // Fallback range
+                        selectedRange = .day // Fallback range
                     }
                     print("Loaded cached digest from today.")
                     return // Exit after loading cache
