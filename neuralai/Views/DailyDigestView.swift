@@ -83,7 +83,10 @@ struct DailyDigestView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Level \(appManager.buddyLevel)")
                         .font(.caption)
-                    ProgressView(value: Float(appManager.buddyXP), total: Float(appManager.xpForNextLevel))
+                    ProgressView(
+                        value: max(0, min(Float(appManager.buddyXP), Float(appManager.xpForNextLevel))), 
+                        total: max(1, Float(appManager.xpForNextLevel))
+                    )
                         .progressViewStyle(.linear)
                         .frame(width: 80)
                     Text("\(appManager.xpTowardsNextLevel)/\(appManager.xpForNextLevel) XP")
