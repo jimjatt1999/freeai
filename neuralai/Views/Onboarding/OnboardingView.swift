@@ -56,13 +56,15 @@ struct OnboardingView: View {
                         
                         // Core features list
                         VStack(alignment: .leading, spacing: 20) {
+                            FeatureRow(icon: "lock.shield.fill", title: "privacy first", description: "Everything runs locally, no data ever leaves your device")
+                            
                             FeatureRow(icon: "message.fill", title: "chat", description: "Have private conversations that stay on your device")
                             
                             FeatureRow(icon: "doc.text.fill", title: "Notes", description: "Transform your thoughts into organized notes with AI")
                             
                             FeatureRow(icon: "bell.fill", title: "Reminders", description: "Create natural language reminders and get things done")
                             
-                            FeatureRow(icon: "lock.shield.fill", title: "privacy first", description: "Everything runs locally, no data ever leaves your device")
+                            FeatureRow(icon: "calendar.day.timeline.left", title: "Daily Digest", description: "Get a personalized summary of your day, including calendar events and reminders.")
                         }
                         .padding(.horizontal, 25)
                         .offset(y: fadeInTrigger ? 0 : 40)

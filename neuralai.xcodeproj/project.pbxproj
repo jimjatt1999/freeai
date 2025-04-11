@@ -14,26 +14,26 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		860E9CCE2CB055B000C5BB52 /* freeai.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = freeai.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		860E9CCE2CB055B000C5BB52 /* neuralai.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = neuralai.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		258729302D0785A700BB7B6F /* Exceptions for "freeai" folder in "freeai" target */ = {
+		F96516C12DA9A1AA0009A50E /* Exceptions for "neuralai" folder in "neuralai" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
-			target = 860E9CCD2CB055B000C5BB52 /* freeai */;
+			target = 860E9CCD2CB055B000C5BB52 /* neuralai */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		860E9CD02CB055B000C5BB52 /* freeai */ = {
+		860E9CD02CB055B000C5BB52 /* neuralai */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				258729302D0785A700BB7B6F /* Exceptions for "freeai" folder in "freeai" target */,
+				F96516C12DA9A1AA0009A50E /* Exceptions for "neuralai" folder in "neuralai" target */,
 			);
-			path = freeai;
+			path = neuralai;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -56,7 +56,7 @@
 		860E9CC52CB055B000C5BB52 = {
 			isa = PBXGroup;
 			children = (
-				860E9CD02CB055B000C5BB52 /* freeai */,
+				860E9CD02CB055B000C5BB52 /* neuralai */,
 				869B975E2D0DD3EC0078DF5A /* Frameworks */,
 				860E9CCF2CB055B000C5BB52 /* Products */,
 			);
@@ -65,7 +65,7 @@
 		860E9CCF2CB055B000C5BB52 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				860E9CCE2CB055B000C5BB52 /* freeai.app */,
+				860E9CCE2CB055B000C5BB52 /* neuralai.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -80,9 +80,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		860E9CCD2CB055B000C5BB52 /* freeai */ = {
+		860E9CCD2CB055B000C5BB52 /* neuralai */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 860E9CDF2CB055B100C5BB52 /* Build configuration list for PBXNativeTarget "freeai" */;
+			buildConfigurationList = 860E9CDF2CB055B100C5BB52 /* Build configuration list for PBXNativeTarget "neuralai" */;
 			buildPhases = (
 				860E9CCA2CB055B000C5BB52 /* Sources */,
 				860E9CCB2CB055B000C5BB52 /* Frameworks */,
@@ -93,17 +93,17 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				860E9CD02CB055B000C5BB52 /* freeai */,
+				860E9CD02CB055B000C5BB52 /* neuralai */,
 			);
-			name = freeai;
+			name = neuralai;
 			packageProductDependencies = (
 				860F26A32CBC31D6004E8D40 /* MarkdownUI */,
 				869B97612D0DD46B0078DF5A /* MLXLMCommon */,
 				869B97632D0DD4D80078DF5A /* MLXLLM */,
 				F934BBCC2DA90B4E003E21BF /* Zip */,
 			);
-			productName = freeai;
-			productReference = 860E9CCE2CB055B000C5BB52 /* freeai.app */;
+			productName = neuralai;
+			productReference = 860E9CCE2CB055B000C5BB52 /* neuralai.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -121,7 +121,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 860E9CC92CB055B000C5BB52 /* Build configuration list for PBXProject "freeai" */;
+			buildConfigurationList = 860E9CC92CB055B000C5BB52 /* Build configuration list for PBXProject "neuralai" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -140,7 +140,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				860E9CCD2CB055B000C5BB52 /* freeai */,
+				860E9CCD2CB055B000C5BB52 /* neuralai */,
 			);
 		};
 /* End PBXProject section */
@@ -288,17 +288,17 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGNING_REQUIRED = NO;
-				CODE_SIGN_ENTITLEMENTS = freeai/freeai.entitlements;
+				CODE_SIGN_ENTITLEMENTS = neuralai/neuralai.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_ASSET_PATHS = "\"freeai/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"neuralai/Preview Content\"";
 				DEVELOPMENT_TEAM = A3338WURDA;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = freeai/Info.plist;
+				INFOPLIST_FILE = neuralai/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "free ai";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Microphone access is needed for speech-to-text functionality";
@@ -318,7 +318,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.jimi.freeai;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jimi.neuralai;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				REGISTER_APP_GROUPS = NO;
@@ -340,17 +340,17 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGNING_REQUIRED = NO;
-				CODE_SIGN_ENTITLEMENTS = freeai/freeai.entitlements;
+				CODE_SIGN_ENTITLEMENTS = neuralai/neuralai.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_ASSET_PATHS = "\"freeai/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"neuralai/Preview Content\"";
 				DEVELOPMENT_TEAM = A3338WURDA;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = freeai/Info.plist;
+				INFOPLIST_FILE = neuralai/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "free ai";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Microphone access is needed for speech-to-text functionality";
@@ -370,7 +370,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.jimi.freeai;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jimi.neuralai;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				REGISTER_APP_GROUPS = NO;
@@ -389,7 +389,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		860E9CC92CB055B000C5BB52 /* Build configuration list for PBXProject "freeai" */ = {
+		860E9CC92CB055B000C5BB52 /* Build configuration list for PBXProject "neuralai" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				860E9CDD2CB055B100C5BB52 /* Debug */,
@@ -398,7 +398,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		860E9CDF2CB055B100C5BB52 /* Build configuration list for PBXNativeTarget "freeai" */ = {
+		860E9CDF2CB055B100C5BB52 /* Build configuration list for PBXNativeTarget "neuralai" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				860E9CE02CB055B100C5BB52 /* Debug */,
