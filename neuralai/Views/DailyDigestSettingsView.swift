@@ -62,8 +62,6 @@ struct DailyDigestSettingsView: View {
                 }
             }
         }
-        .navigationTitle("Daily Digest Settings")
-        .navigationBarTitleDisplayMode(.inline)
         .fontDesign(appManager.appFontDesign.getFontDesign()) // Consistent font
     }
 }

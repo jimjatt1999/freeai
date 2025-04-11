@@ -2,7 +2,6 @@
 //  Data.swift
 //  free ai
 //
-//  Created by Jordan Singer on 10/5/24.
 //
 
 import SwiftUI

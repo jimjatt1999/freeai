@@ -1,6 +1,6 @@
 //
 //  freeaiApp.swift
-//  free ai
+
 //
 //
 

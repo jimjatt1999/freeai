@@ -2,7 +2,6 @@
 //  ChatsSettingsView.swift
 //  free ai
 //
-//  Created by Jordan Singer on 10/6/24.
 //
 
 import SwiftUI

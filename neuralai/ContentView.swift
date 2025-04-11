@@ -2,7 +2,6 @@
 //  ContentView.swift
 //  free ai
 //
-//  Created by Jordan Singer on 10/4/24.
 //
 
 import SwiftData
@@ -72,37 +71,44 @@ struct ContentView: View {
             } else {
                 // iPhone layout
                 ZStack(alignment: .bottom) {
-                    // Main content area
-                    if showHome {
-                        NavigationView {
-                            DailyDigestView()
-                        }
-                        .padding(.bottom, 50) // Keep padding outside NavigationView
-                    } else if showNotes {
-                        NotesView(showNotes: $showNotes, currentThread: $currentThread)
-                            .padding(.bottom, 50) // Add padding for the navigation bar
-                    } else if showFreeBuddy {
-                        FreeBuddyView()
-                            .environmentObject(appManager)
-                            .padding(.bottom, 50) // Add padding for the navigation bar
-                    } else {
-                        ChatView(currentThread: $currentThread, isPromptFocused: $isPromptFocused, showChats: $showChats, showSettings: $showSettings)
-                            .padding(.bottom, 50) // Add padding for the navigation bar
-                    }
-                    
-                    // Bottom navigation
+                    // Main content area - use consistent approach for all views
                     VStack(spacing: 0) {
-                        BottomNavBar(
-                            showHome: $showHome,
-                            showChat: Binding(
-                                get: { self.showChat },
-                                set: { if $0 { showHome = false; showNotes = false; showFreeBuddy = false } }
-                            ),
-                            showFreeDump: $showNotes,
-                            showFreeBuddy: $showFreeBuddy
-                        )
+                        if showHome {
+                            // Remove NavigationView from here - if needed, add it inside DailyDigestView
+                            DailyDigestView()
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                .edgesIgnoringSafeArea(.top) // Ensure navigation bar respects top safe area
+                        } else if showNotes {
+                            NotesView(showNotes: $showNotes, currentThread: $currentThread)
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                .edgesIgnoringSafeArea(.top) // Ensure navigation bar respects top safe area
+                        } else if showFreeBuddy {
+                            FreeBuddyView()
+                                .environmentObject(appManager)
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                .edgesIgnoringSafeArea(.top) // Ensure navigation bar respects top safe area
+                        } else {
+                            ChatView(currentThread: $currentThread, isPromptFocused: $isPromptFocused, showChats: $showChats, showSettings: $showSettings)
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                .edgesIgnoringSafeArea(.top) // Ensure navigation bar respects top safe area
+                        }
                     }
+                    .padding(.bottom, 49) // Return to standard tab bar height
+                    
+                    // Bottom navigation bar (fixed position at bottom)
+                    BottomNavBar(
+                        showHome: $showHome,
+                        showChat: Binding(
+                            get: { self.showChat },
+                            set: { if $0 { showHome = false; showNotes = false; showFreeBuddy = false } }
+                        ),
+                        showFreeDump: $showNotes,
+                        showFreeBuddy: $showFreeBuddy
+                    )
+                    .frame(maxHeight: 49) // Standard iOS tab bar height
                 }
+                .edgesIgnoringSafeArea(.bottom) // Ignore bottom safe area in the whole container
+                .ignoresSafeArea(.keyboard) // Add this to ensure keyboard doesn't affect layout
             }
         }
         .environmentObject(appManager)

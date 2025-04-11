@@ -30,7 +30,7 @@ struct BottomNavBar: View {
                     showFreeDump = false
                     showFreeBuddy = false
                 } label: {
-                    VStack(spacing: 4) {
+                    VStack(spacing: 2) {
                         Image(systemName: "house.fill")
                             .font(.system(size: 20))
                             .foregroundColor(showHome ? appManager.appTintColor.getColor() : .gray.opacity(0.7))
@@ -49,7 +49,7 @@ struct BottomNavBar: View {
                     showFreeDump = false
                     showFreeBuddy = false
                 } label: {
-                    VStack(spacing: 4) {
+                    VStack(spacing: 2) {
                         Image(systemName: "bubble.left")
                             .font(.system(size: 20))
                             .foregroundColor(showChat ? appManager.appTintColor.getColor() : .gray.opacity(0.7))
@@ -68,7 +68,7 @@ struct BottomNavBar: View {
                     showFreeDump = true
                     showFreeBuddy = false
                 } label: {
-                    VStack(spacing: 4) {
+                    VStack(spacing: 2) {
                         Image(systemName: "doc.text.fill")
                             .font(.title2)
                             .foregroundColor(showFreeDump ? appManager.appTintColor.getColor() : .gray.opacity(0.7))
@@ -87,7 +87,7 @@ struct BottomNavBar: View {
                     showFreeDump = false
                     showFreeBuddy = true
                 } label: {
-                    VStack(spacing: 4) {
+                    VStack(spacing: 2) {
                         Image(systemName: "bell.fill")
                             .font(.title2)
                             .foregroundColor(showFreeBuddy ? appManager.appTintColor.getColor() : .gray.opacity(0.7))
@@ -99,14 +99,25 @@ struct BottomNavBar: View {
                     .frame(maxWidth: .infinity)
                 }
             }
-            .padding(.vertical, 6)
+            .padding(.vertical, 5)
+            .frame(height: 49) // Use iOS standard tab bar height
             .background(
-                // Translucent background with subtle blur
-                Rectangle()
-                    .fill(Color(.systemBackground).opacity(0.92))
-                    .background(Material.thin)
+                // Use more stable background handling
+                ZStack {
+                    // Base opaque background
+                    Color(.systemBackground)
+                    
+                    // Translucent overlay
+                    Rectangle()
+                        .fill(Color(.systemBackground).opacity(0.95))
+                        .background(Material.thin)
+                }
             )
+            
+            // Remove the extra spacer that was pushing the tab bar down
         }
+        .edgesIgnoringSafeArea(.bottom) // Make sure the bar extends to the bottom edge
+        .offset(y: -8) // Move the entire tab bar up by 8 points
         .animation(.easeInOut(duration: 0.2), value: isVisible)
     }
 }

@@ -36,153 +36,180 @@ struct DailyDigestView: View {
     @State private var showSettingsSheet = false
 
     var body: some View {
-        VStack(spacing: 0) { // Reduce root spacing
-            // --- Combined Top Bar with XP, Eyes, and Settings ---
-            HStack(alignment: .center) {
-                 // --- XP Display (Top Left) ---
-                if appManager.showXpInUI {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Level \(appManager.buddyLevel)")
-                            .font(.caption)
-                        ProgressView(value: Float(appManager.buddyXP), total: Float(appManager.xpForNextLevel))
-                            .progressViewStyle(.linear)
-                            .frame(width: 80)
-                        Text("\(appManager.xpTowardsNextLevel)/\(appManager.xpForNextLevel) XP")
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
-                    }
-                    .transition(.opacity.combined(with: .scale(scale: 0.8)))
-                    .frame(width: 80, alignment: .leading) // Ensure XP takes space
-                } else {
-                    // Add a spacer if XP is hidden to maintain balance
-                    Spacer().frame(width: 80)
-                }
-                
-                Spacer()
-                
-                // --- Eyes (Centered) ---
-                AnimatedEyesView(
-                    isGenerating: isGenerating,
-                    isThinking: isGenerating
-                )
-                .frame(height: 50) // Match the height from ChatView
+        NavigationView { // Add NavigationView here since it was removed from ContentView
+            VStack(spacing: 0) { // Main container
+                // --- Top Bar ---
+                topBarView()
+                    .padding(.horizontal)
+                    .padding(.top, 5) // Reduce top padding to move navigation bar closer to top
+                    .background(Color(.systemBackground)) // Keep background consistent
 
-                Spacer()
-
-                // --- Settings Button (Top Right) ---
-                Button {
-                    showSettingsSheet = true
-                } label: {
-                    Image(systemName: "gearshape")
-                        .font(.system(size: 18))
-                        .foregroundColor(appManager.appTintColor.getColor())
+                // --- Scrollable Content ---
+                ScrollView {
+                    contentView()
+                        .padding(.horizontal)
+                        .padding(.vertical, 15) // Add vertical padding inside scroll view
+                        .frame(maxWidth: .infinity) // Ensure content takes full width
                 }
-                .frame(width: 80, alignment: .trailing) // Give settings button same width as XP for balance
+                .foregroundStyle(Color.primary)
+
+                // --- Bottom Controls ---
+                bottomControlsView()
+                    .padding(.horizontal)
+                    .padding(.vertical, 7) // Slightly reduce vertical padding
+                    .background(Color(.systemBackground).shadow(radius: 1, y: -1)) // Add subtle shadow
 
             }
-            .padding(.horizontal)
-            // Removed .padding(.top, 10) - Adjust spacing below instead
-            .frame(height: 60) // Keep a defined height for the top area
-            .padding(.top, 5) // Add small padding to push down slightly from safe area
-
-            // --- Digest Display Area ---
-            ScrollView {
-                  VStack(alignment: .center, spacing: 15) { // Center alignment for VStack
-                      // --- Optional Discover Section --- 
-                      if appManager.dailyDigestShowDiscover, let content = discoverContent { 
-                          Text("Discover")
-                               .font(.system(.headline, design: .monospaced)) // Monospaced Title
-                          Markdown(content) // Use MarkdownUI
-                              .markdownTheme(.basic)
-                              .font(.body) // Use standard body font
-                              // .multilineTextAlignment(.center) // Apply center alignment to Markdown text
-                             Divider().padding(.vertical, 5)
-                      }
-                      
-                      // Combined Summary Section
-                      if let summary = digestSummary {
-                          Text("Your \(selectedRange.rawValue) Digest")
-                             .font(.system(.headline, design: .monospaced)) // Monospaced Title
-                          Markdown(summary) // Use MarkdownUI
-                              .markdownTheme(.basic)
-                              .font(.body) // Use standard body font
-                              // .multilineTextAlignment(.center) // Apply center alignment to Markdown text
-                              // Removed frame modifier to allow centering
-                      }
-                      
-                      // --- Placeholder/Loading --- 
-                      let allEnabledSectionsNil = 
-                          (!appManager.dailyDigestShowDiscover || discoverContent == nil) && 
-                          digestSummary == nil
-                          
-                      if isGenerating && allEnabledSectionsNil {
-                          ProgressView()
-                               .frame(maxWidth: .infinity, alignment: .center)
-                               .padding()
-                      } else if !isGenerating && allEnabledSectionsNil {
-                          Text("Tap 'Generate' for your \(selectedRange.rawValue) digest...")
-                              .font(.system(.body, design: .monospaced))
-                              .foregroundColor(.secondary)
-                              .frame(maxWidth: .infinity, alignment: .center)
-                              .padding()
-                       }
-                  }
-                  .padding(.horizontal) // Add horizontal padding to the content VStack
-                  .padding(.top, 10) // Add padding above content
-                  .frame(maxWidth: .infinity) // Ensure VStack takes full width for centering
-             }
-             .foregroundStyle(Color.primary)
-             .padding(.top, 10) // Add space between top bar and scroll content
-
-            // --- Bottom Control Area (Picker + Button) --- 
-            HStack(spacing: 15) {
-                // --- Date Picker (Moved Here) ---
-                Picker("Digest Range", selection: $selectedRange) {
-                    ForEach(DigestRange.allCases) { range in
-                        Text(range.rawValue).tag(range)
-                    }
-                }
-                .pickerStyle(.menu)
-                // Removed fixed width to allow natural sizing
-
-                Spacer() // Pushes picker left and button right
-
-                // --- Generate Button --- 
-                 Button(action: { generateDigest(for: selectedRange) }) {
-                    Text("Generate \(selectedRange.rawValue) Digest")
-                        .foregroundColor(.primary)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .background(Capsule().fill(Color(.systemGray6)))
-                }
-                .buttonStyle(.plain)
-                .disabled(isGenerating)
-            }
-            .padding(.horizontal) // Add horizontal padding to the HStack
-            .padding(.vertical, 10) // Add vertical padding
-            .frame(height: 50) // Give the bottom bar a defined height
-            // --- End Bottom Control Area ---
-
-         }
-         // Removed horizontal padding from root VStack
-         .background(Color(.systemBackground))
-         .ignoresSafeArea(edges: [.bottom]) // Changed from [.top, .bottom] to allow top bar padding
-         .foregroundColor(.primary)
-         .onAppear {
-             loadCachedDigestIfNeeded()
-         }
-         .sheet(isPresented: $showSettingsSheet) {
-            // Present the appropriate settings view
-            // Assuming SettingsView is the main container for settings
-            SettingsView(currentThread: .constant(nil)) // Pass nil or relevant thread if needed
-                .environmentObject(appManager)
-                .environment(llm)
-                .presentationDragIndicator(.visible)
-                .presentationDetents([.medium, .large])
-         }
+            .background(Color(.systemBackground))
+            .foregroundColor(.primary)
+            .navigationBarHidden(true) // Hide navigation bar since we're using our own top bar
+            .edgesIgnoringSafeArea(.bottom) // Ignore bottom safe area for the bottom controls
+        }
+        .onAppear {
+            loadCachedDigestIfNeeded()
+        }
+        .sheet(isPresented: $showSettingsSheet) {
+            settingsSheetView()
+        }
     }
 
-    // --- Generate Digest Logic (Refactored) --- 
+    // --- Helper View Builders ---
+
+    @ViewBuilder
+    private func topBarView() -> some View {
+        HStack(alignment: .center, spacing: 0) { // Use spacing 0 and add spacers
+            // XP Display (Conditional)
+            if appManager.showXpInUI {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Level \(appManager.buddyLevel)")
+                        .font(.caption)
+                    ProgressView(value: Float(appManager.buddyXP), total: Float(appManager.xpForNextLevel))
+                        .progressViewStyle(.linear)
+                        .frame(width: 80)
+                    Text("\(appManager.xpTowardsNextLevel)/\(appManager.xpForNextLevel) XP")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                }
+                .transition(.opacity.combined(with: .scale(scale: 0.8)))
+                .frame(width: 100, alignment: .leading) // Give slightly more space if needed
+            } else {
+                Spacer().frame(width: 100) // Match width when hidden
+            }
+
+            Spacer() // Pushes Eyes to center
+
+            // Eyes
+            AnimatedEyesView(isGenerating: isGenerating, isThinking: isGenerating)
+                .frame(height: 50) // Keep eyes height
+
+            Spacer() // Pushes Settings to right
+
+            // Settings Button
+            Button {
+                showSettingsSheet = true
+            } label: {
+                Image(systemName: "gearshape")
+                    .font(.system(size: 18))
+                    .foregroundColor(appManager.appTintColor.getColor())
+                    .frame(width: 44, height: 44) // Make button tap area larger
+            }
+            .frame(width: 100, alignment: .trailing) // Match width for balance
+        }
+        .frame(height: 60) // Maintain overall top bar height
+    }
+
+    @ViewBuilder
+    private func contentView() -> some View {
+        VStack(alignment: .leading, spacing: 20) { // Align content left, increase spacing
+            // Discover Section
+            if appManager.dailyDigestShowDiscover, let content = discoverContent {
+                VStack(alignment: .leading, spacing: 8) { // Group title and content
+                    Text("Discover")
+                        .font(.system(.headline, design: .monospaced))
+                    Markdown(content)
+                        .markdownTheme(.basic)
+                        .font(.body)
+                }
+                Divider()
+            }
+
+            // Digest Summary Section
+            if let summary = digestSummary {
+                 VStack(alignment: .leading, spacing: 8) { // Group title and content
+                     Text("Your \(selectedRange.rawValue) Digest")
+                         .font(.system(.headline, design: .monospaced))
+                     Markdown(summary)
+                         .markdownTheme(.basic)
+                         .font(.body)
+                 }
+            }
+
+            // Placeholder / Loading State
+            let allEnabledSectionsNil =
+                (!appManager.dailyDigestShowDiscover || discoverContent == nil) &&
+                digestSummary == nil
+
+            if isGenerating && allEnabledSectionsNil {
+                ProgressView()
+                    .frame(maxWidth: .infinity, alignment: .center) // Center horizontally
+                    .padding(.vertical, 50) // Add vertical padding
+            } else if !isGenerating && allEnabledSectionsNil {
+                Text("Tap 'Generate' for your \(selectedRange.rawValue) digest...")
+                    .font(.system(.body, design: .monospaced))
+                    .foregroundColor(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .center) // Center horizontally
+                    .padding(.vertical, 50) // Add vertical padding
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func bottomControlsView() -> some View {
+        HStack(spacing: 15) {
+            Picker("Digest Range", selection: $selectedRange) {
+                ForEach(DigestRange.allCases) { range in
+                    Text(range.rawValue).tag(range)
+                }
+            }
+            .pickerStyle(.menu)
+            // Give picker some minimum width but allow expansion
+            .frame(minWidth: 100)
+
+            Spacer() // Pushes button to the right
+
+            Button(action: { generateDigest(for: selectedRange) }) {
+                HStack { // Add icon to button
+                    if isGenerating {
+                        ProgressView().tint(.primary) // Show progress in button
+                    } else {
+                        Image(systemName: "wand.and.stars")
+                    }
+                    Text("Generate \(selectedRange.rawValue)") // Shorten text slightly
+                }
+                .foregroundColor(.primary)
+                .padding(.horizontal, 15)
+                .padding(.vertical, 10)
+                .background(Capsule().fill(Color(.systemGray5))) // Slightly darker capsule
+            }
+            .buttonStyle(.plain)
+            .disabled(isGenerating)
+            // Optional: Animate button state change
+             .animation(.easeInOut, value: isGenerating)
+        }
+        .frame(height: 50) // Define height for bottom controls area
+    }
+
+    @ViewBuilder
+    private func settingsSheetView() -> some View {
+        // Don't wrap in NavigationView since SettingsView already has its own NavigationStack
+        SettingsView(currentThread: .constant(nil)) // Pass nil or relevant thread if needed
+            .environmentObject(appManager)
+            .environment(llm)
+            .presentationDragIndicator(.visible)
+            .presentationDetents([.medium, .large])
+    }
+
+    // --- Generate Digest Logic (Refactored) ---
     private func generateDigest(for range: DigestRange) {
         // Reset state
         isGenerating = true
@@ -206,7 +233,7 @@ struct DailyDigestView: View {
             
             var contextForLLM = "" // String to hold data for LLM summary
             
-            // --- 0. Fetch Discover Content (Optional & Conditional) --- 
+            // --- 0. Fetch Discover Content (Optional & Conditional) ---
             // Fetch this first so it appears above the summary
             if showDiscover {
                 if let modelName = modelName {
@@ -236,7 +263,7 @@ struct DailyDigestView: View {
                 // No sleep needed here as it runs before the main summary fetch
             }
             
-            // --- 1. Fetch Calendar (Conditional) --- 
+            // --- 1. Fetch Calendar (Conditional) ---
             if showCalendar {
                 let params = currentRange.fetchParams
                 let fetchedCalendarText = await appManager.fetchCalendarEvents(for: params.range, value: params.value)
@@ -253,7 +280,7 @@ struct DailyDigestView: View {
                 try? await Task.sleep(nanoseconds: 300_000_000) // Slightly longer delay
             }
 
-            // --- 2. Fetch Reminders (Conditional) --- 
+            // --- 2. Fetch Reminders (Conditional) ---
             if showReminders {
                 // Determine end date based on selected range
                 let rangeEndDate: Date?
@@ -325,7 +352,7 @@ struct DailyDigestView: View {
                 try? await Task.sleep(nanoseconds: 300_000_000)
             }
 
-            // --- 3. Generate LLM Summary (If Context Exists) --- 
+            // --- 3. Generate LLM Summary (If Context Exists) ---
             if let model = modelName, !contextForLLM.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 // Truncate context if too long
                 let maxContextLength = 4000
@@ -366,7 +393,7 @@ struct DailyDigestView: View {
                 appManager.cachedDigestGenerationTimestamp = Calendar.current.startOfDay(for: Date()).timeIntervalSince1970
             }
             
-            // --- Finish --- 
+            // --- Finish ---
             // Award XP for generating a digest
             appManager.awardXP(points: 5, trigger: "Digest Generated") // Increased to 5 XP
             
