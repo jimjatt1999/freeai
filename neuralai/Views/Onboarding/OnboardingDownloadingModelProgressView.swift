@@ -80,7 +80,7 @@ struct OnboardingDownloadingModelProgressView: View {
                 .opacity(animationTrigger ? 1 : 0)
                 
                 VStack(spacing: 12) {
-                    Text(installed ? "Installation Complete" : "Setting Up Free AI")
+                    Text(installed ? "Installation Complete" : "Setting Up neural ai")
                         .font(.system(size: 32, weight: .bold, design: .rounded))
                         .foregroundStyle(Color.primary)
                         .multilineTextAlignment(.center)

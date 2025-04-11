@@ -208,7 +208,7 @@ class AppManager: ObservableObject {
     // --- End Terminal Style Properties ---
     
     // --- NEW: Calendar Integration State ---
-    @AppStorage("calendarAccessEnabled") var calendarAccessEnabled: Bool = false
+    @AppStorage("calendarAccessEnabled") var calendarAccessEnabled: Bool = true // Set default to true
     
     // --- NEW: Data Structures for Topic Management ---
     let commonDiscoverTopics: [String] = [

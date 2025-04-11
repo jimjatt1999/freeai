@@ -193,30 +193,11 @@ struct OnboardingInstallModelView: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            // --- Add Animated Eyes Here ---
-            AnimatedEyesView()
-                .scaleEffect(1.5) // Adjust size as needed
-                .padding(.top, 40)
-                .padding(.bottom, 20)
-            // --- End Animated Eyes ---
-
-            Text("Choose Your AI Model")
-                .font(.system(size: 32, weight: .bold, design: .rounded))
-                .foregroundStyle(Color.primary)
-
-            Text("Select a model to download. Larger models are more capable but require more storage and memory.")
-                .font(.headline)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal)
-
-            ZStack {
-                if deviceSupportsMetal3 {
-                    modelsList
-                } else {
-                    DeviceNotSupportedView()
-                }
+        ZStack {
+            if deviceSupportsMetal3 {
+                modelsList
+            } else {
+                DeviceNotSupportedView()
             }
         }
         .onAppear {

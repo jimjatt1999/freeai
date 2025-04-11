@@ -26,6 +26,9 @@ struct DailyDigestSettingsView: View {
             // --- Discover Section Settings ---
             Section(header: Text("Discover Feature")) {
                 Toggle("Show Discover Section", isOn: $appManager.dailyDigestShowDiscover.animation())
+                Text("Include a section in your digest with a brief, interesting insight or fact based on selected topics.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
             }
 
             if appManager.dailyDigestShowDiscover {

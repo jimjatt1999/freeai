@@ -76,7 +76,7 @@ struct OnboardingView: View {
                         Button {
                             navigateToModelSelection = true
                         } label: {
-                            Text("get started")
+                            Text("Get Started & Daily Digest")
                                 .font(.system(.headline, design: .monospaced))
                                 .fontWeight(.medium)
                                 .frame(maxWidth: .infinity)
@@ -120,7 +120,7 @@ struct FeatureRow: View {
             Image(systemName: icon)
                 .font(.system(size: 20))
                 .foregroundColor(.primary)
-                .frame(width: 30, height: 30)
+                .frame(width: 30, height: 30, alignment: .center)
             
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
@@ -130,7 +130,6 @@ struct FeatureRow: View {
                 Text(description)
                     .font(.system(.subheadline, design: .monospaced))
                     .foregroundColor(.secondary)
-                    .lineLimit(2)
             }
         }
         .padding(.vertical, 5)

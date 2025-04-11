@@ -18,7 +18,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		F96516C12DA9A1AA0009A50E /* Exceptions for "neuralai" folder in "neuralai" target */ = {
+		F96516C32DA9A97F0009A50E /* Exceptions for "neuralai" folder in "neuralai" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -31,7 +31,7 @@
 		860E9CD02CB055B000C5BB52 /* neuralai */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				F96516C12DA9A1AA0009A50E /* Exceptions for "neuralai" folder in "neuralai" target */,
+				F96516C32DA9A97F0009A50E /* Exceptions for "neuralai" folder in "neuralai" target */,
 			);
 			path = neuralai;
 			sourceTree = "<group>";
@@ -299,7 +299,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = neuralai/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "free ai";
+				INFOPLIST_KEY_CFBundleDisplayName = "neural ai";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Microphone access is needed for speech-to-text functionality";
 				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Speech recognition is used to convert your voice to text for sending messages";
@@ -351,7 +351,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = neuralai/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "free ai";
+				INFOPLIST_KEY_CFBundleDisplayName = "neural ai";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Microphone access is needed for speech-to-text functionality";
 				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Speech recognition is used to convert your voice to text for sending messages";

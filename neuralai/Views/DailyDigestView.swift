@@ -127,6 +127,7 @@ struct DailyDigestView: View {
                               .padding()
                        }
                   }
+                  .padding(.horizontal) // Add horizontal padding to the content VStack
                   .padding(.top, 10) // Add padding above content
                   .frame(maxWidth: .infinity) // Ensure VStack takes full width for centering
              }
