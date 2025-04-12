@@ -7,6 +7,8 @@
 
 import SwiftUI
 import SwiftData
+import UniformTypeIdentifiers
+import UIKit
 
 // --- NEW: Calendar Range Enum ---
 enum CalendarRangeOption: Identifiable, CaseIterable {
@@ -32,23 +34,104 @@ enum CalendarRangeOption: Identifiable, CaseIterable {
 }
 // --- END NEW ---
 
+// --- NEW: Document Processing State ---
+internal enum DocumentProcessingState: Equatable {
+    case idle
+    case loading
+    case chunking
+    case summarizing
+    case finalizing
+    case complete
+    case error(String)
+    
+    static func == (lhs: DocumentProcessingState, rhs: DocumentProcessingState) -> Bool {
+        switch (lhs, rhs) {
+        case (.idle, .idle),
+             (.loading, .loading),
+             (.chunking, .chunking),
+             (.summarizing, .summarizing),
+             (.finalizing, .finalizing),
+             (.complete, .complete):
+            return true
+        case (.error(let lhsMsg), .error(let rhsMsg)):
+            return lhsMsg == rhsMsg
+        default:
+            return false
+        }
+    }
+}
+// --- END NEW ---
+
+// Shimmering Text Modifier
+struct ShimmeringText: ViewModifier {
+    @State private var phase: CGFloat = 0
+    var speed: Double = 0.5 // Control shimmer speed
+    var delay: Double = 0 // Control delay between loops
+
+    func body(content: Content) -> some View {
+        content
+            .overlay(
+                LinearGradient(
+                    gradient: Gradient(stops: [
+                        .init(color: .clear, location: phase - 0.5),
+                        .init(color: Color.black.opacity(0.4), location: phase),
+                        .init(color: .clear, location: phase + 0.5)
+                    ]),
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
+                .mask(content)
+            )
+            .onAppear {
+                withAnimation(
+                    .linear(duration: speed)
+                    .repeatForever(autoreverses: false)
+                    .delay(delay)
+                ) {
+                    phase = 1.0
+                }
+            }
+    }
+}
+
 struct ContextSelectorView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var appManager: AppManager // To access tint color etc.
+    @Environment(\.presentationMode) var presentationMode
+    @Environment(\.openURL) var openURL
+    @Environment(LLMEvaluator.self) var llm // Add LLM service
+    
+    // Reference to parent view
+    // var parent: AnyObject? // REMOVE THIS
 
     // Bindings to update ChatView state
     @Binding var activeContextDescription: String?
     @Binding var selectedNoteIDs: Set<UUID>
-    @Binding var useContextType: ContextType? // Use global enum
+    @Binding var useContextType: ChatContextType? // Use global enum
     // --- Add Binding for Calendar Params --- 
     @Binding var calendarFetchParams: (range: Calendar.Component, value: Int)?
+    @Binding var documentSummaryBinding: String // ADD THIS
     // --- End Add Binding --- 
 
     // State for this view
     @State private var selectionMode: ContextSelectionMode = .chooseType
     @State private var notes: [DumpNote] = [] // Fetched notes
     @State private var initiallySelectedNoteIDs: Set<UUID> = [] // Track initial state for cancel
+    @State private var showCopyConfirmation = false // State for copy confirmation
+    @State private var isCancelled = false // State for cancellation
+    @State private var dotCount = 0 // State for animated dots
+    
+    let dotTimer = Timer.publish(every: 0.5, on: .main, in: .common).autoconnect()
+    
+    // --- NEW: Document Upload State ---
+    @State private var showingDocumentPicker = false
+    @State private var isDocumentPickerPresented = false
+    @State private var documentProcessingState: DocumentProcessingState = .idle
+    @State private var documentTitle: String = ""
+    @State private var documentSummary: String = ""
+    @State private var processingProgress: Double = 0.0
+    // --- END NEW ---
 
     // --- Filter State ---
     @State private var selectedDateFilter: DateFilterType = .all
@@ -64,7 +147,9 @@ struct ContextSelectorView: View {
     // --- End Filter State ---
 
     // Extend selection modes
-    private enum ContextSelectionMode { case chooseType, selectNotes, chooseCalendarRange }
+    private enum ContextSelectionMode { 
+        case chooseType, selectNotes, chooseCalendarRange, processDocument 
+    }
 
     // Fetch descriptor for notes (sorted by timestamp)
     private var notesFetchDescriptor: FetchDescriptor<DumpNote> {
@@ -84,24 +169,50 @@ struct ContextSelectorView: View {
                 // --- Add Calendar Range Case --- 
                 case .chooseCalendarRange:
                     chooseCalendarRangeView
-                // --- End Calendar Range Case --- 
+                // --- NEW: Document Processing Case ---
+                case .processDocument:
+                    documentProcessingView
+                // --- END NEW ---
                 }
             }
             .navigationTitle(navigationTitle)
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    leadingToolbarButton
-                }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    trailingToolbarButton
-                }
-            }
             .onAppear(perform: loadData)
+            // --- NEW: Present Document Picker ---
+            .sheet(isPresented: $showingDocumentPicker) {
+                DocumentPicker(processState: $documentProcessingState, 
+                               documentTitle: $documentTitle,
+                               documentSummary: $documentSummary,
+                               progress: $processingProgress,
+                               isCancelled: $isCancelled)
+            }
+            .sheet(isPresented: $isDocumentPickerPresented) {
+                DocumentPicker(processState: $documentProcessingState, 
+                               documentTitle: $documentTitle,
+                               documentSummary: $documentSummary,
+                               progress: $processingProgress,
+                               isCancelled: $isCancelled)
+            }
+            // --- END NEW ---
             #if !os(visionOS)
             .tint(appManager.appTintColor.getColor()) // Apply tint
             #endif
         }
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                leadingToolbarButton
+            }
+            ToolbarItem(placement: .navigationBarTrailing) {
+                trailingToolbarButton
+            }
+        }
+        .overlay(
+            Group {
+                if documentProcessingState != .idle {
+                    documentProcessingOverlay
+                }
+            }
+        )
     }
 
     // MARK: - Subviews
@@ -131,6 +242,16 @@ struct ContextSelectorView: View {
                 } label: {
                     Label("Select Notes for Context", systemImage: "note.text")
                 }
+                
+                // --- NEW: Document Upload Button ---
+                Button {
+                    // Present document picker
+                    isDocumentPickerPresented = true
+                    selectionMode = .processDocument
+                } label: {
+                    Label("Upload Document", systemImage: "doc.fill")
+                }
+                // --- END NEW ---
             }
         }
     }
@@ -209,6 +330,177 @@ struct ContextSelectorView: View {
         }
     }
 
+    // --- NEW: Document Processing View ---
+    private var documentProcessingView: some View {
+        VStack(spacing: 20) {
+            switch documentProcessingState {
+            case .idle:
+                VStack {
+                    Text("Select a document to upload")
+                        .font(.headline)
+                        .padding(.bottom, 4)
+                    
+                    Button("Choose Document") {
+                        isDocumentPickerPresented = true
+                    }
+                    .buttonStyle(.borderedProminent)
+                    
+                    Text("Supports: PDF, TXT")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .padding(.top, 8)
+                }
+                
+            case .loading, .chunking, .summarizing, .finalizing:
+                VStack {
+                    ProgressView(value: processingProgress)
+                        .progressViewStyle(.linear)
+                        .frame(maxWidth: 250)
+                        .padding(.bottom, 8)
+
+                    // Single animated status line
+                    Text(processingStateMessage + animatedDots)
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .id(processingStateMessage + animatedDots)
+                    
+                    // Cancel Button
+                    Button("Cancel", role: .destructive) {
+                        cancelProcessing()
+                    }
+                    .buttonStyle(.bordered)
+                    .padding(.top)
+                }
+                .transition(.opacity) // Add transition for smoother appearance
+                .onReceive(dotTimer) { _ in
+                    // Only update if in a processing state
+                    if case .loading = documentProcessingState { dotCount += 1 }
+                    else if case .chunking = documentProcessingState { dotCount += 1 }
+                    else if case .summarizing = documentProcessingState { dotCount += 1 }
+                    else if case .finalizing = documentProcessingState { dotCount += 1 }
+                }
+                
+            case .complete:
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Title: \(documentTitle)")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .padding(.bottom, 4)
+                    
+                    // Expanded ScrollView with full text visibility
+                    ScrollView {
+                        Text( (try? AttributedString(markdown: documentSummary)) ?? AttributedString(documentSummary) ) // Render Markdown with fallback
+                            .font(.callout)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal, 0) // Ensure no horizontal padding on Text
+                    }
+                    .padding(.vertical, 10)
+                    .padding(.horizontal) // Add horizontal padding to ScrollView
+                    
+                    // Buttons side-by-side
+                    HStack {
+                        Button {
+                            UIPasteboard.general.string = documentSummary
+                            withAnimation {
+                                showCopyConfirmation = true
+                            }
+                            // Hide after 2 seconds
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                withAnimation {
+                                    showCopyConfirmation = false
+                                }
+                            }
+                        } label: {
+                            Label("Copy Summary", systemImage: "doc.on.doc")
+                        }
+                        .buttonStyle(.bordered)
+                        
+                        Spacer() // Pushes buttons apart
+                        
+                        Button("Use Document as Context") {
+                            prepareAndDismissWithDocument()
+                        }
+                        // Custom Styling for prominent button
+                        .buttonStyle(.bordered) // Use bordered as base
+                        .background(appManager.appTintColor.getColor()) // Apply tint color background
+                        .foregroundColor(Color(.systemBackground)) // Use background color for text (adapts to light/dark)
+                        .cornerRadius(8) // Match bordered style corner radius
+                    }
+                    .padding(.top, 8)
+                    .padding(.horizontal)
+                }
+                .overlay(
+                    // Copy confirmation overlay
+                    Group {
+                        if showCopyConfirmation {
+                            Text("Summary Copied!")
+                                .font(.caption)
+                                .padding(8)
+                                .background(Color(.systemGray5))
+                                .cornerRadius(8)
+                                .transition(.opacity.combined(with: .move(edge: .bottom)))
+                                .offset(y: -50) // Position above buttons
+                        }
+                    }
+                )
+                
+            case .error(let message):
+                VStack {
+                    Image(systemName: "exclamationmark.triangle")
+                        .font(.largeTitle)
+                        .foregroundColor(.orange)
+                        .padding(.bottom)
+                    
+                    Text("Error Processing Document")
+                        .font(.headline)
+                    
+                    Text(message)
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                        .padding()
+                    
+                    Button("Try Again") {
+                        isDocumentPickerPresented = true
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .padding(.top)
+                }
+            }
+        }
+        .padding()
+        .onAppear {
+            // Start animation if we're processing
+            if case .loading = documentProcessingState, documentTitle.isEmpty {
+                // If no document is selected yet, show picker
+                isDocumentPickerPresented = true
+            }
+        }
+    }
+    
+    // Helper computed properties for document processing UI
+    private var processingStateMessage: String {
+        switch documentProcessingState {
+        case .loading:
+            return "Preparing your document..."
+        case .chunking:
+            return "Organizing thoughts..."
+        case .summarizing:
+            return "Distilling the essence..."
+        case .finalizing:
+            return "Adding the final touches..."
+        default:
+            return "Neura is working..."
+        }
+    }
+
+    // Animated dots for loading states
+    private var animatedDots: String {
+        let baseCount = dotCount % 3
+        let dots = String(repeating: ".", count: baseCount + 1)
+        return dots
+    }
+
     // MARK: - Toolbar Logic
 
     private var navigationTitle: String {
@@ -218,6 +510,7 @@ struct ContextSelectorView: View {
         // --- Add Calendar Range Title --- 
         case .chooseCalendarRange: "Select Range"
         // --- End Calendar Range Title --- 
+        case .processDocument: "Process Document"
         }
     }
 
@@ -227,7 +520,7 @@ struct ContextSelectorView: View {
         case .chooseType:
             Button("Cancel") { dismiss() }
         // --- Add Calendar Range Back Button --- 
-        case .selectNotes, .chooseCalendarRange:
+        case .selectNotes, .chooseCalendarRange, .processDocument:
             Button { // Back to type selection
                 // selectedNoteIDs = initiallySelectedNoteIDs // Only needed for notes
                 selectionMode = .chooseType
@@ -252,6 +545,8 @@ struct ContextSelectorView: View {
         case .chooseCalendarRange:
             EmptyView() // No trailing button needed when selecting range
         // --- End Calendar Range Case --- 
+        case .processDocument:
+            EmptyView() // No trailing button needed when processing document
         }
     }
 
@@ -269,9 +564,9 @@ struct ContextSelectorView: View {
         let allTags = notes.flatMap { $0.tags }
         availableTags = Array(Set(allTags)).sorted() // Get unique sorted tags
         // Reset selection mode on reappear unless notes are already selected
-        if selectedNoteIDs.isEmpty && useContextType != .notes {
+        if selectedNoteIDs.isEmpty && useContextType != ChatContextType.notes {
              selectionMode = .chooseType
-        } else if !selectedNoteIDs.isEmpty && useContextType == .notes {
+        } else if !selectedNoteIDs.isEmpty && useContextType == ChatContextType.notes {
             selectionMode = .selectNotes // Stay in note selection if notes were previously selected
         }
          else {
@@ -287,21 +582,30 @@ struct ContextSelectorView: View {
         }
     }
 
-    private func prepareAndDismiss(type: ContextType, rangeOption: CalendarRangeOption? = nil) {
+    private func prepareAndDismiss(type: ChatContextType, rangeOption: CalendarRangeOption? = nil) {
         useContextType = type
         switch type {
         case .reminders:
-            activeContextDescription = "Reminders" // Simple description
+            print("Preparing Reminder Context...")
+            activeContextDescription = "Active Reminders" // More descriptive
             selectedNoteIDs = [] // Ensure notes are cleared if reminders chosen
+            calendarFetchParams = nil // Clear calendar params
         case .notes:
             if selectedNoteIDs.isEmpty {
                 activeContextDescription = nil // Should not happen due to Done button disable logic
                 useContextType = nil
             } else if selectedNoteIDs.count == 1 {
-                activeContextDescription = "1 Note"
+                // Find the note title if possible
+                if let selectedNote = notes.first(where: { selectedNoteIDs.contains($0.id) }) {
+                    let title = selectedNote.title.isEmpty ? "Untitled note" : selectedNote.title
+                    activeContextDescription = title.prefix(20).description // Limit length
+                } else {
+                    activeContextDescription = "1 Note"
+                }
             } else {
                 activeContextDescription = "\(selectedNoteIDs.count) Notes"
             }
+            calendarFetchParams = nil // Clear calendar params
         case .calendar:
             guard let option = rangeOption else { 
                 // This shouldn't happen if called correctly from chooseCalendarRangeView
@@ -309,10 +613,40 @@ struct ContextSelectorView: View {
                 dismiss()
                 return 
             }
-            activeContextDescription = "Calendar (\(option.displayName))"
+            activeContextDescription = option.displayName // Just use the display name
             calendarFetchParams = option.fetchParams // Set the fetch params
+            print("Calendar context set - range: \(option.fetchParams.range), value: \(option.fetchParams.value)")
             selectedNoteIDs = [] // Ensure notes are cleared
+        case .document:
+            prepareAndDismissWithDocument()
         }
+        dismiss()
+    }
+
+    private func cancelProcessing() {
+        print("Cancellation requested.")
+        isCancelled = true 
+        documentProcessingState = .idle // Reset state
+        documentTitle = "" // Clear potentially partial data
+        documentSummary = "" 
+        documentSummaryBinding = "" // Clear binding
+        processingProgress = 0.0
+        dismiss() // Close the view
+    }
+
+    private func prepareAndDismissWithDocument() {
+        // Pass document context back to ChatView
+        useContextType = ChatContextType.document
+        activeContextDescription = documentTitle.isEmpty ? "Untitled Document" : documentTitle
+        selectedNoteIDs = []
+        calendarFetchParams = nil
+        
+        // Update document bindings if available
+        documentSummaryBinding = documentSummary
+        
+        // Reset processing state but keep summary and title
+        documentProcessingState = .idle
+        processingProgress = 0.0
         dismiss()
     }
 
@@ -348,17 +682,24 @@ struct ContextSelectorView: View {
 
         return currentlyFiltered
     }
-}
 
-// --- Preview ---
-//#Preview {
-//    // Need to provide bindings and environment objects for preview
-//    // This might require a wrapper view
-//    ContextSelectorView(
-//        activeContextDescription: .constant(nil),
-//        selectedNoteIDs: .constant(Set()),
-//        useContextType: .constant(nil)
-//    )
-//    .environmentObject(AppManager()) // Add mock AppManager if needed
-//    // Add mock modelContext for preview if necessary
-//} 
+    // --- NEW ---
+    private var documentProcessingOverlay: some View {
+        ZStack {
+            Color.black.opacity(0.5)
+                .ignoresSafeArea()
+            
+            VStack {
+                documentProcessingView
+                    .padding()
+                    .background(
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(Color(.systemBackground))
+                    )
+                    .padding(.horizontal)
+                    .shadow(radius: 8)
+            }
+        }
+    }
+    // --- END NEW ---
+}

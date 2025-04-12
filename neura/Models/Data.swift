@@ -405,10 +405,6 @@ enum ChatMode: String, CaseIterable, Identifiable {
 }
 // --- End Chat Mode Enum ---
 
-// --- Context Type Enum (Moved from ChatView) ---
-enum ContextType { case notes, reminders, calendar }
-// --- End Context Type Enum ---
-
 enum Role: String, Codable {
     case assistant
     case user

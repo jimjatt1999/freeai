@@ -425,9 +425,21 @@ struct DailyDigestView: View {
                     print("Digest context truncated to \(maxContextLength) chars.")
                 }
 
-                let summaryPrompt = "Summarize the following context for the user's \(currentRange.rawValue) digest. Be friendly and encouraging. Format the output using clean Markdown (e.g., use **bold** or *italics* for emphasis, not raw asterisks). \n\nContext:\n\(truncatedContext)" // Use truncated context
+                // --- Personalize Prompt --- 
+                var personalizedPrompt = "Summarize the following context for the user's \(currentRange.rawValue) digest. Be friendly and encouraging. Format the output using clean Markdown (e.g., use **bold** or *italics* for emphasis, not raw asterisks)."
+                
+                // Fetch user profile and add name if available
+                let profileDescriptor = FetchDescriptor<UserProfile>()
+                if let userProfile = (try? context.fetch(profileDescriptor))?.first, !userProfile.name.isEmpty {
+                    personalizedPrompt += " The user's name is \(userProfile.name)."
+                    print("Personalizing digest prompt for user: \(userProfile.name)")
+                }
+                
+                personalizedPrompt += "\n\nContext:\n\(truncatedContext)" // Use truncated context
+                // --- End Personalize Prompt ---
+                
                 let summaryThread = Thread()
-                summaryThread.messages.append(Message(role: .user, content: summaryPrompt))
+                summaryThread.messages.append(Message(role: .user, content: personalizedPrompt)) // Use personalized prompt
                 let summarySystemPrompt = "You are an AI assistant creating a personalized daily digest summary formatted in clean Markdown."
                 
                 let summaryResult = await llm.generate(

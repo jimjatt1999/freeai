@@ -61,6 +61,12 @@ struct DimmingButtonStyle: ButtonStyle {
 }
 // --- End Custom Button Style --- 
 
+// --- Context Type Enum (Moved from ChatView) ---
+enum ChatContextType { 
+    case notes, reminders, calendar, document 
+}
+// --- End Context Type Enum ---
+
 struct ChatView: View {
     @EnvironmentObject var appManager: AppManager
     @Environment(\.modelContext) var modelContext
@@ -91,9 +97,12 @@ struct ChatView: View {
     @State private var showingContextSelector = false
     @State private var activeContextDescription: String? = nil // e.g., "Reminders" or "3 Notes"
     @State private var selectedNoteIDs: Set<UUID> = []
-    @State private var useContextType: ContextType? = nil // :notes or :reminders
+    @State private var useContextType: ChatContextType? = nil // :notes or :reminders
     // --- NEW: State for Calendar Fetch Parameters ---
     @State private var calendarFetchParams: (range: Calendar.Component, value: Int)? = nil
+    // --- END NEW ---
+    // --- NEW: Document Summary ---
+    @State var documentSummary: String = ""
     // --- END NEW ---
 
     // --- Example Prompts (Updated & Renamed) ---
@@ -391,26 +400,44 @@ struct ChatView: View {
                     // Active Context Indicator (Optional)
                     if let contextDesc = activeContextDescription {
                         HStack {
-                            Text("Context: \(contextDesc)")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 4)
-                                .background(Color(.systemGray5))
-                                .clipShape(Capsule())
+                            // Context capsule with icon and text
+                            HStack(spacing: 6) {
+                                // Add icon based on context type
+                                if let contextType = useContextType {
+                                    Image(systemName: contextTypeIcon(contextType))
+                                        .font(.caption)
+                                }
+                                
+                                Text(contextDesc)
+                                    .font(.caption)
+                            }
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(
+                                Capsule()
+                                    .fill(useContextType.map { contextColor($0) } ?? Color.gray)
+                            )
+                            
                             Button {
-                                // Clear context
-                                activeContextDescription = nil
-                                selectedNoteIDs = []
-                                useContextType = nil
+                                // Clear all context state variables and provide feedback
+                                print("X button pressed on context: \(contextDesc), type: \(String(describing: useContextType)), calendar: \(String(describing: calendarFetchParams))")
+                                clearContextState()
+                                appManager.playHaptic() // Add haptic feedback
                             } label: {
                                 Image(systemName: "xmark.circle.fill")
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(.white)
+                                    .padding(4)
+                                    .background(Circle().fill(Color.gray.opacity(0.3)))
                             }
                             Spacer()
                         }
                         .padding(.horizontal)
                         .padding(.bottom, 2) // Small spacing before input
+                        .onAppear {
+                            // Debug: Log context state when indicator appears
+                            print("Context indicator appeared: \(contextDesc), type: \(String(describing: useContextType)), calendar: \(String(describing: calendarFetchParams))")
+                        }
                     }
                     
                     HStack {
@@ -453,9 +480,11 @@ struct ChatView: View {
                     activeContextDescription: $activeContextDescription,
                     selectedNoteIDs: $selectedNoteIDs,
                     useContextType: $useContextType,
-                    calendarFetchParams: $calendarFetchParams
+                    calendarFetchParams: $calendarFetchParams,
+                    documentSummaryBinding: $documentSummary
                 )
                 .environmentObject(appManager) // Pass environment objects
+                .environment(llm) // Pass LLM for document processing
             }
         }
     }
@@ -620,11 +649,18 @@ struct ChatView: View {
                                     // Update system prompt for notes context
                                     systemPrompt = "You are an assistant discussing specific notes provided by the user. Use the provided context to answer the user's query. Base prompt: \(systemPrompt)"
                                 }
+                            } else if !documentSummary.isEmpty {
+                                // Handle document context (uploaded file)
+                                print("Using document summary as context")
+                                contextString += "CONTEXT: The user has provided the following document for context:\n\n"
+                                contextString += documentSummary
+                                // Update system prompt for document context
+                                systemPrompt = "You are an assistant discussing a document uploaded by the user. Use the provided document summary to answer the user's query. Base prompt: \(systemPrompt)"
                             }
                         
                         // --- Add Calendar Case --- 
                         case .calendar:
-                            print("Preparing Calendar Context...")
+                            print("Preparing Calendar Context... Parameters: \(String(describing: calendarFetchParams))")
                             // Fetch calendar events using selected parameters
                             let params = calendarFetchParams ?? (.month, 1) // Default if nil
                             let calendarContext = await appManager.fetchCalendarEvents(for: params.range, value: params.value)
@@ -634,8 +670,24 @@ struct ChatView: View {
                                 contextString += calendarContext // Append fetched events
                                 // Update system prompt for calendar context
                                 systemPrompt = "You are an assistant discussing the user's schedule. Use the provided calendar context to answer the user's query. Base prompt: \(systemPrompt)"
+                                print("Successfully added calendar context of length: \(calendarContext.count)")
+                            } else {
+                                print("Calendar context was empty - using calendar access was not successful")
                             }
                         // --- End Calendar Case ---
+                        
+                        // --- Document Context Case ---
+                        case .document:
+                            if !documentSummary.isEmpty {
+                                print("Using document context")
+                                contextString += "CONTEXT: The user has provided the following document for context:\n\n"
+                                contextString += documentSummary
+                                // Update system prompt for document context
+                                systemPrompt = "You are an assistant discussing a document uploaded by the user. Use the provided document summary to answer the user's query. Base prompt: \(systemPrompt)"
+                            } else {
+                                print("Document summary was empty - no document context available")
+                            }
+                        // --- End Document Context Case ---
                         }
                         contextString += "\nUSER QUERY: " // Separator before the actual user message
                         print("Context String Prepared:\n\(contextString)")
@@ -670,10 +722,7 @@ struct ChatView: View {
                     }
 
                     // --- Reset Context State --- 
-                    activeContextDescription = nil
-                    selectedNoteIDs = []
-                    useContextType = nil
-                    calendarFetchParams = nil // <-- Reset params
+                    clearContextState() // Use the helper function for consistency
                     // --- End Reset ---
                     
                     generatingThreadID = nil
@@ -796,6 +845,54 @@ struct ChatView: View {
          print("Started new chat.")
      }
     // --- End New Chat Helper ---
+
+    // --- Context State Management --- 
+    private func clearContextState() {
+        // Clear all context-related state
+        print("Clearing context state - Before: type=\(String(describing: useContextType)), calendar=\(String(describing: calendarFetchParams)), document=\(documentSummary.isEmpty ? "empty" : "exists")")
+        
+        // First reset calendar params to ensure they're cleared
+        calendarFetchParams = nil
+        
+        // Clear document summary
+        documentSummary = ""
+        
+        // Then clear the rest
+        activeContextDescription = nil
+        selectedNoteIDs = []
+        useContextType = nil
+        
+        print("Context state cleared - After: type=\(String(describing: useContextType)), calendar=\(String(describing: calendarFetchParams)), document=\(documentSummary.isEmpty ? "empty" : "exists")")
+    }
+
+    // Return appropriate icon for each context type
+    private func contextTypeIcon(_ type: ChatContextType) -> String {
+        switch type {
+        case .notes:
+            return "note.text"
+        case .reminders:
+            return "checklist"
+        case .calendar:
+            return "calendar"
+        case .document:
+            return "doc.text"
+        }
+    }
+
+    // Return appropriate color for each context type
+    private func contextColor(_ type: ChatContextType) -> Color {
+        switch type {
+        case .notes:
+            return Color.blue
+        case .reminders:
+            return Color.orange
+        case .calendar:
+            return Color.purple
+        case .document:
+            return Color.green
+        }
+    }
+    // --- End Context State Management ---
 }
 
 #Preview {
