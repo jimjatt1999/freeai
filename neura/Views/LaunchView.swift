@@ -26,6 +26,7 @@ struct LaunchView: View {
         "Running fully on your device.",
         "Warming up the Neural nets.",
         "Keeping your data local.",
+        "Engineered and brought to life by Jimi Olaoya",
         "Thinking probabilistically.",
         "Calculating the meaning of life... almost.", // Hitchhiker's Guide
         "Making the transistors sweat.",

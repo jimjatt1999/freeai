@@ -733,16 +733,16 @@ struct ReminderRow: View {
                 toggleAction(reminder)
             } label: {
                  let iconName = reminder.isCompleted ? "checkmark.square.fill" : "square"
-                 // Use tint color for completed state
                  let iconColor = reminder.isCompleted ? appManager.appTintColor.getColor() : (isOverdue ? Color.red : Color.secondary)
                  Image(systemName: iconName)
                     .foregroundColor(iconColor)
                     .font(.title2)
-                    .padding(4) 
+                    .padding(4)
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            
+            .highPriorityGesture(TapGesture().onEnded { _ in toggleAction(reminder) })
+
             VStack(alignment: .leading, spacing: 2) { 
                 Text(reminder.taskDescription)
                     .strikethrough(reminder.isCompleted, color: .secondary)
@@ -799,6 +799,7 @@ struct ReminderRow: View {
                     .contentShape(Rectangle()) // Ensure entire frame is tappable
             }
             .buttonStyle(.plain)
+            .highPriorityGesture(TapGesture().onEnded { _ in deleteAction(reminder) })
         }
         .padding(.vertical, 6)
         .listRowSeparator(.hidden)

@@ -16,16 +16,17 @@ struct FreeDumpSettingsView: View {
     @Query private var dumpNotes: [DumpNote]
     
     @State private var showDeleteConfirmation = false
-    @State private var formattingStyle: String = "Simple"
+    @State private var formattingStyle: String = UserDefaults.standard.string(forKey: "freeDumpFormattingStyle") ?? "Save Raw"
     @State private var customTag: String = ""
     @State private var userTags: [String] = []
     
-    // Available formatting presets - simplified
+    // Available formatting presets - ensure consistency
     private let formattingPresets = [
-        "Simple": "Basic restructuring with simple formatting",
-        "Grammar Fix": "Focus on correcting grammar and spelling",
-        "Detailed": "Comprehensive organization with detailed sections",
-        "Journal": "Format as a reflective journal entry"
+        "Save Raw": "No AI processing is applied.",
+        "Simple Restructure": "Basic restructuring with simple formatting.",
+        "Grammar Fix": "Focus on correcting grammar and spelling.",
+        "Journal Entry": "Format as a reflective journal entry.",
+        "Detailed Summary": "Comprehensive organization with detailed sections."
     ]
     
     var body: some View {
@@ -63,9 +64,6 @@ struct FreeDumpSettingsView: View {
                 Text("This will permanently delete all your notes. This action cannot be undone.")
             }
             .onAppear {
-                // Load saved values
-                formattingStyle = UserDefaults.standard.string(forKey: "freeDumpFormattingStyle") ?? "Simple"
-                
                 // Collect all tags from notes and from UserDefaults
                 var allTags = Set<String>()
                 
@@ -86,7 +84,9 @@ struct FreeDumpSettingsView: View {
                 UserDefaults.standard.set(userTags, forKey: "freeDumpUserTags")
             }
             .onChange(of: formattingStyle) { _, newValue in
+                print("Formatting style changed to: \(newValue)") // DEBUG
                 UserDefaults.standard.set(newValue, forKey: "freeDumpFormattingStyle")
+                print("Saved '\(newValue)' to UserDefaults for key 'freeDumpFormattingStyle'") // DEBUG
             }
             .onChange(of: userTags) { _, newValue in
                 UserDefaults.standard.set(newValue, forKey: "freeDumpUserTags")
@@ -96,7 +96,7 @@ struct FreeDumpSettingsView: View {
     
     // Extracted Section Views
     private var noteProcessingStyleSection: some View {
-        Section(header: Text("NOTE PROCESSING STYLE")) {
+        Section(header: Text("DEFAULT NOTE PROCESSING STYLE")) {
             Picker("Style", selection: $formattingStyle) {
                 ForEach(Array(formattingPresets.keys).sorted(), id: \.self) { preset in
                     Text(preset).tag(preset)

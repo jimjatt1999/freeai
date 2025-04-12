@@ -132,7 +132,7 @@ class AppManager: ObservableObject {
     // --- End Eye Customization Settings ---
     
     // --- NEW: Generation Animation Setting ---
-    @AppStorage("generationAnimationStyle") var generationAnimationStyle: GenerationAnimationStyle = .random
+    @AppStorage("generationAnimationStyle") var generationAnimationStyle: GenerationAnimationStyle = .thinking
     // --- END NEW ---
     
     // --- Eye Tap Action Setting ---

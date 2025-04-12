@@ -146,7 +146,13 @@ struct DumpDetailView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.horizontal)
                     } else { // Fallback to raw
-                        Text(note.rawContent)
+                        // Use Markdown for raw content as well
+                        Markdown(note.rawContent)
+                            .markdownTheme(
+                                .gitHub.text { 
+                                     ForegroundColor(foregroundTextColor) // Apply text color
+                                 }
+                            )
                             .font(.body)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.horizontal)

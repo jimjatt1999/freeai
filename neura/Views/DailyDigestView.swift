@@ -328,9 +328,21 @@ struct DailyDigestView: View {
                 let params = currentRange.fetchParams
                 // fetchCalendarEvents now handles permission requests internally
                 let fetchedCalendarText = await appManager.fetchCalendarEvents(for: params.range, value: params.value)
+                
+                // --- NEW: Check for Authorization Error --- 
+                if fetchedCalendarText.contains("not authorized") || fetchedCalendarText.contains("access is required") {
+                    await MainActor.run {
+                        digestSummary = "Calendar access is needed for a personalized digest. Please grant access in the Settings app."
+                        isGenerating = false
+                    }
+                    print("Digest generation stopped: Calendar access denied.")
+                    return // Stop processing the rest of the digest generation
+                }
+                // --- END NEW ---
+                
                 let finalCalendarText: String?
                 
-                if fetchedCalendarText.isEmpty || fetchedCalendarText.contains("No relevant events") || fetchedCalendarText.contains("not authorized") {
+                if fetchedCalendarText.isEmpty || fetchedCalendarText.contains("No relevant events") {
                     finalCalendarText = nil // Set to nil if no useful data
                 } else {
                     // Remove the header added by the fetch function
@@ -426,6 +438,7 @@ struct DailyDigestView: View {
                 }
 
                 // --- Personalize Prompt --- 
+                // Make the prompt more directive
                 var personalizedPrompt = "Summarize the following context for the user's \(currentRange.rawValue) digest. Be friendly and encouraging. Format the output using clean Markdown (e.g., use **bold** or *italics* for emphasis, not raw asterisks)."
                 
                 // Fetch user profile and add name if available
@@ -440,6 +453,7 @@ struct DailyDigestView: View {
                 
                 let summaryThread = Thread()
                 summaryThread.messages.append(Message(role: .user, content: personalizedPrompt)) // Use personalized prompt
+                // Strengthen the system prompt
                 let summarySystemPrompt = "You are an AI assistant creating a personalized daily digest summary formatted in clean Markdown."
                 
                 let summaryResult = await llm.generate(

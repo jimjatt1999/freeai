@@ -377,15 +377,16 @@ struct NotesView: View {
                                 // Note: The case for "No notes yet." is handled by the initial `if dumpNotes.isEmpty` check earlier.
                             }
                         }
-                        .padding(.vertical) // Add padding to the VStack containing sections
+                        .padding(.vertical) // Keep vertical padding for inner content
                     }
+                    .padding(.bottom, 60) // Add padding to the ScrollView itself
                 }
             }
             .navigationBarHidden(true)
             // Add FAB overlay with Tap and Long Press
             .overlay(alignment: .bottomTrailing) { 
                 fabButton
-                    .padding(.bottom, 60) // SIGNIFICANTLY increased padding to lift FAB
+                    .padding(.bottom, 55) // SIGNIFICANTLY increased padding to lift FAB
             }
             // Sheet for Text Notes
             .sheet(isPresented: $showNewTextNoteSheet) { 
@@ -428,6 +429,11 @@ struct NotesView: View {
             } message: {
                 Text("Are you sure you want to delete this note?")
             }
+        }
+        .onAppear {
+            // No need to assign filteredNotes here, computed property handles it
+            // filteredNotes = dumpNotes
+            createSampleNotesIfNeeded() // Call the new function
         }
     }
     
@@ -737,9 +743,170 @@ struct NotesView: View {
         .buttonStyle(.plain)
     }
     // --- End Type Filter Chip Helper ---
+    
+    // --- Private Functions --- 
+    private func deleteNote(_ note: DumpNote) {
+        modelContext.delete(note)
+    }
+
+    // --- NEW: Create Sample Notes --- 
+    private func createSampleNotesIfNeeded() {
+        // Check if notes already exist
+        guard dumpNotes.isEmpty else { return }
+        
+        // Sample Note 1: App Overview
+        let appOverviewContent = """
+        # Welcome to Neura! Your Private AI Assistant
+
+        Neura is designed to be your helpful companion, running entirely on your device for maximum privacy.
+
+        ## Key Features:
+
+        - **Chat:** Have private conversations with Neura. Your data never leaves your device.
+        - **Context:** Add context to your chats! Select notes, include recent reminders, or add upcoming calendar events so Neura has relevant information.
+        - **Document Upload:** Need to understand a document? Upload PDF or TXT files, and Neura can summarize them for you (tap the '+' in Chat).
+        - **Reminders:** Set reminders using natural language in the Reminders tab.
+        - **Daily Digest:** Get a personalized summary of your day, including calendar events and reminders (check the Home tab).
+        - **Notes (This Tab!):** Jot down thoughts, ideas, or anything you need to remember. Use text or record audio.
+        """ // Use dashes for lists
+        let appOverviewNote = DumpNote(
+            rawContent: appOverviewContent,
+            title: "Welcome to Neura!",
+            tags: ["welcome", "features"],
+            colorTag: "blue" // Give it a color
+        )
+        modelContext.insert(appOverviewNote)
+        
+        // Sample Note 2: Using Notes
+        let notesFeatureContent = """
+        # How to Use Notes
+
+        This is your space for capturing thoughts quickly.
+
+        ## Creating Notes:
+
+        - **Text:** Tap the '+' button to create a new text note.
+        - **Audio:** Tap and **hold** the '+' button to start recording an audio note. Your speech will be automatically transcribed when you save!
+
+        ## Processing Styles:
+
+        When saving a text note, you can choose an AI processing style:
+
+        - **Save Raw:** Saves your note exactly as you typed it.
+        - **Simple Restructure:** AI organizes the text for better readability.
+        - **Grammar Fix:** AI corrects grammar and spelling.
+        - **Journal Entry:** AI formats the text as a journal entry.
+        - **Detailed Summary:** AI creates a structured summary.
+
+        You can set the default style in Notes Settings (gear icon). You can also reprocess notes later by editing them.
+
+        ## Other Features:
+
+        - **Tags:** Add tags to organize your notes.
+        - **Color:** Assign colors to notes for visual cues.
+        - **Pin:** Pin important notes to the top.
+        """ // Use dashes for lists
+        let notesFeatureNote = DumpNote(
+            rawContent: notesFeatureContent,
+            title: "Using the Notes Feature",
+            tags: ["notes", "guide", "audio", "processing"],
+            colorTag: "green" // Give it a color
+        )
+        modelContext.insert(notesFeatureNote)
+
+        // --- ADD NEW SAMPLE NOTES --- 
+
+        // Sample Note 3: Neura Eyes
+        let neuraEyesContent = """
+        # Meet Neura's Eyes!
+
+        Those expressive eyes aren't just for show! They provide visual feedback and add a touch of personality.
+
+        ## What They Do:
+        - **Idle:** Look around randomly, blink.
+        - **Thinking/Generating:** Show an animation (thinking indicator or glow) while processing your requests.
+        - **Listening:** (Subtle animation when implemented)
+        - **Tap:** React when you tap them (try it!).
+
+        ## Customization:
+        Head over to **Settings > Neura Eyes** to:
+        - Change their **Shape** (Circle, Oval, Square).
+        - Pick **Outline** and **Iris Colors**.
+        - Adjust **Background Color** (or set to Adaptive).
+        - Change **Iris Size** and **Stroke Width**.
+        - Select the **Tap Action**.
+        - Choose the **Generation Animation** (Thinking Indicator or Glow).
+        - Toggle the **Border** on/off.
+        """
+        let neuraEyesNote = DumpNote(
+            rawContent: neuraEyesContent,
+            title: "Customizing Neura Eyes",
+            tags: ["guide", "settings", "eyes", "customization"],
+            colorTag: "purple"
+        )
+        modelContext.insert(neuraEyesNote)
+
+        // Sample Note 4: Chat & Themes
+        let chatThemesContent = """
+        # Chatting with Neura & Fun Themes
+
+        The Chat tab is your main space for interacting with Neura.
+
+        ## Chat Features:
+        - **Context:** Use the '+' button to add context from Notes, Reminders, Calendar, or uploaded Documents.
+        - **Privacy:** All conversations happen locally.
+
+        ## Interface Styles (Settings > Chat):
+        Want a different look? Try the **Terminal Interface Style**!
+        - **Enable:** Toggle it on in Chat settings.
+        - **Themes:** Choose from various color schemes like Classic Green, Amber, Matrix, Futuristic, or even a retro **Game Boy Screen**!
+        - **Effects:** Add scanlines, flicker, and window controls for extra nostalgia.
+        
+        *(Note: Daily Digest on the Home tab also has its own separate Terminal Style settings)*
+        """
+        let chatThemesNote = DumpNote(
+            rawContent: chatThemesContent,
+            title: "Chat Features & Themes",
+            tags: ["guide", "chat", "settings", "themes", "terminal"],
+            colorTag: "orange"
+        )
+        modelContext.insert(chatThemesNote)
+
+        // Sample Note 5: Gamification
+        let gamificationContent = """
+        # Level Up with Neura! (Gamification)
+        
+        Neura includes a simple XP (Experience Points) system to make interacting a bit more fun.
+        
+        ## Earning XP:
+        You earn points for actions like:
+        - Chatting with Neura.
+        - Completing reminders.
+        - Saving notes.
+        - Generating the Daily Digest.
+        
+        ## Levels:
+        Every 100 XP, you gain a level! It's just for fun, a way to track your engagement.
+        
+        ## Settings (Settings > Gamification):
+        - **Enable/Disable:** Turn the XP system on or off entirely.
+        - **Show in UI:** Choose whether to display your Level and XP progress bar at the top of some screens (like Home).
+        - **Reset:** Reset your XP and level back to zero.
+        """
+        let gamificationNote = DumpNote(
+            rawContent: gamificationContent,
+            title: "Gamification: Earn XP!",
+            tags: ["guide", "settings", "gamification", "xp"],
+            colorTag: "yellow"
+        )
+        modelContext.insert(gamificationNote)
+        // --- END ADD NEW SAMPLE NOTES --- 
+
+        print("Created sample notes.")
+    }
+    // --- END NEW ---
 }
 
-// Preview provider (should now work with the explicit init)
 #Preview {
     // Ensure the required bindings are provided correctly
     @State var showNotes = true

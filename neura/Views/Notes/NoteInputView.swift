@@ -51,7 +51,7 @@ struct DumpInputView: View {
     @FocusState private var isTextFieldFocused: Bool
     @State private var selectedColorTag: String? = nil
     private let availableColorTags: [String?] = [nil, "red", "blue", "green", "yellow", "purple"]
-    @State private var selectedProcessingStyle: String = "Save Raw"
+    @State private var selectedProcessingStyle: String = UserDefaults.standard.string(forKey: "freeDumpFormattingStyle") ?? "Save Raw"
     private let processingStyles = ["Save Raw", "Simple Restructure", "Grammar Fix", "Journal Entry", "Detailed Summary"]
     
     // Completion handler

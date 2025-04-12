@@ -308,7 +308,7 @@ struct CustomizeAIView: View {
             Form {
                 Section {
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("What should ai call you?")
+                        Text("What should neura call you?")
                             .font(.system(size: 14))
                             .foregroundColor(.secondary)
                         
@@ -334,7 +334,7 @@ struct CustomizeAIView: View {
                 Section {
                     VStack(alignment: .leading, spacing: 8) {
                         HStack {
-                            Text("What traits should ai have?")
+                            Text("What traits should neura have?")
                                 .font(.system(size: 14))
                                 .foregroundColor(.secondary)
                             

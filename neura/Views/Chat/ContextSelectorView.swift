@@ -373,22 +373,25 @@ struct ContextSelectorView: View {
                 }
                 
             case .complete:
-                VStack(alignment: .leading, spacing: 10) {
+                VStack(alignment: .leading) {
                     Text("Title: \(documentTitle)")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
-                        .padding(.bottom, 4)
-                    
-                    // Expanded ScrollView with full text visibility
+                        .padding(.bottom, 8)
+
+                        .fixedSize(horizontal: false, vertical: true)
+
+
                     ScrollView {
-                        Text( (try? AttributedString(markdown: documentSummary)) ?? AttributedString(documentSummary) ) // Render Markdown with fallback
+                        Text( (try? AttributedString(markdown: documentSummary)) ?? AttributedString(documentSummary) )
                             .font(.callout)
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.horizontal, 0) // Ensure no horizontal padding on Text
+
+                            .padding(.bottom)
                     }
-                    .padding(.vertical, 10)
-                    .padding(.horizontal) // Add horizontal padding to ScrollView
-                    
+
+                    Spacer()
+
                     // Buttons side-by-side
                     HStack {
                         Button {
@@ -407,7 +410,7 @@ struct ContextSelectorView: View {
                         }
                         .buttonStyle(.bordered)
                         
-                        Spacer() // Pushes buttons apart
+                        Spacer()
                         
                         Button("Use Document as Context") {
                             prepareAndDismissWithDocument()
