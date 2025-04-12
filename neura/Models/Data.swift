@@ -114,11 +114,17 @@ class AppManager: ObservableObject {
     @AppStorage("numberOfVisits") var numberOfVisits = 0
     @AppStorage("numberOfVisitsOfLastRequest") var numberOfVisitsOfLastRequest = 0
     
-    // --- NEW: Neura Eyes Specific Settings ---
-    @AppStorage("showNeuraEyes") var showNeuraEyes: Bool = true // Default ON
-    @AppStorage("showNeuraEyesBorder") var showNeuraEyesBorder: Bool = false // Default OFF
+    // --- Add Toggle State for Eyes --- 
+    @Published var showNeuraEyes: Bool = true
+    // --- End Toggle State ---
+    
+    // --- Chat Mode State (Moved from ChatView) ---
+    @Published var selectedChatMode: ChatMode = .chat
+    // --- End Chat Mode State ---
+    
+    // --- Eye Customization Settings ---
     @AppStorage("eyeShape") var eyeShape: EyeShapeType = .circle
-    @AppStorage("eyeOutlineColor") var eyeOutlineColor: AppTintColor = .primary
+    @AppStorage("eyeOutlineColor") var eyeOutlineColor: AppTintColor = .monochrome
     @AppStorage("eyeBackgroundColor") var eyeBackgroundColor: EyeBackgroundColorType = .white
     @AppStorage("eyeIrisColor") var eyeIrisColor: AppTintColor = .monochrome // Default to monochrome (often black/white)
     @AppStorage("eyeIrisSize") var eyeIrisSize: EyeIrisSizeType = .medium
@@ -126,12 +132,16 @@ class AppManager: ObservableObject {
     // --- End Eye Customization Settings ---
     
     // --- NEW: Generation Animation Setting ---
-    @AppStorage("generationAnimationStyle") var generationAnimationStyle: GenerationAnimationStyle = GenerationAnimationStyle.thinking // Fully qualified default
+    @AppStorage("generationAnimationStyle") var generationAnimationStyle: GenerationAnimationStyle = .random
     // --- END NEW ---
     
     // --- Eye Tap Action Setting ---
-    @AppStorage("eyeTapAction") var eyeTapAction: EyeTapActionType = EyeTapActionType.blink // Fully qualified default
+    @AppStorage("eyeTapAction") var eyeTapAction: EyeTapActionType = .predefined
     // --- End Eye Tap Action Setting ---
+    
+    // --- NEW: Setting to show/hide the border around Neura Eyes --- 
+    @AppStorage("showNeuraEyesBorder") var showNeuraEyesBorder: Bool = false
+    // --- End NEW ---
     
     // --- Buddy Gamification ---
     @AppStorage("buddyXP") var buddyXP: Int = 0

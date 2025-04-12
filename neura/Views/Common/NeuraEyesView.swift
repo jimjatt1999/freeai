@@ -195,7 +195,8 @@ struct NeuraEyesView: View {
                 .frame(width: currentEyeWidth, height: currentEyeHeight)
                 .clipped()
             }
-            .if(appManager.showNeuraEyesBorder) { view in // Conditional Border/BG
+            // Conditionally apply border modifiers
+            .if(appManager.showNeuraEyesBorder) { view in
                 view
                     .padding(10) // Add padding inside the border
                     .background(Color(.secondarySystemBackground)) // Add background

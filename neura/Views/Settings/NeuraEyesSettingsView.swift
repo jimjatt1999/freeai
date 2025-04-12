@@ -25,11 +25,6 @@ struct NeuraSettingsView: View {
                 }
                 .padding(.vertical)
                 
-                // --- Added: Border Toggle ---
-                Toggle("Show Border", isOn: $appManager.showNeuraEyesBorder)
-                    .tint(.blue) // Optional: style the toggle
-                // --- End Added ---
-                
                 // Settings Pickers
                 Picker("Shape", selection: $appManager.eyeShape) {
                     ForEach(EyeShapeType.allCases) { option in
@@ -81,6 +76,11 @@ struct NeuraSettingsView: View {
                      }
                  }
                  // --- End Added ---
+                 
+                 // --- NEW: Border Toggle ---
+                 Toggle("Show Border", isOn: $appManager.showNeuraEyesBorder)
+                     .tint(appManager.appTintColor.getColor()) // Optional: Use app tint for the toggle
+                 // --- END NEW ---
             }
             .disabled(!appManager.showNeuraEyes) // Disable customization if eyes are off
             // --- End Eye Customization Section ---
