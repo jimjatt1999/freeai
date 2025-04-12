@@ -140,7 +140,7 @@ class AppManager: ObservableObject {
     // --- End Eye Tap Action Setting ---
     
     // --- NEW: Setting to show/hide the border around Neura Eyes --- 
-    @AppStorage("showNeuraEyesBorder") var showNeuraEyesBorder: Bool = false
+    @AppStorage("showNeuraEyesBorder") var showNeuraEyesBorder: Bool = true
     // --- End NEW ---
     
     // --- Buddy Gamification ---

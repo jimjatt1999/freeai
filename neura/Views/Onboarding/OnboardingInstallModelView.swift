@@ -24,11 +24,9 @@ struct OnboardingInstallModelView: View {
         VStack(spacing: 24) {
             // Header
             VStack(spacing: 18) {
-                // Minimalist icon
-                Rectangle()
-                    .fill(Color.primary)
-                    .frame(width: 60, height: 60)
-                    .cornerRadius(16)
+                // Use NeuraEyesView instead of the simple rectangle
+                NeuraEyesView()
+                    // Add similar entrance animation
                     .scaleEffect(animationTrigger ? 1.0 : 0.5)
                     .opacity(animationTrigger ? 1.0 : 0.0)
 
@@ -36,6 +34,7 @@ struct OnboardingInstallModelView: View {
                     Text("Let's get you started")
                         .font(.system(size: 32, weight: .bold, design: .rounded))
                         .foregroundStyle(Color.primary)
+                        .multilineTextAlignment(.center)
                     Text("Choose a model that lives entirely on your device")
                         .font(.headline)
                         .foregroundStyle(.secondary)
@@ -124,7 +123,7 @@ struct OnboardingInstallModelView: View {
                         ) {
                             AppFeatureRow(
                                 title: "Chat",
-                                description: "Your AI buddy that never leaves your device (or judges your spelling)",
+                                description: "Your AI buddy that never leaves your device (or judges your spelling), Chat freely and upload documents for neura to analyse all locally!",
                                 iconName: "message.fill"
                             )
                             

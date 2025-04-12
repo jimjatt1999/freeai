@@ -28,7 +28,7 @@ struct OnboardingView: View {
                         
                         // Neura
                         NeuraEyesView()
-                            .scaleEffect(1.8)
+                            .scaleEffect(1.5)
                             .opacity(fadeInTrigger ? 1 : 0)
                             .scaleEffect(animationTrigger ? 1 : 0.8)
                             .offset(y: animationTrigger ? 0 : 30)
@@ -41,21 +41,32 @@ struct OnboardingView: View {
                             .scaleEffect(animationTrigger ? 1 : 0.8)
                             .offset(y: animationTrigger ? 0 : 30)
                             .opacity(fadeInTrigger ? 1 : 0)
+                            .padding(.bottom, 1)
+                        
+                        // Tapping hint
+                        Text("(Try tapping my eyes!)")
+                            .font(.system(.caption, design: .monospaced))
+                            .foregroundStyle(.secondary)
+                            .scaleEffect(animationTrigger ? 1 : 0.8)
+                            .offset(y: animationTrigger ? 0 : 30)
+                            .opacity(fadeInTrigger ? 1 : 0)
                             .padding(.bottom, 5)
                         
                         // App subtitle
-                        Text("Private on-device AI assistant")
-                            .font(.system(.headline, design: .monospaced))
+                        Text("Say Hi to Neura your Private on-device AI assistant")
+                            .font(.system(.subheadline, design: .monospaced))
                             .foregroundStyle(.secondary)
                             .multilineTextAlignment(.center)
                             .scaleEffect(animationTrigger ? 1 : 0.8)
                             .offset(y: animationTrigger ? 0 : 30)
                             .opacity(fadeInTrigger ? 1 : 0)
                             .padding(.bottom, 40)
+                            .fixedSize(horizontal: false, vertical: true)
+
                         
                         // Core features list
                         VStack(alignment: .leading, spacing: 20) {
-                            FeatureRow(icon: "lock.shield.fill", title: "privacy first", description: "Everything runs locally, no data ever leaves your device")
+                            FeatureRow(icon: "lock.shield.fill", title: "privacy first", description: "Everything runs locally, no data ever leaves your device, no internet needed. The Power of AI in the palm of your hands")
                             
                             FeatureRow(icon: "message.fill", title: "chat", description: "Have private conversations that stay on your device")
                             
@@ -69,13 +80,11 @@ struct OnboardingView: View {
                         .offset(y: fadeInTrigger ? 0 : 40)
                         .opacity(fadeInTrigger ? 1 : 0)
                         
-                        Spacer()
-                        
                         // Continue button
                         Button {
                             navigateToModelSelection = true
                         } label: {
-                            Text("Get Started & Daily Digest")
+                            Text("Get Started")
                                 .font(.system(.headline, design: .monospaced))
                                 .fontWeight(.medium)
                                 .frame(maxWidth: .infinity)
@@ -127,8 +136,9 @@ struct FeatureRow: View {
                     .fontWeight(.medium)
                 
                 Text(description)
-                    .font(.system(.subheadline, design: .monospaced))
+                    .font(.system(.caption, design: .monospaced))
                     .foregroundColor(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
         .padding(.vertical, 5)
