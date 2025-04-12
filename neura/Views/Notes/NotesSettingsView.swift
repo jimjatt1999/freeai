@@ -19,6 +19,8 @@ struct FreeDumpSettingsView: View {
     @State private var formattingStyle: String = UserDefaults.standard.string(forKey: "freeDumpFormattingStyle") ?? "Save Raw"
     @State private var customTag: String = ""
     @State private var userTags: [String] = []
+    @State private var showExportErrorAlert = false
+    @State private var exportErrorMessage = ""
     
     // Available formatting presets - ensure consistency
     private let formattingPresets = [
@@ -62,6 +64,11 @@ struct FreeDumpSettingsView: View {
                 }
             } message: {
                 Text("This will permanently delete all your notes. This action cannot be undone.")
+            }
+            .alert("Export Error", isPresented: $showExportErrorAlert) {
+                Button("OK") { }
+            } message: {
+                Text(exportErrorMessage)
             }
             .onAppear {
                 // Collect all tags from notes and from UserDefaults
@@ -211,6 +218,7 @@ struct FreeDumpSettingsView: View {
                 } label: {
                     Label("Export All Notes", systemImage: "square.and.arrow.up")
                 }
+                .disabled(dumpNotes.isEmpty)
                 
                 // Clear all notes option
                 Button(role: .destructive) {
@@ -232,82 +240,111 @@ struct FreeDumpSettingsView: View {
         case json
     }
     
-    // Fixed export notes function
+    // Refactored export notes function
     private func exportAllNotes(format: ExportFormat) {
         guard !dumpNotes.isEmpty else { return }
         
-        // Create temp directory
+        // Create temp directory URL
         let tempDir = FileManager.default.temporaryDirectory
-        var archiveURL: URL?
+        var fileToShareURL: URL?
+        var exportError: Error? = nil
         
         do {
             if format == .txt {
-                // Create a directory for the files
-                let notesDir = tempDir.appendingPathComponent("FreeAINotes")
-                try? FileManager.default.removeItem(at: notesDir) // Remove if exists
-                try FileManager.default.createDirectory(at: notesDir, withIntermediateDirectories: true, attributes: nil)
+                // --- Create a SINGLE TXT file --- 
+                let txtFileURL = tempDir.appendingPathComponent("NeuraNotesExport.txt")
+                try? FileManager.default.removeItem(at: txtFileURL) // Remove if exists
                 
-                // Create a text file for each note
+                var combinedContent = "" // Start with an empty string
                 for note in dumpNotes {
-                    let title = note.title.isEmpty ? "Untitled" : note.title
-                    let safeName = title.replacingOccurrences(of: "/", with: "-")
-                                        .replacingOccurrences(of: "\\", with: "-")
-                    let fileName = "\(safeName)-\(note.id.uuidString.prefix(8)).txt"
-                    let fileURL = notesDir.appendingPathComponent(fileName)
-                    
-                    // Format the note content
-                    var content = "Title: \(note.title)\n"
-                    content += "Date: \(formatDate(note.timestamp))\n"
+                    combinedContent += "Title: \(note.title.isEmpty ? "Untitled" : note.title)\n"
+                    combinedContent += "Date: \(formatDate(note.timestamp))\n"
                     if !note.tags.isEmpty {
-                        content += "Tags: \(note.tags.joined(separator: ", "))\n"
+                        combinedContent += "Tags: \(note.tags.joined(separator: ", "))\n"
                     }
-                    content += "\n\(note.structuredContent.isEmpty ? note.rawContent : note.structuredContent)"
-                    
-                    try content.write(to: fileURL, atomically: true, encoding: .utf8)
+                    combinedContent += "\n"
+                    combinedContent += "\(note.structuredContent.isEmpty ? note.rawContent : note.structuredContent)\n"
+                    combinedContent += "\n---\n\n" // Add a separator
                 }
                 
-                // Create zip archive
-                let zipURL = tempDir.appendingPathComponent("FreeAINotes.zip")
-                try? FileManager.default.removeItem(at: zipURL) // Remove if exists
-                
-                // Share directly the folder instead of zip for now
-                archiveURL = notesDir
-            } else {
-                // JSON export
-                let jsonURL = tempDir.appendingPathComponent("FreeAINotes.json")
+                // Write the combined string to the single file
+                try combinedContent.write(to: txtFileURL, atomically: true, encoding: .utf8)
+                fileToShareURL = txtFileURL
+                print("Successfully created combined TXT export file at: \(txtFileURL)")
+                // --- END SINGLE TXT file creation ---
+
+            } else { // JSON export
+                let jsonURL = tempDir.appendingPathComponent("NeuraNotesExport.json")
                 try? FileManager.default.removeItem(at: jsonURL) // Remove if exists
-                
-                // Convert notes to a dictionary
+
+                // Convert notes to a dictionary (Existing logic)
                 let notesData = dumpNotes.map { note -> [String: Any] in
                     [
                         "id": note.id.uuidString,
                         "title": note.title,
                         "rawContent": note.rawContent,
                         "structuredContent": note.structuredContent,
-                        "timestamp": formatDate(note.timestamp),
-                        "tags": note.tags
+                        "timestamp": formatDate(note.timestamp), // Using existing formatter
+                        "tags": note.tags,
+                        "colorTag": note.colorTag ?? "",
+                        "isPinned": note.isPinned,
+                        "audioFilename": note.audioFilename ?? "",
+                        "transcription": note.transcription ?? "",
+                        "linkURL": note.linkURL ?? "",
+                        "linkTitle": note.linkTitle ?? "",
+                        "linkImageURL": note.linkImageURL ?? ""
                     ]
                 }
-                
-                // Serialize to JSON
+
+                // Serialize and write JSON (Add specific error handling)
                 let jsonData = try JSONSerialization.data(withJSONObject: notesData, options: .prettyPrinted)
                 try jsonData.write(to: jsonURL)
-                
-                archiveURL = jsonURL
+                fileToShareURL = jsonURL
+                print("Successfully created JSON export file at: \(jsonURL)")
             }
             
-            // Share the file
-            if let url = archiveURL {
+        } catch {
+            print("Error creating export file: \(error)")
+            exportError = error
+        }
+        
+        // --- Present Share Sheet --- 
+        if let url = fileToShareURL, exportError == nil {
+            do { // Add do-catch for presentation
                 let activityVC = UIActivityViewController(activityItems: [url], applicationActivities: nil)
                 
-                // Present the activity view controller
-                if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-                   let controller = windowScene.windows.first?.rootViewController {
-                    controller.present(activityVC, animated: true)
+                // Find the appropriate presenting view controller
+                guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene, 
+                      let rootViewController = windowScene.windows.first?.rootViewController else {
+                    throw NSError(domain: "UIError", code: 1, userInfo: [NSLocalizedDescriptionKey: "Could not find root view controller."])
                 }
+                
+                // Handle iPad popover presentation
+                if let popoverController = activityVC.popoverPresentationController {
+                    popoverController.sourceView = rootViewController.view // Or specify a more specific source view
+                    popoverController.sourceRect = CGRect(x: rootViewController.view.bounds.midX, y: rootViewController.view.bounds.midY, width: 0, height: 0)
+                    popoverController.permittedArrowDirections = [] // No arrow for centered presentation
+                }
+                
+                // Find the most appropriate controller to present from
+                var presenter = rootViewController
+                while let presented = presenter.presentedViewController {
+                    presenter = presented
+                }
+                
+                presenter.present(activityVC, animated: true)
+                print("Presented share sheet for: \(url)")
+                
+            } catch {
+                print("Error presenting share sheet: \(error)")
+                exportError = error // Set error if presentation fails
             }
-        } catch {
-            print("Error exporting notes: \(error)")
+        }
+        
+        // --- Show Alert on Error --- 
+        if let error = exportError {
+            exportErrorMessage = "Failed to export notes: \(error.localizedDescription)"
+            showExportErrorAlert = true
         }
     }
     
