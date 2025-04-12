@@ -1,0 +1,5 @@
+- onboarding users gives name
+- or customize from onboarding
+or skips
+
+skip ui issues etc
