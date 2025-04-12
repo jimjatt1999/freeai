@@ -1,0 +1,38 @@
+{
+  "" : {
+    "diagnostics" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/Zip/build/Zip.build/Debug-iphoneos/Zip.build/Objects-normal/arm64/Zip-master.dia",
+    "emit-module-dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/Zip/build/Zip.build/Debug-iphoneos/Zip.build/Objects-normal/arm64/Zip-master-emit-module.d",
+    "emit-module-diagnostics" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/Zip/build/Zip.build/Debug-iphoneos/Zip.build/Objects-normal/arm64/Zip-master-emit-module.dia",
+    "swift-dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/Zip/build/Zip.build/Debug-iphoneos/Zip.build/Objects-normal/arm64/Zip-master.swiftdeps"
+  },
+  "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/Zip/Zip/QuickZip.swift" : {
+    "const-values" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/Zip/build/Zip.build/Debug-iphoneos/Zip.build/Objects-normal/arm64/QuickZip.swiftconstvalues",
+    "dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/Zip/build/Zip.build/Debug-iphoneos/Zip.build/Objects-normal/arm64/QuickZip.d",
+    "diagnostics" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/Zip/build/Zip.build/Debug-iphoneos/Zip.build/Objects-normal/arm64/QuickZip.dia",
+    "index-unit-output-path" : "/Zip.build/Debug-iphoneos/Zip.build/Objects-normal/arm64/QuickZip.o",
+    "llvm-bc" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/Zip/build/Zip.build/Debug-iphoneos/Zip.build/Objects-normal/arm64/QuickZip.bc",
+    "object" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/Zip/build/Zip.build/Debug-iphoneos/Zip.build/Objects-normal/arm64/QuickZip.o",
+    "swift-dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/Zip/build/Zip.build/Debug-iphoneos/Zip.build/Objects-normal/arm64/QuickZip.swiftdeps",
+    "swiftmodule" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/Zip/build/Zip.build/Debug-iphoneos/Zip.build/Objects-normal/arm64/QuickZip~partial.swiftmodule"
+  },
+  "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/Zip/Zip/Zip.swift" : {
+    "const-values" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/Zip/build/Zip.build/Debug-iphoneos/Zip.build/Objects-normal/arm64/Zip.swiftconstvalues",
+    "dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/Zip/build/Zip.build/Debug-iphoneos/Zip.build/Objects-normal/arm64/Zip.d",
+    "diagnostics" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/Zip/build/Zip.build/Debug-iphoneos/Zip.build/Objects-normal/arm64/Zip.dia",
+    "index-unit-output-path" : "/Zip.build/Debug-iphoneos/Zip.build/Objects-normal/arm64/Zip.o",
+    "llvm-bc" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/Zip/build/Zip.build/Debug-iphoneos/Zip.build/Objects-normal/arm64/Zip.bc",
+    "object" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/Zip/build/Zip.build/Debug-iphoneos/Zip.build/Objects-normal/arm64/Zip.o",
+    "swift-dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/Zip/build/Zip.build/Debug-iphoneos/Zip.build/Objects-normal/arm64/Zip.swiftdeps",
+    "swiftmodule" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/Zip/build/Zip.build/Debug-iphoneos/Zip.build/Objects-normal/arm64/Zip~partial.swiftmodule"
+  },
+  "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/Zip/Zip/ZipUtilities.swift" : {
+    "const-values" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/Zip/build/Zip.build/Debug-iphoneos/Zip.build/Objects-normal/arm64/ZipUtilities.swiftconstvalues",
+    "dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/Zip/build/Zip.build/Debug-iphoneos/Zip.build/Objects-normal/arm64/ZipUtilities.d",
+    "diagnostics" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/Zip/build/Zip.build/Debug-iphoneos/Zip.build/Objects-normal/arm64/ZipUtilities.dia",
+    "index-unit-output-path" : "/Zip.build/Debug-iphoneos/Zip.build/Objects-normal/arm64/ZipUtilities.o",
+    "llvm-bc" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/Zip/build/Zip.build/Debug-iphoneos/Zip.build/Objects-normal/arm64/ZipUtilities.bc",
+    "object" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/Zip/build/Zip.build/Debug-iphoneos/Zip.build/Objects-normal/arm64/ZipUtilities.o",
+    "swift-dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/Zip/build/Zip.build/Debug-iphoneos/Zip.build/Objects-normal/arm64/ZipUtilities.swiftdeps",
+    "swiftmodule" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/Zip/build/Zip.build/Debug-iphoneos/Zip.build/Objects-normal/arm64/ZipUtilities~partial.swiftmodule"
+  }
+}

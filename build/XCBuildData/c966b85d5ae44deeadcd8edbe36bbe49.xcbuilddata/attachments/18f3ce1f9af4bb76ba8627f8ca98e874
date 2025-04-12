@@ -1,0 +1,4 @@
+module Minizip {
+umbrella header "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/Zip/Zip/minizip/include/Minizip.h"
+export *
+}

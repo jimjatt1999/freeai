@@ -1,0 +1,378 @@
+{
+  "" : {
+    "diagnostics" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/neura-master.dia",
+    "emit-module-dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/neura-master-emit-module.d",
+    "emit-module-diagnostics" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/neura-master-emit-module.dia",
+    "swift-dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/neura-master.swiftdeps"
+  },
+  "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/DerivedSources/GeneratedAssetSymbols.swift" : {
+    "const-values" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/GeneratedAssetSymbols.swiftconstvalues",
+    "dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/GeneratedAssetSymbols.d",
+    "diagnostics" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/GeneratedAssetSymbols.dia",
+    "index-unit-output-path" : "/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/GeneratedAssetSymbols.o",
+    "llvm-bc" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/GeneratedAssetSymbols.bc",
+    "object" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/GeneratedAssetSymbols.o",
+    "swift-dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/GeneratedAssetSymbols.swiftdeps",
+    "swiftmodule" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/GeneratedAssetSymbols~partial.swiftmodule"
+  },
+  "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/neura/ContentView.swift" : {
+    "const-values" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ContentView.swiftconstvalues",
+    "dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ContentView.d",
+    "diagnostics" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ContentView.dia",
+    "index-unit-output-path" : "/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ContentView.o",
+    "llvm-bc" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ContentView.bc",
+    "object" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ContentView.o",
+    "swift-dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ContentView.swiftdeps",
+    "swiftmodule" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ContentView~partial.swiftmodule"
+  },
+  "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/neura/Models/Data.swift" : {
+    "const-values" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/Data.swiftconstvalues",
+    "dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/Data.d",
+    "diagnostics" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/Data.dia",
+    "index-unit-output-path" : "/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/Data.o",
+    "llvm-bc" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/Data.bc",
+    "object" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/Data.o",
+    "swift-dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/Data.swiftdeps",
+    "swiftmodule" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/Data~partial.swiftmodule"
+  },
+  "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/neura/Models/DeviceStat.swift" : {
+    "const-values" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/DeviceStat.swiftconstvalues",
+    "dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/DeviceStat.d",
+    "diagnostics" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/DeviceStat.dia",
+    "index-unit-output-path" : "/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/DeviceStat.o",
+    "llvm-bc" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/DeviceStat.bc",
+    "object" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/DeviceStat.o",
+    "swift-dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/DeviceStat.swiftdeps",
+    "swiftmodule" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/DeviceStat~partial.swiftmodule"
+  },
+  "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/neura/Models/LLMEvaluator.swift" : {
+    "const-values" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/LLMEvaluator.swiftconstvalues",
+    "dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/LLMEvaluator.d",
+    "diagnostics" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/LLMEvaluator.dia",
+    "index-unit-output-path" : "/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/LLMEvaluator.o",
+    "llvm-bc" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/LLMEvaluator.bc",
+    "object" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/LLMEvaluator.o",
+    "swift-dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/LLMEvaluator.swiftdeps",
+    "swiftmodule" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/LLMEvaluator~partial.swiftmodule"
+  },
+  "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/neura/Models/Models.swift" : {
+    "const-values" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/Models.swiftconstvalues",
+    "dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/Models.d",
+    "diagnostics" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/Models.dia",
+    "index-unit-output-path" : "/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/Models.o",
+    "llvm-bc" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/Models.bc",
+    "object" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/Models.o",
+    "swift-dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/Models.swiftdeps",
+    "swiftmodule" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/Models~partial.swiftmodule"
+  },
+  "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/neura/Models/RequestLLMIntent.swift" : {
+    "const-values" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/RequestLLMIntent.swiftconstvalues",
+    "dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/RequestLLMIntent.d",
+    "diagnostics" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/RequestLLMIntent.dia",
+    "index-unit-output-path" : "/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/RequestLLMIntent.o",
+    "llvm-bc" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/RequestLLMIntent.bc",
+    "object" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/RequestLLMIntent.o",
+    "swift-dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/RequestLLMIntent.swiftdeps",
+    "swiftmodule" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/RequestLLMIntent~partial.swiftmodule"
+  },
+  "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/neura/Views/BottomNavBar.swift" : {
+    "const-values" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/BottomNavBar.swiftconstvalues",
+    "dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/BottomNavBar.d",
+    "diagnostics" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/BottomNavBar.dia",
+    "index-unit-output-path" : "/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/BottomNavBar.o",
+    "llvm-bc" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/BottomNavBar.bc",
+    "object" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/BottomNavBar.o",
+    "swift-dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/BottomNavBar.swiftdeps",
+    "swiftmodule" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/BottomNavBar~partial.swiftmodule"
+  },
+  "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/neura/Views/Chat/ChatView.swift" : {
+    "const-values" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ChatView.swiftconstvalues",
+    "dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ChatView.d",
+    "diagnostics" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ChatView.dia",
+    "index-unit-output-path" : "/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ChatView.o",
+    "llvm-bc" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ChatView.bc",
+    "object" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ChatView.o",
+    "swift-dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ChatView.swiftdeps",
+    "swiftmodule" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ChatView~partial.swiftmodule"
+  },
+  "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/neura/Views/Chat/ChatsListView.swift" : {
+    "const-values" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ChatsListView.swiftconstvalues",
+    "dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ChatsListView.d",
+    "diagnostics" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ChatsListView.dia",
+    "index-unit-output-path" : "/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ChatsListView.o",
+    "llvm-bc" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ChatsListView.bc",
+    "object" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ChatsListView.o",
+    "swift-dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ChatsListView.swiftdeps",
+    "swiftmodule" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ChatsListView~partial.swiftmodule"
+  },
+  "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/neura/Views/Chat/ContextSelectorView.swift" : {
+    "const-values" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ContextSelectorView.swiftconstvalues",
+    "dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ContextSelectorView.d",
+    "diagnostics" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ContextSelectorView.dia",
+    "index-unit-output-path" : "/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ContextSelectorView.o",
+    "llvm-bc" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ContextSelectorView.bc",
+    "object" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ContextSelectorView.o",
+    "swift-dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ContextSelectorView.swiftdeps",
+    "swiftmodule" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ContextSelectorView~partial.swiftmodule"
+  },
+  "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/neura/Views/Chat/ConversationView.swift" : {
+    "const-values" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ConversationView.swiftconstvalues",
+    "dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ConversationView.d",
+    "diagnostics" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ConversationView.dia",
+    "index-unit-output-path" : "/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ConversationView.o",
+    "llvm-bc" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ConversationView.bc",
+    "object" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ConversationView.o",
+    "swift-dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ConversationView.swiftdeps",
+    "swiftmodule" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ConversationView~partial.swiftmodule"
+  },
+  "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/neura/Views/Common/NeuronView.swift" : {
+    "const-values" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NeuronView.swiftconstvalues",
+    "dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NeuronView.d",
+    "diagnostics" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NeuronView.dia",
+    "index-unit-output-path" : "/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NeuronView.o",
+    "llvm-bc" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NeuronView.bc",
+    "object" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NeuronView.o",
+    "swift-dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NeuronView.swiftdeps",
+    "swiftmodule" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NeuronView~partial.swiftmodule"
+  },
+  "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/neura/Views/DailyDigestSettingsView.swift" : {
+    "const-values" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/DailyDigestSettingsView.swiftconstvalues",
+    "dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/DailyDigestSettingsView.d",
+    "diagnostics" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/DailyDigestSettingsView.dia",
+    "index-unit-output-path" : "/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/DailyDigestSettingsView.o",
+    "llvm-bc" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/DailyDigestSettingsView.bc",
+    "object" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/DailyDigestSettingsView.o",
+    "swift-dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/DailyDigestSettingsView.swiftdeps",
+    "swiftmodule" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/DailyDigestSettingsView~partial.swiftmodule"
+  },
+  "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/neura/Views/DailyDigestView.swift" : {
+    "const-values" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/DailyDigestView.swiftconstvalues",
+    "dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/DailyDigestView.d",
+    "diagnostics" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/DailyDigestView.dia",
+    "index-unit-output-path" : "/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/DailyDigestView.o",
+    "llvm-bc" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/DailyDigestView.bc",
+    "object" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/DailyDigestView.o",
+    "swift-dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/DailyDigestView.swiftdeps",
+    "swiftmodule" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/DailyDigestView~partial.swiftmodule"
+  },
+  "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/neura/Views/LaunchView.swift" : {
+    "const-values" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/LaunchView.swiftconstvalues",
+    "dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/LaunchView.d",
+    "diagnostics" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/LaunchView.dia",
+    "index-unit-output-path" : "/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/LaunchView.o",
+    "llvm-bc" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/LaunchView.bc",
+    "object" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/LaunchView.o",
+    "swift-dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/LaunchView.swiftdeps",
+    "swiftmodule" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/LaunchView~partial.swiftmodule"
+  },
+  "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/neura/Views/Notes/AudioInputView.swift" : {
+    "const-values" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/AudioInputView.swiftconstvalues",
+    "dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/AudioInputView.d",
+    "diagnostics" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/AudioInputView.dia",
+    "index-unit-output-path" : "/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/AudioInputView.o",
+    "llvm-bc" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/AudioInputView.bc",
+    "object" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/AudioInputView.o",
+    "swift-dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/AudioInputView.swiftdeps",
+    "swiftmodule" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/AudioInputView~partial.swiftmodule"
+  },
+  "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/neura/Views/Notes/NoteDetailView.swift" : {
+    "const-values" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NoteDetailView.swiftconstvalues",
+    "dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NoteDetailView.d",
+    "diagnostics" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NoteDetailView.dia",
+    "index-unit-output-path" : "/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NoteDetailView.o",
+    "llvm-bc" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NoteDetailView.bc",
+    "object" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NoteDetailView.o",
+    "swift-dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NoteDetailView.swiftdeps",
+    "swiftmodule" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NoteDetailView~partial.swiftmodule"
+  },
+  "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/neura/Views/Notes/NoteInputView.swift" : {
+    "const-values" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NoteInputView.swiftconstvalues",
+    "dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NoteInputView.d",
+    "diagnostics" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NoteInputView.dia",
+    "index-unit-output-path" : "/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NoteInputView.o",
+    "llvm-bc" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NoteInputView.bc",
+    "object" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NoteInputView.o",
+    "swift-dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NoteInputView.swiftdeps",
+    "swiftmodule" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NoteInputView~partial.swiftmodule"
+  },
+  "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/neura/Views/Notes/NotesSettingsView.swift" : {
+    "const-values" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NotesSettingsView.swiftconstvalues",
+    "dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NotesSettingsView.d",
+    "diagnostics" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NotesSettingsView.dia",
+    "index-unit-output-path" : "/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NotesSettingsView.o",
+    "llvm-bc" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NotesSettingsView.bc",
+    "object" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NotesSettingsView.o",
+    "swift-dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NotesSettingsView.swiftdeps",
+    "swiftmodule" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NotesSettingsView~partial.swiftmodule"
+  },
+  "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/neura/Views/Notes/NotesView.swift" : {
+    "const-values" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NotesView.swiftconstvalues",
+    "dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NotesView.d",
+    "diagnostics" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NotesView.dia",
+    "index-unit-output-path" : "/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NotesView.o",
+    "llvm-bc" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NotesView.bc",
+    "object" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NotesView.o",
+    "swift-dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NotesView.swiftdeps",
+    "swiftmodule" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NotesView~partial.swiftmodule"
+  },
+  "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/neura/Views/Onboarding/DeviceNotSupportedView.swift" : {
+    "const-values" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/DeviceNotSupportedView.swiftconstvalues",
+    "dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/DeviceNotSupportedView.d",
+    "diagnostics" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/DeviceNotSupportedView.dia",
+    "index-unit-output-path" : "/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/DeviceNotSupportedView.o",
+    "llvm-bc" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/DeviceNotSupportedView.bc",
+    "object" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/DeviceNotSupportedView.o",
+    "swift-dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/DeviceNotSupportedView.swiftdeps",
+    "swiftmodule" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/DeviceNotSupportedView~partial.swiftmodule"
+  },
+  "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/neura/Views/Onboarding/MoonAnimationView.swift" : {
+    "const-values" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/MoonAnimationView.swiftconstvalues",
+    "dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/MoonAnimationView.d",
+    "diagnostics" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/MoonAnimationView.dia",
+    "index-unit-output-path" : "/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/MoonAnimationView.o",
+    "llvm-bc" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/MoonAnimationView.bc",
+    "object" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/MoonAnimationView.o",
+    "swift-dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/MoonAnimationView.swiftdeps",
+    "swiftmodule" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/MoonAnimationView~partial.swiftmodule"
+  },
+  "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/neura/Views/Onboarding/OnboardingDownloadingModelProgressView.swift" : {
+    "const-values" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/OnboardingDownloadingModelProgressView.swiftconstvalues",
+    "dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/OnboardingDownloadingModelProgressView.d",
+    "diagnostics" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/OnboardingDownloadingModelProgressView.dia",
+    "index-unit-output-path" : "/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/OnboardingDownloadingModelProgressView.o",
+    "llvm-bc" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/OnboardingDownloadingModelProgressView.bc",
+    "object" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/OnboardingDownloadingModelProgressView.o",
+    "swift-dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/OnboardingDownloadingModelProgressView.swiftdeps",
+    "swiftmodule" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/OnboardingDownloadingModelProgressView~partial.swiftmodule"
+  },
+  "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/neura/Views/Onboarding/OnboardingInstallModelView.swift" : {
+    "const-values" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/OnboardingInstallModelView.swiftconstvalues",
+    "dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/OnboardingInstallModelView.d",
+    "diagnostics" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/OnboardingInstallModelView.dia",
+    "index-unit-output-path" : "/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/OnboardingInstallModelView.o",
+    "llvm-bc" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/OnboardingInstallModelView.bc",
+    "object" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/OnboardingInstallModelView.o",
+    "swift-dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/OnboardingInstallModelView.swiftdeps",
+    "swiftmodule" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/OnboardingInstallModelView~partial.swiftmodule"
+  },
+  "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/neura/Views/Onboarding/OnboardingView.swift" : {
+    "const-values" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/OnboardingView.swiftconstvalues",
+    "dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/OnboardingView.d",
+    "diagnostics" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/OnboardingView.dia",
+    "index-unit-output-path" : "/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/OnboardingView.o",
+    "llvm-bc" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/OnboardingView.bc",
+    "object" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/OnboardingView.o",
+    "swift-dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/OnboardingView.swiftdeps",
+    "swiftmodule" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/OnboardingView~partial.swiftmodule"
+  },
+  "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/neura/Views/Reminders/ReminderEditView.swift" : {
+    "const-values" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ReminderEditView.swiftconstvalues",
+    "dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ReminderEditView.d",
+    "diagnostics" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ReminderEditView.dia",
+    "index-unit-output-path" : "/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ReminderEditView.o",
+    "llvm-bc" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ReminderEditView.bc",
+    "object" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ReminderEditView.o",
+    "swift-dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ReminderEditView.swiftdeps",
+    "swiftmodule" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ReminderEditView~partial.swiftmodule"
+  },
+  "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/neura/Views/Reminders/RemindersView.swift" : {
+    "const-values" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/RemindersView.swiftconstvalues",
+    "dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/RemindersView.d",
+    "diagnostics" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/RemindersView.dia",
+    "index-unit-output-path" : "/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/RemindersView.o",
+    "llvm-bc" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/RemindersView.bc",
+    "object" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/RemindersView.o",
+    "swift-dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/RemindersView.swiftdeps",
+    "swiftmodule" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/RemindersView~partial.swiftmodule"
+  },
+  "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/neura/Views/Settings/AppearanceSettingsView.swift" : {
+    "const-values" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/AppearanceSettingsView.swiftconstvalues",
+    "dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/AppearanceSettingsView.d",
+    "diagnostics" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/AppearanceSettingsView.dia",
+    "index-unit-output-path" : "/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/AppearanceSettingsView.o",
+    "llvm-bc" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/AppearanceSettingsView.bc",
+    "object" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/AppearanceSettingsView.o",
+    "swift-dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/AppearanceSettingsView.swiftdeps",
+    "swiftmodule" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/AppearanceSettingsView~partial.swiftmodule"
+  },
+  "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/neura/Views/Settings/ChatsSettingsView.swift" : {
+    "const-values" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ChatsSettingsView.swiftconstvalues",
+    "dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ChatsSettingsView.d",
+    "diagnostics" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ChatsSettingsView.dia",
+    "index-unit-output-path" : "/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ChatsSettingsView.o",
+    "llvm-bc" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ChatsSettingsView.bc",
+    "object" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ChatsSettingsView.o",
+    "swift-dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ChatsSettingsView.swiftdeps",
+    "swiftmodule" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ChatsSettingsView~partial.swiftmodule"
+  },
+  "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/neura/Views/Settings/CreditsView.swift" : {
+    "const-values" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/CreditsView.swiftconstvalues",
+    "dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/CreditsView.d",
+    "diagnostics" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/CreditsView.dia",
+    "index-unit-output-path" : "/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/CreditsView.o",
+    "llvm-bc" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/CreditsView.bc",
+    "object" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/CreditsView.o",
+    "swift-dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/CreditsView.swiftdeps",
+    "swiftmodule" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/CreditsView~partial.swiftmodule"
+  },
+  "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/neura/Views/Settings/GamificationSettingsView.swift" : {
+    "const-values" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/GamificationSettingsView.swiftconstvalues",
+    "dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/GamificationSettingsView.d",
+    "diagnostics" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/GamificationSettingsView.dia",
+    "index-unit-output-path" : "/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/GamificationSettingsView.o",
+    "llvm-bc" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/GamificationSettingsView.bc",
+    "object" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/GamificationSettingsView.o",
+    "swift-dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/GamificationSettingsView.swiftdeps",
+    "swiftmodule" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/GamificationSettingsView~partial.swiftmodule"
+  },
+  "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/neura/Views/Settings/ModelsSettingsView.swift" : {
+    "const-values" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ModelsSettingsView.swiftconstvalues",
+    "dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ModelsSettingsView.d",
+    "diagnostics" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ModelsSettingsView.dia",
+    "index-unit-output-path" : "/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ModelsSettingsView.o",
+    "llvm-bc" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ModelsSettingsView.bc",
+    "object" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ModelsSettingsView.o",
+    "swift-dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ModelsSettingsView.swiftdeps",
+    "swiftmodule" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/ModelsSettingsView~partial.swiftmodule"
+  },
+  "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/neura/Views/Settings/NeuronSettingsView.swift" : {
+    "const-values" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NeuronSettingsView.swiftconstvalues",
+    "dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NeuronSettingsView.d",
+    "diagnostics" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NeuronSettingsView.dia",
+    "index-unit-output-path" : "/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NeuronSettingsView.o",
+    "llvm-bc" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NeuronSettingsView.bc",
+    "object" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NeuronSettingsView.o",
+    "swift-dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NeuronSettingsView.swiftdeps",
+    "swiftmodule" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/NeuronSettingsView~partial.swiftmodule"
+  },
+  "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/neura/Views/Settings/PersonalizationSettingsView.swift" : {
+    "const-values" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/PersonalizationSettingsView.swiftconstvalues",
+    "dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/PersonalizationSettingsView.d",
+    "diagnostics" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/PersonalizationSettingsView.dia",
+    "index-unit-output-path" : "/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/PersonalizationSettingsView.o",
+    "llvm-bc" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/PersonalizationSettingsView.bc",
+    "object" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/PersonalizationSettingsView.o",
+    "swift-dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/PersonalizationSettingsView.swiftdeps",
+    "swiftmodule" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/PersonalizationSettingsView~partial.swiftmodule"
+  },
+  "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/neura/Views/Settings/SettingsView.swift" : {
+    "const-values" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/SettingsView.swiftconstvalues",
+    "dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/SettingsView.d",
+    "diagnostics" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/SettingsView.dia",
+    "index-unit-output-path" : "/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/SettingsView.o",
+    "llvm-bc" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/SettingsView.bc",
+    "object" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/SettingsView.o",
+    "swift-dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/SettingsView.swiftdeps",
+    "swiftmodule" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/SettingsView~partial.swiftmodule"
+  },
+  "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/neura/freeaiApp.swift" : {
+    "const-values" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/freeaiApp.swiftconstvalues",
+    "dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/freeaiApp.d",
+    "diagnostics" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/freeaiApp.dia",
+    "index-unit-output-path" : "/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/freeaiApp.o",
+    "llvm-bc" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/freeaiApp.bc",
+    "object" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/freeaiApp.o",
+    "swift-dependencies" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/freeaiApp.swiftdeps",
+    "swiftmodule" : "/Users/zecro/ZECRO_STUDIOS_PROJECT_ios/neura/build/neura.build/Debug-iphoneos/neura.build/Objects-normal/arm64/freeaiApp~partial.swiftmodule"
+  }
+}

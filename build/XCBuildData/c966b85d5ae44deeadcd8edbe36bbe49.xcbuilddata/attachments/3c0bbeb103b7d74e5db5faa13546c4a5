@@ -1,0 +1,18 @@
+{
+  "" : {
+    "diagnostics" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift/build/mlx-swift.build/Debug-iphoneos/MLXRandom.build/Objects-normal/arm64/MLXRandom-master.dia",
+    "emit-module-dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift/build/mlx-swift.build/Debug-iphoneos/MLXRandom.build/Objects-normal/arm64/MLXRandom-master-emit-module.d",
+    "emit-module-diagnostics" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift/build/mlx-swift.build/Debug-iphoneos/MLXRandom.build/Objects-normal/arm64/MLXRandom-master-emit-module.dia",
+    "swift-dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift/build/mlx-swift.build/Debug-iphoneos/MLXRandom.build/Objects-normal/arm64/MLXRandom-master.swiftdeps"
+  },
+  "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift/Source/MLXRandom/Random.swift" : {
+    "const-values" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift/build/mlx-swift.build/Debug-iphoneos/MLXRandom.build/Objects-normal/arm64/Random.swiftconstvalues",
+    "dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift/build/mlx-swift.build/Debug-iphoneos/MLXRandom.build/Objects-normal/arm64/Random.d",
+    "diagnostics" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift/build/mlx-swift.build/Debug-iphoneos/MLXRandom.build/Objects-normal/arm64/Random.dia",
+    "index-unit-output-path" : "/mlx-swift.build/Debug-iphoneos/MLXRandom.build/Objects-normal/arm64/Random.o",
+    "llvm-bc" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift/build/mlx-swift.build/Debug-iphoneos/MLXRandom.build/Objects-normal/arm64/Random.bc",
+    "object" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift/build/mlx-swift.build/Debug-iphoneos/MLXRandom.build/Objects-normal/arm64/Random.o",
+    "swift-dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift/build/mlx-swift.build/Debug-iphoneos/MLXRandom.build/Objects-normal/arm64/Random.swiftdeps",
+    "swiftmodule" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift/build/mlx-swift.build/Debug-iphoneos/MLXRandom.build/Objects-normal/arm64/Random~partial.swiftmodule"
+  }
+}

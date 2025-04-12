@@ -1,0 +1,48 @@
+{
+  "" : {
+    "diagnostics" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/swift-numerics/build/swift-numerics.build/Debug-iphoneos/ComplexModule.build/Objects-normal/arm64/ComplexModule-master.dia",
+    "emit-module-dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/swift-numerics/build/swift-numerics.build/Debug-iphoneos/ComplexModule.build/Objects-normal/arm64/ComplexModule-master-emit-module.d",
+    "emit-module-diagnostics" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/swift-numerics/build/swift-numerics.build/Debug-iphoneos/ComplexModule.build/Objects-normal/arm64/ComplexModule-master-emit-module.dia",
+    "swift-dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/swift-numerics/build/swift-numerics.build/Debug-iphoneos/ComplexModule.build/Objects-normal/arm64/ComplexModule-master.swiftdeps"
+  },
+  "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/swift-numerics/Sources/ComplexModule/Arithmetic.swift" : {
+    "const-values" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/swift-numerics/build/swift-numerics.build/Debug-iphoneos/ComplexModule.build/Objects-normal/arm64/Arithmetic.swiftconstvalues",
+    "dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/swift-numerics/build/swift-numerics.build/Debug-iphoneos/ComplexModule.build/Objects-normal/arm64/Arithmetic.d",
+    "diagnostics" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/swift-numerics/build/swift-numerics.build/Debug-iphoneos/ComplexModule.build/Objects-normal/arm64/Arithmetic.dia",
+    "index-unit-output-path" : "/swift-numerics.build/Debug-iphoneos/ComplexModule.build/Objects-normal/arm64/Arithmetic.o",
+    "llvm-bc" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/swift-numerics/build/swift-numerics.build/Debug-iphoneos/ComplexModule.build/Objects-normal/arm64/Arithmetic.bc",
+    "object" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/swift-numerics/build/swift-numerics.build/Debug-iphoneos/ComplexModule.build/Objects-normal/arm64/Arithmetic.o",
+    "swift-dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/swift-numerics/build/swift-numerics.build/Debug-iphoneos/ComplexModule.build/Objects-normal/arm64/Arithmetic.swiftdeps",
+    "swiftmodule" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/swift-numerics/build/swift-numerics.build/Debug-iphoneos/ComplexModule.build/Objects-normal/arm64/Arithmetic~partial.swiftmodule"
+  },
+  "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/swift-numerics/Sources/ComplexModule/Complex.swift" : {
+    "const-values" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/swift-numerics/build/swift-numerics.build/Debug-iphoneos/ComplexModule.build/Objects-normal/arm64/Complex.swiftconstvalues",
+    "dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/swift-numerics/build/swift-numerics.build/Debug-iphoneos/ComplexModule.build/Objects-normal/arm64/Complex.d",
+    "diagnostics" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/swift-numerics/build/swift-numerics.build/Debug-iphoneos/ComplexModule.build/Objects-normal/arm64/Complex.dia",
+    "index-unit-output-path" : "/swift-numerics.build/Debug-iphoneos/ComplexModule.build/Objects-normal/arm64/Complex.o",
+    "llvm-bc" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/swift-numerics/build/swift-numerics.build/Debug-iphoneos/ComplexModule.build/Objects-normal/arm64/Complex.bc",
+    "object" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/swift-numerics/build/swift-numerics.build/Debug-iphoneos/ComplexModule.build/Objects-normal/arm64/Complex.o",
+    "swift-dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/swift-numerics/build/swift-numerics.build/Debug-iphoneos/ComplexModule.build/Objects-normal/arm64/Complex.swiftdeps",
+    "swiftmodule" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/swift-numerics/build/swift-numerics.build/Debug-iphoneos/ComplexModule.build/Objects-normal/arm64/Complex~partial.swiftmodule"
+  },
+  "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/swift-numerics/Sources/ComplexModule/Differentiable.swift" : {
+    "const-values" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/swift-numerics/build/swift-numerics.build/Debug-iphoneos/ComplexModule.build/Objects-normal/arm64/Differentiable.swiftconstvalues",
+    "dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/swift-numerics/build/swift-numerics.build/Debug-iphoneos/ComplexModule.build/Objects-normal/arm64/Differentiable.d",
+    "diagnostics" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/swift-numerics/build/swift-numerics.build/Debug-iphoneos/ComplexModule.build/Objects-normal/arm64/Differentiable.dia",
+    "index-unit-output-path" : "/swift-numerics.build/Debug-iphoneos/ComplexModule.build/Objects-normal/arm64/Differentiable.o",
+    "llvm-bc" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/swift-numerics/build/swift-numerics.build/Debug-iphoneos/ComplexModule.build/Objects-normal/arm64/Differentiable.bc",
+    "object" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/swift-numerics/build/swift-numerics.build/Debug-iphoneos/ComplexModule.build/Objects-normal/arm64/Differentiable.o",
+    "swift-dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/swift-numerics/build/swift-numerics.build/Debug-iphoneos/ComplexModule.build/Objects-normal/arm64/Differentiable.swiftdeps",
+    "swiftmodule" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/swift-numerics/build/swift-numerics.build/Debug-iphoneos/ComplexModule.build/Objects-normal/arm64/Differentiable~partial.swiftmodule"
+  },
+  "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/swift-numerics/Sources/ComplexModule/ElementaryFunctions.swift" : {
+    "const-values" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/swift-numerics/build/swift-numerics.build/Debug-iphoneos/ComplexModule.build/Objects-normal/arm64/ElementaryFunctions.swiftconstvalues",
+    "dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/swift-numerics/build/swift-numerics.build/Debug-iphoneos/ComplexModule.build/Objects-normal/arm64/ElementaryFunctions.d",
+    "diagnostics" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/swift-numerics/build/swift-numerics.build/Debug-iphoneos/ComplexModule.build/Objects-normal/arm64/ElementaryFunctions.dia",
+    "index-unit-output-path" : "/swift-numerics.build/Debug-iphoneos/ComplexModule.build/Objects-normal/arm64/ElementaryFunctions.o",
+    "llvm-bc" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/swift-numerics/build/swift-numerics.build/Debug-iphoneos/ComplexModule.build/Objects-normal/arm64/ElementaryFunctions.bc",
+    "object" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/swift-numerics/build/swift-numerics.build/Debug-iphoneos/ComplexModule.build/Objects-normal/arm64/ElementaryFunctions.o",
+    "swift-dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/swift-numerics/build/swift-numerics.build/Debug-iphoneos/ComplexModule.build/Objects-normal/arm64/ElementaryFunctions.swiftdeps",
+    "swiftmodule" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/swift-numerics/build/swift-numerics.build/Debug-iphoneos/ComplexModule.build/Objects-normal/arm64/ElementaryFunctions~partial.swiftmodule"
+  }
+}

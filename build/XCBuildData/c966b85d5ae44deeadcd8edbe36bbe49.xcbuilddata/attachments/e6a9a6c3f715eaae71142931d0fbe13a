@@ -1,0 +1,178 @@
+{
+  "" : {
+    "diagnostics" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/MLXLLM-master.dia",
+    "emit-module-dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/MLXLLM-master-emit-module.d",
+    "emit-module-diagnostics" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/MLXLLM-master-emit-module.dia",
+    "swift-dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/MLXLLM-master.swiftdeps"
+  },
+  "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/Libraries/MLXLLM/LLMModel.swift" : {
+    "const-values" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/LLMModel.swiftconstvalues",
+    "dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/LLMModel.d",
+    "diagnostics" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/LLMModel.dia",
+    "index-unit-output-path" : "/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/LLMModel.o",
+    "llvm-bc" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/LLMModel.bc",
+    "object" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/LLMModel.o",
+    "swift-dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/LLMModel.swiftdeps",
+    "swiftmodule" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/LLMModel~partial.swiftmodule"
+  },
+  "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/Libraries/MLXLLM/LLMModelFactory.swift" : {
+    "const-values" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/LLMModelFactory.swiftconstvalues",
+    "dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/LLMModelFactory.d",
+    "diagnostics" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/LLMModelFactory.dia",
+    "index-unit-output-path" : "/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/LLMModelFactory.o",
+    "llvm-bc" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/LLMModelFactory.bc",
+    "object" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/LLMModelFactory.o",
+    "swift-dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/LLMModelFactory.swiftdeps",
+    "swiftmodule" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/LLMModelFactory~partial.swiftmodule"
+  },
+  "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/Libraries/MLXLLM/Lora+Data.swift" : {
+    "const-values" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Lora+Data.swiftconstvalues",
+    "dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Lora+Data.d",
+    "diagnostics" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Lora+Data.dia",
+    "index-unit-output-path" : "/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Lora+Data.o",
+    "llvm-bc" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Lora+Data.bc",
+    "object" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Lora+Data.o",
+    "swift-dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Lora+Data.swiftdeps",
+    "swiftmodule" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Lora+Data~partial.swiftmodule"
+  },
+  "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/Libraries/MLXLLM/LoraTrain.swift" : {
+    "const-values" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/LoraTrain.swiftconstvalues",
+    "dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/LoraTrain.d",
+    "diagnostics" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/LoraTrain.dia",
+    "index-unit-output-path" : "/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/LoraTrain.o",
+    "llvm-bc" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/LoraTrain.bc",
+    "object" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/LoraTrain.o",
+    "swift-dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/LoraTrain.swiftdeps",
+    "swiftmodule" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/LoraTrain~partial.swiftmodule"
+  },
+  "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/Libraries/MLXLLM/Models/Cohere.swift" : {
+    "const-values" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Cohere.swiftconstvalues",
+    "dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Cohere.d",
+    "diagnostics" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Cohere.dia",
+    "index-unit-output-path" : "/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Cohere.o",
+    "llvm-bc" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Cohere.bc",
+    "object" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Cohere.o",
+    "swift-dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Cohere.swiftdeps",
+    "swiftmodule" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Cohere~partial.swiftmodule"
+  },
+  "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/Libraries/MLXLLM/Models/Gemma.swift" : {
+    "const-values" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Gemma.swiftconstvalues",
+    "dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Gemma.d",
+    "diagnostics" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Gemma.dia",
+    "index-unit-output-path" : "/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Gemma.o",
+    "llvm-bc" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Gemma.bc",
+    "object" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Gemma.o",
+    "swift-dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Gemma.swiftdeps",
+    "swiftmodule" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Gemma~partial.swiftmodule"
+  },
+  "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/Libraries/MLXLLM/Models/Gemma2.swift" : {
+    "const-values" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Gemma2.swiftconstvalues",
+    "dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Gemma2.d",
+    "diagnostics" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Gemma2.dia",
+    "index-unit-output-path" : "/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Gemma2.o",
+    "llvm-bc" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Gemma2.bc",
+    "object" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Gemma2.o",
+    "swift-dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Gemma2.swiftdeps",
+    "swiftmodule" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Gemma2~partial.swiftmodule"
+  },
+  "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/Libraries/MLXLLM/Models/Internlm2.swift" : {
+    "const-values" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Internlm2.swiftconstvalues",
+    "dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Internlm2.d",
+    "diagnostics" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Internlm2.dia",
+    "index-unit-output-path" : "/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Internlm2.o",
+    "llvm-bc" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Internlm2.bc",
+    "object" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Internlm2.o",
+    "swift-dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Internlm2.swiftdeps",
+    "swiftmodule" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Internlm2~partial.swiftmodule"
+  },
+  "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/Libraries/MLXLLM/Models/Llama.swift" : {
+    "const-values" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Llama.swiftconstvalues",
+    "dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Llama.d",
+    "diagnostics" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Llama.dia",
+    "index-unit-output-path" : "/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Llama.o",
+    "llvm-bc" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Llama.bc",
+    "object" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Llama.o",
+    "swift-dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Llama.swiftdeps",
+    "swiftmodule" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Llama~partial.swiftmodule"
+  },
+  "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/Libraries/MLXLLM/Models/OpenELM.swift" : {
+    "const-values" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/OpenELM.swiftconstvalues",
+    "dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/OpenELM.d",
+    "diagnostics" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/OpenELM.dia",
+    "index-unit-output-path" : "/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/OpenELM.o",
+    "llvm-bc" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/OpenELM.bc",
+    "object" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/OpenELM.o",
+    "swift-dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/OpenELM.swiftdeps",
+    "swiftmodule" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/OpenELM~partial.swiftmodule"
+  },
+  "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/Libraries/MLXLLM/Models/Phi.swift" : {
+    "const-values" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Phi.swiftconstvalues",
+    "dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Phi.d",
+    "diagnostics" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Phi.dia",
+    "index-unit-output-path" : "/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Phi.o",
+    "llvm-bc" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Phi.bc",
+    "object" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Phi.o",
+    "swift-dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Phi.swiftdeps",
+    "swiftmodule" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Phi~partial.swiftmodule"
+  },
+  "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/Libraries/MLXLLM/Models/Phi3.swift" : {
+    "const-values" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Phi3.swiftconstvalues",
+    "dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Phi3.d",
+    "diagnostics" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Phi3.dia",
+    "index-unit-output-path" : "/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Phi3.o",
+    "llvm-bc" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Phi3.bc",
+    "object" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Phi3.o",
+    "swift-dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Phi3.swiftdeps",
+    "swiftmodule" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Phi3~partial.swiftmodule"
+  },
+  "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/Libraries/MLXLLM/Models/PhiMoE.swift" : {
+    "const-values" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/PhiMoE.swiftconstvalues",
+    "dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/PhiMoE.d",
+    "diagnostics" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/PhiMoE.dia",
+    "index-unit-output-path" : "/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/PhiMoE.o",
+    "llvm-bc" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/PhiMoE.bc",
+    "object" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/PhiMoE.o",
+    "swift-dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/PhiMoE.swiftdeps",
+    "swiftmodule" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/PhiMoE~partial.swiftmodule"
+  },
+  "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/Libraries/MLXLLM/Models/Qwen2.swift" : {
+    "const-values" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Qwen2.swiftconstvalues",
+    "dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Qwen2.d",
+    "diagnostics" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Qwen2.dia",
+    "index-unit-output-path" : "/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Qwen2.o",
+    "llvm-bc" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Qwen2.bc",
+    "object" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Qwen2.o",
+    "swift-dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Qwen2.swiftdeps",
+    "swiftmodule" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Qwen2~partial.swiftmodule"
+  },
+  "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/Libraries/MLXLLM/Models/Starcoder2.swift" : {
+    "const-values" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Starcoder2.swiftconstvalues",
+    "dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Starcoder2.d",
+    "diagnostics" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Starcoder2.dia",
+    "index-unit-output-path" : "/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Starcoder2.o",
+    "llvm-bc" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Starcoder2.bc",
+    "object" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Starcoder2.o",
+    "swift-dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Starcoder2.swiftdeps",
+    "swiftmodule" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/Starcoder2~partial.swiftmodule"
+  },
+  "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/Libraries/MLXLLM/SuScaledRotaryEmbedding.swift" : {
+    "const-values" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/SuScaledRotaryEmbedding.swiftconstvalues",
+    "dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/SuScaledRotaryEmbedding.d",
+    "diagnostics" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/SuScaledRotaryEmbedding.dia",
+    "index-unit-output-path" : "/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/SuScaledRotaryEmbedding.o",
+    "llvm-bc" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/SuScaledRotaryEmbedding.bc",
+    "object" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/SuScaledRotaryEmbedding.o",
+    "swift-dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/SuScaledRotaryEmbedding.swiftdeps",
+    "swiftmodule" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/SuScaledRotaryEmbedding~partial.swiftmodule"
+  },
+  "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/Libraries/MLXLLM/SwitchLayers.swift" : {
+    "const-values" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/SwitchLayers.swiftconstvalues",
+    "dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/SwitchLayers.d",
+    "diagnostics" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/SwitchLayers.dia",
+    "index-unit-output-path" : "/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/SwitchLayers.o",
+    "llvm-bc" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/SwitchLayers.bc",
+    "object" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/SwitchLayers.o",
+    "swift-dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/SwitchLayers.swiftdeps",
+    "swiftmodule" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift-examples/build/mlx-libraries.build/Debug-iphoneos/MLXLLM.build/Objects-normal/arm64/SwitchLayers~partial.swiftmodule"
+  }
+}

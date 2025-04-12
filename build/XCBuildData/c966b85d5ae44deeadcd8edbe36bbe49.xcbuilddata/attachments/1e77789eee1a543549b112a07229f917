@@ -1,0 +1,28 @@
+{
+  "" : {
+    "diagnostics" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift/build/mlx-swift.build/Debug-iphoneos/MLXFast.build/Objects-normal/arm64/MLXFast-master.dia",
+    "emit-module-dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift/build/mlx-swift.build/Debug-iphoneos/MLXFast.build/Objects-normal/arm64/MLXFast-master-emit-module.d",
+    "emit-module-diagnostics" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift/build/mlx-swift.build/Debug-iphoneos/MLXFast.build/Objects-normal/arm64/MLXFast-master-emit-module.dia",
+    "swift-dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift/build/mlx-swift.build/Debug-iphoneos/MLXFast.build/Objects-normal/arm64/MLXFast-master.swiftdeps"
+  },
+  "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift/Source/MLXFast/MLXFast.swift" : {
+    "const-values" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift/build/mlx-swift.build/Debug-iphoneos/MLXFast.build/Objects-normal/arm64/MLXFast.swiftconstvalues",
+    "dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift/build/mlx-swift.build/Debug-iphoneos/MLXFast.build/Objects-normal/arm64/MLXFast.d",
+    "diagnostics" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift/build/mlx-swift.build/Debug-iphoneos/MLXFast.build/Objects-normal/arm64/MLXFast.dia",
+    "index-unit-output-path" : "/mlx-swift.build/Debug-iphoneos/MLXFast.build/Objects-normal/arm64/MLXFast.o",
+    "llvm-bc" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift/build/mlx-swift.build/Debug-iphoneos/MLXFast.build/Objects-normal/arm64/MLXFast.bc",
+    "object" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift/build/mlx-swift.build/Debug-iphoneos/MLXFast.build/Objects-normal/arm64/MLXFast.o",
+    "swift-dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift/build/mlx-swift.build/Debug-iphoneos/MLXFast.build/Objects-normal/arm64/MLXFast.swiftdeps",
+    "swiftmodule" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift/build/mlx-swift.build/Debug-iphoneos/MLXFast.build/Objects-normal/arm64/MLXFast~partial.swiftmodule"
+  },
+  "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift/Source/MLXFast/MLXFastKernel.swift" : {
+    "const-values" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift/build/mlx-swift.build/Debug-iphoneos/MLXFast.build/Objects-normal/arm64/MLXFastKernel.swiftconstvalues",
+    "dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift/build/mlx-swift.build/Debug-iphoneos/MLXFast.build/Objects-normal/arm64/MLXFastKernel.d",
+    "diagnostics" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift/build/mlx-swift.build/Debug-iphoneos/MLXFast.build/Objects-normal/arm64/MLXFastKernel.dia",
+    "index-unit-output-path" : "/mlx-swift.build/Debug-iphoneos/MLXFast.build/Objects-normal/arm64/MLXFastKernel.o",
+    "llvm-bc" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift/build/mlx-swift.build/Debug-iphoneos/MLXFast.build/Objects-normal/arm64/MLXFastKernel.bc",
+    "object" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift/build/mlx-swift.build/Debug-iphoneos/MLXFast.build/Objects-normal/arm64/MLXFastKernel.o",
+    "swift-dependencies" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift/build/mlx-swift.build/Debug-iphoneos/MLXFast.build/Objects-normal/arm64/MLXFastKernel.swiftdeps",
+    "swiftmodule" : "/Users/zecro/Library/Developer/Xcode/DerivedData/neura-grzhnlgakmavufaxewggrhwzihko/SourcePackages/checkouts/mlx-swift/build/mlx-swift.build/Debug-iphoneos/MLXFast.build/Objects-normal/arm64/MLXFastKernel~partial.swiftmodule"
+  }
+}
