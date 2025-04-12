@@ -475,18 +475,14 @@ struct ChatView: View {
                 }
                 #endif
             }
-            .sheet(isPresented: $showingContextSelector) {
-                ContextSelectorView(
-                    activeContextDescription: $activeContextDescription,
-                    selectedNoteIDs: $selectedNoteIDs,
-                    useContextType: $useContextType,
-                    calendarFetchParams: $calendarFetchParams,
-                    documentSummaryBinding: $documentSummary
-                )
-                .environmentObject(appManager) // Pass environment objects
-                .environment(llm) // Pass LLM for document processing
+            .sheet(isPresented: $showingContextSelector) { 
+                contextSelectorSheet() 
             }
         }
+        .padding(.bottom, 54) // SIGNIFICANTLY INCREASED padding to push input up more
+        #if os(iOS)
+        .navigationBarTitleDisplayMode(.inline)
+        #endif
     }
 
     // --- New Top Bar Content View --- 
@@ -521,18 +517,6 @@ struct ChatView: View {
                              .padding(8) // Increase tap area
                      }
                      .buttonStyle(DimmingButtonStyle())
-                     
-                     // Settings Trailing
-                     Button(action: {
-                         appManager.playHaptic()
-                         showSettings.toggle()
-                     }) {
-                         // Add padding around the image
-                         Image(systemName: "gearshape")
-                             .font(.system(size: 18))
-                             .padding(8) // Increase tap area
-                     }
-                     .buttonStyle(DimmingButtonStyle())
                 }
             }
             
@@ -555,28 +539,24 @@ struct ChatView: View {
         }
         .padding(.horizontal) // Keep outer padding
         .padding(.top, 8)
-        .padding(.bottom, 4)
+        .padding(.bottom, 16) // Increased bottom padding
         .frame(height: 50) // Slightly increased height to accommodate padding
     }
 
     // --- Context Selection Sheet --- 
-    @ViewBuilder
     private func contextSelectorSheet() -> some View {
-        // Placeholder - build ContextSelectorView next
-        NavigationStack {
-            VStack {
-                Text("Select Context")
-                    .font(.title2)
-                Spacer()
-                Text("TODO: Build Note/Reminder Selection UI")
-                Spacer()
-            }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") { showingContextSelector = false }
-                }
-            }
-        }
+        // Return the actual ContextSelectorView
+        ContextSelectorView(
+            activeContextDescription: $activeContextDescription,
+            selectedNoteIDs: $selectedNoteIDs,
+            useContextType: $useContextType,
+            calendarFetchParams: $calendarFetchParams,
+            documentSummaryBinding: $documentSummary
+        )
+        .environmentObject(appManager) // Pass environment objects
+        .environment(llm) // Pass LLM for document processing
+        // Wrap in NavigationStack if needed for title/buttons, but ContextSelectorView might handle this
+        // NavigationStack { ... } // Might not be needed if ContextSelectorView has its own
     }
     // --- End Context Selection Sheet ---
 

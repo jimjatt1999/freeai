@@ -7,6 +7,18 @@
 
 import SwiftUI
 
+// --- Custom Button Style for Tap Animation ---
+struct NavButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label // The ButtonStyle itself doesn't apply visuals, just passes the state
+            // Add a subtle scale effect based on pressed state
+            .scaleEffect(configuration.isPressed ? 0.96 : 1.0)
+            // Animate the scale effect
+            .animation(.spring(duration: 0.2), value: configuration.isPressed)
+    }
+}
+// --- End Custom Button Style ---
+
 struct BottomNavBar: View {
     @EnvironmentObject var appManager: AppManager
     @Binding var showHome: Bool
@@ -25,10 +37,12 @@ struct BottomNavBar: View {
             HStack(spacing: 0) {
                 // Home button
                 Button {
-                    showHome = true
-                    showChat = false
-                    showFreeDump = false
-                    showFreeBuddy = false
+                    withAnimation {
+                        showHome = true
+                        showChat = false
+                        showFreeDump = false
+                        showFreeBuddy = false
+                    }
                 } label: {
                     VStack(spacing: 2) {
                         Image(systemName: "house.fill")
@@ -41,13 +55,16 @@ struct BottomNavBar: View {
                     }
                     .frame(maxWidth: .infinity)
                 }
+                .buttonStyle(NavButtonStyle()) // Apply custom style
                 
                 // Chat button
                 Button {
-                    showHome = false
-                    showChat = true
-                    showFreeDump = false
-                    showFreeBuddy = false
+                    withAnimation {
+                        showHome = false
+                        showChat = true
+                        showFreeDump = false
+                        showFreeBuddy = false
+                    }
                 } label: {
                     VStack(spacing: 2) {
                         Image(systemName: "bubble.left")
@@ -60,13 +77,16 @@ struct BottomNavBar: View {
                     }
                     .frame(maxWidth: .infinity)
                 }
+                .buttonStyle(NavButtonStyle()) // Apply custom style
                 
                 // FreeDump button
                 Button {
-                    showHome = false
-                    showChat = false
-                    showFreeDump = true
-                    showFreeBuddy = false
+                    withAnimation {
+                        showHome = false
+                        showChat = false
+                        showFreeDump = true
+                        showFreeBuddy = false
+                    }
                 } label: {
                     VStack(spacing: 2) {
                         Image(systemName: "doc.text.fill")
@@ -79,13 +99,16 @@ struct BottomNavBar: View {
                     }
                     .frame(maxWidth: .infinity)
                 }
+                .buttonStyle(NavButtonStyle()) // Apply custom style
                 
                 // FreeBuddy button
                 Button {
-                    showHome = false
-                    showChat = false
-                    showFreeDump = false
-                    showFreeBuddy = true
+                    withAnimation {
+                        showHome = false
+                        showChat = false
+                        showFreeDump = false
+                        showFreeBuddy = true
+                    }
                 } label: {
                     VStack(spacing: 2) {
                         Image(systemName: "bell.fill")
@@ -98,6 +121,7 @@ struct BottomNavBar: View {
                     }
                     .frame(maxWidth: .infinity)
                 }
+                .buttonStyle(NavButtonStyle()) // Apply custom style
             }
             .padding(.vertical, 5)
             .frame(height: 49) // Use iOS standard tab bar height

@@ -103,6 +103,7 @@ struct FreeBuddyView: View {
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 12)
+                .padding(.bottom, 10) // Add bottom padding
                  // --- End Eyes & Level Display ---
 
                 // --- Reminder List (With Sections) --- 
@@ -242,6 +243,7 @@ struct FreeBuddyView: View {
                         .shadow(color: Color.black.opacity(0.1), radius: 2, x: 0, y: 1)
                 )
                 .padding() // Padding around the input box
+                .padding(.bottom, 54) // SIGNIFICANTLY increase extra bottom padding
 
             }
             .navigationTitle("")

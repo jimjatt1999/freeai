@@ -25,6 +25,11 @@ struct NeuraSettingsView: View {
                 }
                 .padding(.vertical)
                 
+                // --- Added: Border Toggle ---
+                Toggle("Show Border", isOn: $appManager.showNeuraEyesBorder)
+                    .tint(.blue) // Optional: style the toggle
+                // --- End Added ---
+                
                 // Settings Pickers
                 Picker("Shape", selection: $appManager.eyeShape) {
                     ForEach(EyeShapeType.allCases) { option in
@@ -68,6 +73,14 @@ struct NeuraSettingsView: View {
                     }
                  }
                  .pickerStyle(.menu) 
+                 
+                 // --- Added: Generation Animation Picker ---
+                 Picker("Generation Animation", selection: $appManager.generationAnimationStyle) {
+                     ForEach(GenerationAnimationStyle.allCases) { style in
+                         Text(style.rawValue).tag(style)
+                     }
+                 }
+                 // --- End Added ---
             }
             .disabled(!appManager.showNeuraEyes) // Disable customization if eyes are off
             // --- End Eye Customization Section ---

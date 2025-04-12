@@ -78,22 +78,25 @@ struct ContentView: View {
                             DailyDigestView()
                                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                                 .edgesIgnoringSafeArea(.top) // Ensure navigation bar respects top safe area
+                                .transition(.opacity.combined(with: .scale(scale: 0.95))) // Smoother transition
                         } else if showNotes {
                             NotesView(showNotes: $showNotes, currentThread: $currentThread)
                                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                                 .edgesIgnoringSafeArea(.top) // Ensure navigation bar respects top safe area
+                                .transition(.opacity.combined(with: .scale(scale: 0.95))) // Smoother transition
                         } else if showFreeBuddy {
                             FreeBuddyView()
                                 .environmentObject(appManager)
                                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                                 .edgesIgnoringSafeArea(.top) // Ensure navigation bar respects top safe area
+                                .transition(.opacity.combined(with: .scale(scale: 0.95))) // Smoother transition
                         } else {
                             ChatView(currentThread: $currentThread, isPromptFocused: $isPromptFocused, showChats: $showChats, showSettings: $showSettings)
                                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                                 .edgesIgnoringSafeArea(.top) // Ensure navigation bar respects top safe area
+                                .transition(.opacity.combined(with: .scale(scale: 0.95))) // Smoother transition
                         }
                     }
-                    .padding(.bottom, 49) // Return to standard tab bar height
                     
                     // Bottom navigation bar (fixed position at bottom)
                     BottomNavBar(
@@ -107,7 +110,6 @@ struct ContentView: View {
                     )
                     .frame(maxHeight: 49) // Standard iOS tab bar height
                 }
-                .edgesIgnoringSafeArea(.bottom) // Ignore bottom safe area in the whole container
                 .ignoresSafeArea(.keyboard) // Add this to ensure keyboard doesn't affect layout
             }
         }
@@ -143,15 +145,6 @@ struct ContentView: View {
                 .if(appManager.userInterfaceIdiom == .phone) { view in
                     view.presentationDetents([.medium, .large])
                 }
-        }
-        // Settings Sheet (Reverted to Sheet)
-        .sheet(isPresented: $showSettings) {
-            SettingsView(currentThread: $currentThread)
-                .environmentObject(appManager)
-                .environment(llm)
-                .presentationDragIndicator(.visible) // Add drag indicator
-                // Allow medium and large detents
-                .presentationDetents([.medium, .large]) 
         }
         .fullScreenCover(isPresented: $showOnboarding, onDismiss: dismissOnboarding) {
             OnboardingView(showOnboarding: $showOnboarding)

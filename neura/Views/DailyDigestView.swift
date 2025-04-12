@@ -57,13 +57,12 @@ struct DailyDigestView: View {
                 bottomControlsView()
                     .padding(.horizontal)
                     .padding(.vertical, 7) // Slightly reduce vertical padding
-                    .background(Color(.systemBackground).shadow(radius: 1, y: -1)) // Add subtle shadow
+                    .padding(.bottom, 54) // SIGNIFICANTLY increased padding below controls
 
             }
             .background(Color(.systemBackground))
             .foregroundColor(.primary)
             .navigationBarHidden(true) // Hide navigation bar since we're using our own top bar
-            .edgesIgnoringSafeArea(.bottom) // Ignore bottom safe area for the bottom controls
         }
         .onAppear {
             loadCachedDigestIfNeeded()
@@ -126,6 +125,7 @@ struct DailyDigestView: View {
             .frame(width: 100, alignment: .trailing) // Match width for balance
         }
         .frame(height: 60) // Maintain overall top bar height
+        .padding(.bottom, 10) // Add padding below the top bar
     }
 
     @ViewBuilder
@@ -242,14 +242,14 @@ struct DailyDigestView: View {
                     if isGenerating {
                         ProgressView().tint(.primary) // Show progress in button
                     } else {
-                        Image(systemName: "wand.and.stars")
+                        // Image(systemName: "wand.and.stars") // REMOVED ICON
                     }
                     Text("Generate \(selectedRange.rawValue)") // Shorten text slightly
                 }
                 .foregroundColor(.primary)
                 .padding(.horizontal, 15)
                 .padding(.vertical, 10)
-                .background(Capsule().fill(Color(.systemGray5))) // Slightly darker capsule
+                .background(Capsule().fill(Color(.systemGray6))) // Use subtle background
             }
             .buttonStyle(.plain)
             .disabled(isGenerating)

@@ -195,6 +195,16 @@ struct NeuraEyesView: View {
                 .frame(width: currentEyeWidth, height: currentEyeHeight)
                 .clipped()
             }
+            .if(appManager.showNeuraEyesBorder) { view in // Conditional Border/BG
+                view
+                    .padding(10) // Add padding inside the border
+                    .background(Color(.secondarySystemBackground)) // Add background
+                    .clipShape(RoundedRectangle(cornerRadius: 12)) // Clip background
+                    .overlay( // Add border
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(Color.black, lineWidth: 1)
+                    )
+            }
             .rotationEffect(rollAngle) // Apply roll effect to eyes HStack
             // --- NEW: Apply Glow Effect --- 
             // Use primary color for glow to work in dark mode, reduce radius/opacity for subtlety
@@ -319,18 +329,26 @@ struct NeuraEyesView: View {
                  var nextCrossEyedOffset: CGFloat = 0
                  var nextIrisScaleY: CGFloat = 1.0
                  
+                 // --- Chance to Pause --- 
+                 if Double.random(in: 0...1) < 0.15 { // 15% chance to just pause
+                     let pauseDelay = Double.random(in: 1.0...2.5)
+                     try? await Task.sleep(nanoseconds: UInt64(pauseDelay * 1_000_000_000))
+                     continue // Skip the rest of the loop and decide next action again
+                 }
+                 // --- End Chance to Pause ---
+                 
                  // Randomize horizontal offset
-                 let possibleOffsetsX: [CGFloat] = [-currentIrisMaxOffset, 0, currentIrisMaxOffset]
-                 var newOffsetX = possibleOffsetsX.filter { $0 != irisOffset }.randomElement() ?? 0
+                 var newOffsetX: CGFloat
                  
                  // Randomize vertical offset
                  var newOffsetY: CGFloat = 0
-                 if Double.random(in: 0...1) < 0.25 { // Increased chance
-                     newOffsetY = CGFloat.random(in: -2.0...2.0) // Slightly larger range
-                 }
                  
                  // --- Chance for Special Moves --- 
                  let randomAction = Double.random(in: 0...1)
+                 
+                 var shouldRoll = false
+                 var lookDirectionX: CGFloat? = nil
+                 var lookDirectionY: CGFloat? = nil
                  
                  if randomAction < 0.15 { // 15% chance to go cross-eyed
                      nextCrossEyedOffset = currentIrisMaxOffset * 0.8 // Move inwards
@@ -338,25 +356,69 @@ struct NeuraEyesView: View {
                      newOffsetY = 0 // Center vertically
                  } else if randomAction < 0.3 { // 15% chance to squint/widen (if not cross-eyed)
                      nextIrisScaleY = Double.random(in: 0...1) < 0.5 ? 0.6 : 1.4 // Squint or Widen
+                     // Allow slight drift during squint/widen
+                     newOffsetX = irisOffset + CGFloat.random(in: -2...2)
+                     newOffsetY = irisOffsetY + CGFloat.random(in: -1...1)
+                 } else if randomAction < 0.4 { // 10% chance to roll eyes
+                     shouldRoll = true
+                     newOffsetX = irisOffset // Keep current offset during roll
+                     newOffsetY = irisOffsetY
+                 } else if randomAction < 0.60 { // Increased chance (20%) to look together
+                     lookDirectionX = [-currentIrisMaxOffset, currentIrisMaxOffset].randomElement() ?? 0
+                     lookDirectionY = CGFloat.random(in: -2.0...2.0)
+                     newOffsetX = lookDirectionX! // Assign the chosen direction
+                     newOffsetY = lookDirectionY! // Assign the chosen direction
+                 } else { // Default random movement
+                     let possibleOffsetsX: [CGFloat] = [-currentIrisMaxOffset, 0, currentIrisMaxOffset]
+                     newOffsetX = possibleOffsetsX.filter { $0 != irisOffset }.randomElement() ?? 0
+                     if Double.random(in: 0...1) < 0.3 { // 30% chance for vertical offset
+                         newOffsetY = CGFloat.random(in: -2.0...2.0) // Slightly larger range
+                     } else {
+                         newOffsetY = 0 // Keep centered vertically more often
+                     }
                  }
                  // --- End Special Moves ---
                  
-                 withAnimation(.interpolatingSpring(stiffness: 150, damping: 15).speed(1.5)) { 
+                 // Use a slightly different animation for rolling or coordinated look
+                 let animation: Animation
+                 if shouldRoll {
+                     animation = .interpolatingSpring(mass: 0.5, stiffness: 100, damping: 10)
+                 } else if lookDirectionX != nil {
+                     // Slightly quicker animation for coordinated look
+                     animation = .interpolatingSpring(stiffness: 180, damping: 18).speed(1.8)
+                 } else {
+                     // Default animation
+                     animation = .interpolatingSpring(stiffness: 150, damping: 15).speed(1.5)
+                 }
+                 
+                 withAnimation(animation) {
                      irisOffset = newOffsetX
                      irisOffsetY = newOffsetY
                      crossEyedOffset = nextCrossEyedOffset
                      irisScaleY = nextIrisScaleY
+                     if shouldRoll {
+                         rollAngle = Angle.degrees(Double.random(in: -8...8))
+                     }
                  }
                  
-                 // Hold the pose for a duration, shorter if cross-eyed or scaled
+                 // Calculate delay
                  var delayMultiplier: Double = 1.0
-                 if nextCrossEyedOffset != 0 || nextIrisScaleY != 1.0 {
-                     delayMultiplier = 0.5 // Shorter hold for special poses
+                 if nextCrossEyedOffset != 0 || nextIrisScaleY != 1.0 || shouldRoll || lookDirectionX != nil {
+                     delayMultiplier = 0.6 // Shorter hold for special poses
                  }
-                 let delay = Double.random(in: 0.6...1.8) * delayMultiplier 
+                 let delay = Double.random(in: 0.5...1.5) * delayMultiplier
                  try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
-            }
-        }
+
+                 // Animate roll back to center if it happened
+                 if shouldRoll {
+                     withAnimation(.interpolatingSpring(mass: 0.5, stiffness: 100, damping: 10)) {
+                         rollAngle = .degrees(0)
+                     }
+                     // Add a short delay after roll back before next move
+                     try? await Task.sleep(nanoseconds: 200_000_000)
+                 }
+             }
+         }
     }
     
     // --- NEW: Generating Animation ---

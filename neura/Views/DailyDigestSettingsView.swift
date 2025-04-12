@@ -13,37 +13,6 @@ struct DailyDigestSettingsView: View {
 
     var body: some View {
         Form {
-            // --- NEW: Terminal Style Section ---
-            Section("Daily Digest Interface Style") {
-                Toggle("Enable Interface Style", isOn: $appManager.dailyDigestTerminalStyleEnabled.animation())
-
-                if appManager.dailyDigestTerminalStyleEnabled {
-                    Picker("Color Scheme", selection: $appManager.dailyDigestColorScheme) {
-                        // Filter out schemes with black backgrounds for Digest
-                        ForEach(TerminalColorScheme.allCases.filter { $0 != .green && $0 != .amber && $0 != .matrix && $0 != .futuristic }) { scheme in
-                            Text(scheme.rawValue).tag(scheme)
-                        }
-                    }
-
-                    Toggle("Scanlines", isOn: $appManager.dailyDigestScanlinesEnabled)
-                    Toggle("Flicker Effect", isOn: $appManager.dailyDigestFlickerEnabled)
-                    // Toggle("Jitter Effect", isOn: $appManager.dailyDigestJitterEnabled) // Keep hidden for now if not fully implemented
-                    // Toggle("Static Effect", isOn: $appManager.dailyDigestStaticEnabled)
-                    Toggle("Pixel Effect", isOn: $appManager.dailyDigestPixelEffectEnabled)
-
-                    Toggle("Window Controls", isOn: $appManager.dailyDigestWindowControlsEnabled)
-                    if appManager.dailyDigestWindowControlsEnabled {
-                        Picker("Control Style", selection: $appManager.dailyDigestWindowControlsStyle) {
-                            ForEach(WindowControlStyle.allCases) { style in
-                                Text(style.rawValue).tag(style)
-                            }
-                        }
-                        .pickerStyle(.segmented)
-                    }
-                }
-            }
-            // --- END NEW ---
-            
             // --- Included Sections ---
             Section(header: Text("Included Sections")) {
                 Toggle(isOn: $appManager.dailyDigestShowCalendar) {

@@ -44,19 +44,6 @@ struct FreeDumpSettingsView: View {
                 
                 // About section
                 aboutSection
-                
-                // Add "Made by" section at the bottom with version number
-                Section {
-                    HStack {
-                        Text("Made by Jimi Olaoya")
-                            .font(.footnote)
-                            .foregroundColor(.secondary)
-                        Spacer()
-                        Text("v\(Bundle.main.releaseVersionNumber ?? "1.0")")
-                            .font(.footnote)
-                            .foregroundColor(.secondary)
-                    }
-                }
             }
             .navigationTitle("Notes Settings")
             .navigationBarTitleDisplayMode(.inline)

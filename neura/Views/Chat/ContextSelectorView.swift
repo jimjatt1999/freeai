@@ -125,7 +125,6 @@ struct ContextSelectorView: View {
     let dotTimer = Timer.publish(every: 0.5, on: .main, in: .common).autoconnect()
     
     // --- NEW: Document Upload State ---
-    @State private var showingDocumentPicker = false
     @State private var isDocumentPickerPresented = false
     @State private var documentProcessingState: DocumentProcessingState = .idle
     @State private var documentTitle: String = ""
@@ -179,13 +178,6 @@ struct ContextSelectorView: View {
             .navigationBarTitleDisplayMode(.inline)
             .onAppear(perform: loadData)
             // --- NEW: Present Document Picker ---
-            .sheet(isPresented: $showingDocumentPicker) {
-                DocumentPicker(processState: $documentProcessingState, 
-                               documentTitle: $documentTitle,
-                               documentSummary: $documentSummary,
-                               progress: $processingProgress,
-                               isCancelled: $isCancelled)
-            }
             .sheet(isPresented: $isDocumentPickerPresented) {
                 DocumentPicker(processState: $documentProcessingState, 
                                documentTitle: $documentTitle,

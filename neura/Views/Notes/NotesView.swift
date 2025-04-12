@@ -26,7 +26,6 @@ struct NotesView: View {
     @Binding var showNotes: Bool
     @Binding var currentThread: Thread?
     
-    @State private var showSettings = false
     @State private var showNewTextNoteSheet = false
     @State private var showNewAudioNoteSheet = false
     @State private var isFabLongPressing = false // State for animation
@@ -195,14 +194,6 @@ struct NotesView: View {
                     // Places settings button in the top-right
                     HStack {
                         Spacer()
-                        
-                        Button {
-                            showSettings = true
-                        } label: {
-                            Image(systemName: "gearshape")
-                                .font(.system(size: 18))
-                                .foregroundColor(.gray)
-                        }
                     }
                     .padding()
                     
@@ -216,6 +207,7 @@ struct NotesView: View {
                              .fontWeight(.bold)
                     }
                 }
+                .padding(.bottom, 10) // Add padding below the header
 
                 if dumpNotes.isEmpty {
                     // Empty state
@@ -392,13 +384,8 @@ struct NotesView: View {
             .navigationBarHidden(true)
             // Add FAB overlay with Tap and Long Press
             .overlay(alignment: .bottomTrailing) { 
-                 fabButton
-            }
-            .sheet(isPresented: $showSettings) {
-                // Settings sheet
-                FreeDumpSettingsView()
-                    .presentationDetents([.medium])
-                    .presentationDragIndicator(.visible)
+                fabButton
+                    .padding(.bottom, 60) // SIGNIFICANTLY increased padding to lift FAB
             }
             // Sheet for Text Notes
             .sheet(isPresented: $showNewTextNoteSheet) { 

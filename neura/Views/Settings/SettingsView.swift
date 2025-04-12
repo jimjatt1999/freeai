@@ -5,65 +5,80 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct SettingsView: View {
     @EnvironmentObject var appManager: AppManager
     @Environment(\.dismiss) var dismiss
     @Environment(LLMEvaluator.self) var llm
+    @Environment(\.modelContext) private var modelContext
     @Binding var currentThread: Thread?
+    @State private var deleteAllChatsAlert = false
 
     var body: some View {
         NavigationStack {
             Form {
-                Section {
+                Section("General") {
                     NavigationLink(destination: AppearanceSettingsView()) {
-                        Label("appearance", systemImage: "paintpalette")
+                        Label("Appearance", systemImage: "paintpalette")
                     }
-
-                    NavigationLink(destination: ChatsSettingsView(currentThread: $currentThread)) {
-                        Label("chats", systemImage: "message")
+                    NavigationLink(destination: NeuraSettingsView()) {
+                        Label("Neura Eyes", systemImage: "eyes")
                     }
-                    
+                    NavigationLink(destination: PersonalizationSettingsView()) {
+                        Label("Personalization", systemImage: "person.crop.circle.badge.questionmark")
+                    }
                     NavigationLink(destination: ModelsSettingsView()) {
                         Label {
-                            Text("models")
-                                .fixedSize()
+                            Text("Models")
                         } icon: {
-                            Image(systemName: "arrow.down.circle")
+                            Image(systemName: "cpu")
                         }
                         .badge(appManager.modelDisplayName(appManager.currentModelName ?? ""))
                     }
-                    
-                    NavigationLink(destination: PersonalizationSettingsView()) {
-                        Label("personalization", systemImage: "person.crop.circle.badge.questionmark")
+                    if appManager.userInterfaceIdiom == .phone {
+                        Toggle(isOn: $appManager.shouldPlayHaptics) {
+                            Label("Haptics", systemImage: "iphone.gen1.radiowaves.left.and.right")
+                        }
+                        .tint(.green)
                     }
-                    
+                }
+                
+                Section("Features") {
+                    NavigationLink(destination: FreeDumpSettingsView()) {
+                        Label("Notes", systemImage: "note.text")
+                    }
                     NavigationLink(destination: DailyDigestSettingsView()) {
-                        Label("daily digest", systemImage: "newspaper")
+                        Label("Daily Digest", systemImage: "newspaper")
                     }
-                    
                     NavigationLink(destination: GamificationSettingsView()) {
-                        Label("gamification", systemImage: "gamecontroller")
+                        Label("Gamification", systemImage: "gamecontroller")
+                    }
+                }
+                
+                Section("Data Management") {
+                    Button(role: .destructive) {
+                        deleteAllChatsAlert = true
+                    } label: {
+                        Label("Delete All Chats", systemImage: "trash")
+                            .foregroundColor(.red)
                     }
                 }
 
                 Section {
                     NavigationLink(destination: CreditsView()) {
-                        Text("credits")
+                        Label("Credits", systemImage: "info.circle")
                     }
-                }
-                
-                // Add "Made by" section at the bottom with version number
-                Section {
+                } header: {
+                    Text("About")
+                } footer: {
                     HStack {
-                        Text("Made by Jimi Olaoya")
-                            .font(.footnote)
-                            .foregroundColor(.secondary)
+                        Text("Designed & Developed by Jimi Olaoya")
                         Spacer()
-                        Text("v\(Bundle.main.releaseVersionNumber ?? "1.0").\(Bundle.main.buildVersionNumber ?? "0")")
-                            .font(.footnote)
-                            .foregroundColor(.secondary)
+                        Text("v1.0") // Simple version
                     }
+                    .font(.footnote)
+                    .foregroundColor(.secondary)
                 }
             }
             .formStyle(.grouped)
@@ -86,11 +101,28 @@ struct SettingsView: View {
                     }
                     #endif
                 }
+            .alert("Delete All Chats?", isPresented: $deleteAllChatsAlert) {
+                Button("Cancel", role: .cancel) { }
+                Button("Delete", role: .destructive) { deleteChats() }
+            } message: {
+                Text("This will permanently delete all chat history and cannot be undone.")
+            }
         }
         #if !os(visionOS)
         .tint(appManager.appTintColor.getColor())
         #endif
         .environment(\.dynamicTypeSize, appManager.appFontSize.getFontSize())
+    }
+    
+    private func deleteChats() {
+        do {
+            currentThread = nil
+            try modelContext.delete(model: Thread.self)
+            try modelContext.delete(model: Message.self)
+            print("All chats deleted.")
+        } catch {
+            print("Failed to delete chats: \(error)")
+        }
     }
 }
 

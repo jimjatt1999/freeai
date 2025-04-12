@@ -171,7 +171,27 @@ struct LaunchView: View {
                 "Hope you brought coffee, \(name). Let's think deep.",
                 "\(name). Input mode engaged.",
                 "Synchronizing with \(name)'s awesomeness... Done.",
-                "Let the brainstorming begin, \(name)!"
+                "Let the brainstorming begin, \(name)!",
+                "Query: Status of \(name)? Status: Ready for ideas.",
+                "The stage is set, the prompt awaits, \(name).",
+                "Engage thinking cap, \(name)!",
+                "Running diagnostics on creativity... All clear, \(name)!",
+                "Hello, \(name). Shall we play a game... of thoughts?",
+                "Warp speed, Mr. \(name)! Oh, wait, I'm local.",
+                "Just finished reading the internet for you, \(name). (Not really).",
+                "\(name), let's architect some knowledge.",
+                "My purpose is clear: Assist \(name).",
+                "Consider me your personal think tank, \(name).",
+                "If thinking is the goal, \(name), you've come to the right AI.",
+                "The prompt is mightier than the sword, eh \(name)?",
+                "Starting local LLM... Powered by \(name)'s device.",
+                "Let's make some cognitive leaps, \(name).",
+                "Hey \(name), remember that idea you had? Let's explore it.",
+                "Analyzing possibilities for \(name)... Limitless.",
+                "Your data stays here, \(name). My processing stays here too.",
+                "Ready to process your prompts, \(name).",
+                "Neura and \(name): Dynamic Duo of Thought!",
+                "What intellectual adventures await us, \(name)?"
             ]
             currentSubtitle = personalizedSubtitles.randomElement() ?? "Hello, \(name)!"
         } else {

@@ -24,22 +24,6 @@ struct AppearanceSettingsView: View {
             }
             #endif
 
-            // --- ADD NavigationLink to Eyes Settings --- 
-             Section(header: Text("Interface Elements")) {
-                 NavigationLink(destination: NeuraSettingsView()) {
-                     Label("Neura Eyes", systemImage: "eyes")
-                 }
-
-                 // --- NEW: Generation Animation Picker ---
-                 Picker("Generation Animation", selection: $appManager.generationAnimationStyle) {
-                     ForEach(GenerationAnimationStyle.allCases) { style in
-                         Text(style.rawValue).tag(style)
-                     }
-                 }
-                 // --- END NEW ---
-             }
-            // --- END NavigationLink --- 
-            
             Section(header: Text("font")) {
                 Picker(selection: $appManager.appFontDesign) {
                     ForEach(AppFontDesign.allCases.sorted(by: { $0.rawValue < $1.rawValue }), id: \.rawValue) { option in
@@ -72,7 +56,7 @@ struct AppearanceSettingsView: View {
             }
             
             // --- UPDATED: Chat Message Style Settings Section ---
-            Section(header: Text("Chat Message Style")) {
+            Section(header: Text("Chat Interface Style")) {
                 Toggle("Enable Custom Terminal Style", isOn: $appManager.chatInterfaceStyleEnabled.animation())
                 
                 // Show terminal settings only if the master toggle is on
@@ -110,6 +94,37 @@ struct AppearanceSettingsView: View {
                 }
             }
             // --- End Chat Message Style Settings ---
+            
+            // --- ADDED: Daily Digest Interface Style Section ---
+            Section("Daily Digest Interface Style") {
+                Toggle("Enable Interface Style", isOn: $appManager.dailyDigestTerminalStyleEnabled.animation())
+
+                if appManager.dailyDigestTerminalStyleEnabled {
+                    Picker("Color Scheme", selection: $appManager.dailyDigestColorScheme) {
+                        // Filter out schemes with black backgrounds for Digest
+                        ForEach(TerminalColorScheme.allCases.filter { $0 != .green && $0 != .amber && $0 != .matrix && $0 != .futuristic }) { scheme in
+                            Text(scheme.rawValue).tag(scheme)
+                        }
+                    }
+
+                    Toggle("Scanlines", isOn: $appManager.dailyDigestScanlinesEnabled)
+                    Toggle("Flicker Effect", isOn: $appManager.dailyDigestFlickerEnabled)
+                    // Toggle("Jitter Effect", isOn: $appManager.dailyDigestJitterEnabled)
+                    // Toggle("Static Effect", isOn: $appManager.dailyDigestStaticEnabled)
+                    Toggle("Pixel Effect", isOn: $appManager.dailyDigestPixelEffectEnabled)
+
+                    Toggle("Window Controls", isOn: $appManager.dailyDigestWindowControlsEnabled)
+                    if appManager.dailyDigestWindowControlsEnabled {
+                        Picker("Control Style", selection: $appManager.dailyDigestWindowControlsStyle) {
+                            ForEach(WindowControlStyle.allCases) { style in
+                                Text(style.rawValue).tag(style)
+                            }
+                        }
+                        .pickerStyle(.segmented)
+                    }
+                }
+            }
+            // --- End Daily Digest Interface Style Section ---
         }
         .formStyle(.grouped)
         .navigationTitle("appearance")

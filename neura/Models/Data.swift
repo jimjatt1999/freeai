@@ -114,17 +114,11 @@ class AppManager: ObservableObject {
     @AppStorage("numberOfVisits") var numberOfVisits = 0
     @AppStorage("numberOfVisitsOfLastRequest") var numberOfVisitsOfLastRequest = 0
     
-    // --- Add Toggle State for Eyes --- 
-    @Published var showNeuraEyes: Bool = true
-    // --- End Toggle State ---
-    
-    // --- Chat Mode State (Moved from ChatView) ---
-    @Published var selectedChatMode: ChatMode = .chat
-    // --- End Chat Mode State ---
-    
-    // --- Eye Customization Settings ---
+    // --- NEW: Neura Eyes Specific Settings ---
+    @AppStorage("showNeuraEyes") var showNeuraEyes: Bool = true // Default ON
+    @AppStorage("showNeuraEyesBorder") var showNeuraEyesBorder: Bool = false // Default OFF
     @AppStorage("eyeShape") var eyeShape: EyeShapeType = .circle
-    @AppStorage("eyeOutlineColor") var eyeOutlineColor: AppTintColor = .monochrome
+    @AppStorage("eyeOutlineColor") var eyeOutlineColor: AppTintColor = .primary
     @AppStorage("eyeBackgroundColor") var eyeBackgroundColor: EyeBackgroundColorType = .white
     @AppStorage("eyeIrisColor") var eyeIrisColor: AppTintColor = .monochrome // Default to monochrome (often black/white)
     @AppStorage("eyeIrisSize") var eyeIrisSize: EyeIrisSizeType = .medium
