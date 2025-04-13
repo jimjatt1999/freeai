@@ -21,6 +21,7 @@ struct OnboardingDownloadingModelProgressView: View {
         "Installing AI directly into your device... no cloud needed!",
         "Moving in furniture for the AI living in your phone...",
         "Teaching your device to think for itself...",
+        "Engineered and brought to life by Jimi Olaoya...",
         "No internet needed! Works even in elevator shafts!",
         "The entire universe of AI, now in your pocket...",
         "Your device is getting smarter by the second...",
@@ -29,6 +30,8 @@ struct OnboardingDownloadingModelProgressView: View {
         "No data vacations to server farms allowed...",
         "If your phone feels warmer, that's just the AI thinking...",
         "100% offline - works great during zombie apocalypses!"
+        "Do you think biological life is a bootloader for aritficial intelligence?"
+        ""
     ]
     
     var installed: Bool {
