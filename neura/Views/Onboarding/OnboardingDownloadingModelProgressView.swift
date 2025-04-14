@@ -29,8 +29,8 @@ struct OnboardingDownloadingModelProgressView: View {
         "All the computing happens right here in your hands...",
         "No data vacations to server farms allowed...",
         "If your phone feels warmer, that's just the AI thinking...",
-        "100% offline - works great during zombie apocalypses!"
-        "Do you think biological life is a bootloader for aritficial intelligence?"
+        "100% offline - works great during zombie apocalypses!",
+        "Do you think biological life is a bootloader for aritficial intelligence?",
         ""
     ]
     

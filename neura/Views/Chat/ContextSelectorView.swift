@@ -320,6 +320,16 @@ struct ContextSelectorView: View {
             }
             .listStyle(.plain) // Cleaner list style
         }
+        // --- NEW: Attach toolbar directly to the note selection view ---
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button("Done") {
+                    prepareAndDismiss(type: .notes)
+                }
+                .disabled(selectedNoteIDs.isEmpty) // Disable if no notes selected
+            }
+        }
+        // --- END NEW ---
     }
 
     // --- NEW: Document Processing View ---
@@ -532,14 +542,9 @@ struct ContextSelectorView: View {
         case .chooseType:
             EmptyView() // No trailing button needed here
         case .selectNotes:
-            Button("Done") {
-                prepareAndDismiss(type: .notes)
-            }
-            .disabled(selectedNoteIDs.isEmpty) // Disable if no notes selected
-        // --- Add Calendar Range Case --- 
+            EmptyView() // Done button is handled by the list view's toolbar now
         case .chooseCalendarRange:
             EmptyView() // No trailing button needed when selecting range
-        // --- End Calendar Range Case --- 
         case .processDocument:
             EmptyView() // No trailing button needed when processing document
         }

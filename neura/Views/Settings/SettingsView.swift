@@ -20,7 +20,7 @@ struct SettingsView: View {
             Form {
                 Section("General") {
                     NavigationLink(destination: AppearanceSettingsView()) {
-                        Label("Appearance", systemImage: "paintpalette")
+                        Label("Aesthetics", systemImage: "paintpalette")
                     }
                     NavigationLink(destination: NeuraSettingsView()) {
                         Label("Neura Eyes", systemImage: "eyes")

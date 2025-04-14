@@ -24,14 +24,14 @@ struct AppearanceSettingsView: View {
             }
             #endif
 
-            Section(header: Text("font")) {
+            Section(header: Text("App font")) {
                 Picker(selection: $appManager.appFontDesign) {
                     ForEach(AppFontDesign.allCases.sorted(by: { $0.rawValue < $1.rawValue }), id: \.rawValue) { option in
                         Text(String(describing: option).lowercased())
                             .tag(option)
                     }
                 } label: {
-                    Label("design", systemImage: "textformat")
+                    Label("type", systemImage: "textformat")
                 }
 
                 Picker(selection: $appManager.appFontWidth) {
@@ -127,7 +127,7 @@ struct AppearanceSettingsView: View {
             // --- End Daily Digest Interface Style Section ---
         }
         .formStyle(.grouped)
-        .navigationTitle("appearance")
+        .navigationTitle("aesthetics")
         #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
         #endif
