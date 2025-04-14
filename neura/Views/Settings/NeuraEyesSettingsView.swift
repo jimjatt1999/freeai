@@ -77,6 +77,14 @@ struct NeuraSettingsView: View {
                  }
                  // --- End Added ---
                  
+                 // --- NEW: Border Background Picker ---
+                 Picker("Border Background", selection: $appManager.eyeBorderBackgroundColor) {
+                     ForEach(EyeBorderBackgroundColor.allCases) { colorOption in
+                         Text(colorOption.rawValue.capitalized).tag(colorOption)
+                     }
+                 }
+                 // --- END NEW ---
+                 
                  // --- NEW: Border Toggle ---
                  Toggle("Show Border", isOn: $appManager.showNeuraEyesBorder)
                      .tint(appManager.appTintColor.getColor()) // Optional: Use app tint for the toggle

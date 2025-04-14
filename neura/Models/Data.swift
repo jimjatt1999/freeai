@@ -141,7 +141,9 @@ class AppManager: ObservableObject {
     
     // --- NEW: Setting to show/hide the border around Neura Eyes --- 
     @AppStorage("showNeuraEyesBorder") var showNeuraEyesBorder: Bool = true
-    // --- End NEW ---
+    // --- NEW: Border Background Color Setting ---
+    @AppStorage("eyeBorderBackgroundColor") var eyeBorderBackgroundColor: EyeBorderBackgroundColor = .system
+    // --- END NEW ---
     
     // --- Buddy Gamification ---
     @AppStorage("buddyXP") var buddyXP: Int = 0
@@ -787,7 +789,37 @@ enum EyeStrokeWidthType: String, CaseIterable, Identifiable {
     var id: String { self.rawValue }
 }
 
-// --- End Eye Customization Enums ---
+// --- NEW: Eye Border Background Color Enum ---
+enum EyeBorderBackgroundColor: String, CaseIterable, Identifiable {
+    case system = "System Background"
+    case black = "Black"
+    case white = "White"
+    case red = "Red"
+    case green = "Green"
+    case blue = "Blue"
+    case yellow = "Yellow"
+    case purple = "Purple"
+    case lightBlue = "Light Blue" // Added new case
+    // Add more colors as needed
+
+    var id: String { self.rawValue }
+
+    func getColor() -> Color {
+        switch self {
+        case .system: return Color(.secondarySystemBackground) // Use secondary for contrast
+        case .black: return .black
+        case .white: return .white
+        case .red: return .red
+        case .green: return .green
+        case .blue: return .blue
+        case .yellow: return .yellow
+        case .purple: return .purple
+        // Added color definition for light blue
+        case .lightBlue: return Color(red: 0.85, green: 0.9, blue: 0.95)
+        }
+    }
+}
+// --- END NEW ---
 
 // --- Eye Tap Action Enum ---
 enum EyeTapActionType: String, CaseIterable, Identifiable {

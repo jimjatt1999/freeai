@@ -199,7 +199,7 @@ struct NeuraEyesView: View {
             .if(appManager.showNeuraEyesBorder) { view in
                 view
                     .padding(10) // Add padding inside the border
-                    .background(Color(.secondarySystemBackground)) // Add background
+                    .background(appManager.eyeBorderBackgroundColor.getColor())
                     .clipShape(RoundedRectangle(cornerRadius: 12)) // Clip background
                     .overlay( // Add border
                         RoundedRectangle(cornerRadius: 12)
