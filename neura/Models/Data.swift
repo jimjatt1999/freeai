@@ -814,8 +814,8 @@ enum EyeBorderBackgroundColor: String, CaseIterable, Identifiable {
         case .blue: return .blue
         case .yellow: return .yellow
         case .purple: return .purple
-        // Added color definition for light blue
-        case .lightBlue: return Color(red: 0.85, green: 0.9, blue: 0.95)
+        // Updated color definition for light blue using hex #4384cc
+        case .lightBlue: return Color(red: 0.263, green: 0.518, blue: 0.8)
         }
     }
 }
