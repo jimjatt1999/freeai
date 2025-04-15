@@ -8,6 +8,7 @@ import SwiftUI
 @preconcurrency import SwiftData
 import LinkPresentation
 import EventKit
+import Network
 
 // --- NEW: Terminal Style Settings (Moved outside AppManager) ---
 enum TerminalColorScheme: String, CaseIterable, Identifiable {
@@ -100,6 +101,64 @@ enum RecurrenceRule: String, Codable, CaseIterable, Identifiable {
     var id: String { self.rawValue }
 }
 // --- END NEW ---
+
+// --- Network Connectivity Helper ---
+class NetworkMonitor {
+    static let shared = NetworkMonitor()
+    private var monitor: NWPathMonitor?
+    private var isMonitoring = false
+    
+    @Published var isConnected: Bool = true
+    @Published var connectionType: ConnectionType = .wifi
+    
+    enum ConnectionType {
+        case wifi
+        case cellular
+        case ethernet
+        case unknown
+    }
+    
+    private init() {
+        startMonitoring()
+    }
+    
+    deinit {
+        stopMonitoring()
+    }
+    
+    func startMonitoring() {
+        guard !isMonitoring else { return }
+        
+        monitor = NWPathMonitor()
+        let queue = DispatchQueue(label: "NetworkMonitor")
+        
+        monitor?.pathUpdateHandler = { [weak self] path in
+            DispatchQueue.main.async {
+                self?.isConnected = path.status == .satisfied
+                
+                if path.usesInterfaceType(.wifi) {
+                    self?.connectionType = .wifi
+                } else if path.usesInterfaceType(.cellular) {
+                    self?.connectionType = .cellular
+                } else if path.usesInterfaceType(.wiredEthernet) {
+                    self?.connectionType = .ethernet
+                } else {
+                    self?.connectionType = .unknown
+                }
+            }
+        }
+        
+        monitor?.start(queue: queue)
+        isMonitoring = true
+    }
+    
+    func stopMonitoring() {
+        guard isMonitoring, let monitor = monitor else { return }
+        monitor.cancel()
+        self.monitor = nil
+        isMonitoring = false
+    }
+}
 
 class AppManager: ObservableObject {
     // @AppStorage("systemPrompt") var systemPrompt = "you are a helpful assistant" // Removed system prompt setting
@@ -348,7 +407,15 @@ class AppManager: ObservableObject {
     func addInstalledModel(_ model: String) {
         if !installedModels.contains(model) {
             installedModels.append(model)
+            
+            // Also mark in UserDefaults for LLMEvaluator to recognize
+            UserDefaults.standard.set(true, forKey: "model_installed_\(model)")
         }
+    }
+    
+    func isModelInstalled(_ modelID: String) -> Bool {
+        return installedModels.contains(modelID) || 
+               UserDefaults.standard.bool(forKey: "model_installed_\(modelID)")
     }
     
     func modelDisplayName(_ internalName: String) -> String {

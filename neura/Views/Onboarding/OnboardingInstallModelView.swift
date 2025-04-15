@@ -169,10 +169,11 @@ struct OnboardingInstallModelView: View {
                     .fontWeight(.semibold)
                     .frame(maxWidth: .infinity)
                     .frame(height: 60)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(Color(.systemBackground))
                     .background(Color.primary)
                     .cornerRadius(16)
             }
+            .buttonStyle(PlainButtonStyle())
             .disabled(filteredModels.isEmpty && appManager.installedModels.isEmpty)
             .padding(.horizontal, 20)
             .padding(.vertical, 30)

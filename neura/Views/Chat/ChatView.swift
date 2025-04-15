@@ -326,7 +326,7 @@ struct ChatView: View {
                 
                 Image(systemName: "arrow.up")
                     .font(.system(size: 14, weight: .bold))
-                    .foregroundColor(isPromptEmpty ? .gray : .white)
+                    .foregroundColor(isPromptEmpty ? .gray : Color(.systemBackground))
             }
         }
         .disabled(isPromptEmpty)

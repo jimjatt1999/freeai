@@ -8,6 +8,7 @@ import SwiftUI
 import SwiftData
 import MLXLLM
 import MLXLMCommon
+import Network
 
 @main
 struct freeaiApp: App {
@@ -130,6 +131,29 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         let mainWindow = NSApp.windows.first
         mainWindow?.delegate = self
+        
+        // Initialize the network monitor at app start - ONLY needed for initial downloads
+        _ = NetworkMonitor.shared
+        
+        // Set up URL cache for better offline performance
+        configureURLCache()
+    }
+    
+    // Configure URL cache for optimal offline model storage
+    private func configureURLCache() {
+        // Increase URL cache sizes
+        let diskCapacity = 1024 * 1024 * 500  // 500 MB disk cache
+        let memoryCapacity = 1024 * 1024 * 100  // 100 MB memory cache
+        let sharedCache = URLCache(memoryCapacity: memoryCapacity, diskCapacity: diskCapacity)
+        URLCache.shared = sharedCache
+        
+        // Configure URLSession for longer cache lifespan
+        let config = URLSessionConfiguration.default
+        config.requestCachePolicy = .returnCacheDataElseLoad
+        config.urlCache = sharedCache
+        
+        // Apply the configuration
+        URLSession.shared.configuration.urlCache = sharedCache
     }
     
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {

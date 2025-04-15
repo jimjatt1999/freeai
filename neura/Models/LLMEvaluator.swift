@@ -12,6 +12,24 @@ import SwiftUI
 
 enum LLMEvaluatorError: Error {
     case modelNotFound(String)
+    case modelNotDownloaded(String)
+}
+
+/// Preference to prioritize offline access even when online
+@MainActor
+class ModelPreferences {
+    static let shared = ModelPreferences()
+    
+    /// Set to true to always prefer offline model loading without network check
+    var forceOfflineMode: Bool {
+        get { UserDefaults.standard.bool(forKey: "force_offline_model_loading") }
+        set { UserDefaults.standard.set(newValue, forKey: "force_offline_model_loading") }
+    }
+    
+    /// Toggle to always use offline mode
+    func toggleOfflineMode() {
+        forceOfflineMode = !forceOfflineMode
+    }
 }
 
 @Observable
@@ -62,6 +80,15 @@ class LLMEvaluator {
 
     var loadState = LoadState.idle
 
+    /// Try to force offline mode for a specific model
+    func forceLocalModelUse(modelID: String) -> Bool {
+        if case .idle = loadState {
+            ModelPreferences.shared.forceOfflineMode = true
+            return true
+        }
+        return false
+    }
+
     /// load and return the model -- can be called multiple times, subsequent calls will
     /// just return the loaded model
     func load(modelName: String) async throws -> ModelContainer {
@@ -78,18 +105,82 @@ class LLMEvaluator {
             let cache = URLCache.shared
             cache.memoryCapacity = 100 * 1024 * 1024  // 100MB memory cache
             
+            // Configure URL session with better timeout handling
+            let config = URLSessionConfiguration.default
+            config.timeoutIntervalForRequest = 60.0  // 60 seconds timeout for requests
+            config.timeoutIntervalForResource = 300.0  // 5 minutes timeout for resources
+            config.waitsForConnectivity = true  // Wait for connectivity if offline
+            URLSession.shared.configuration.timeoutIntervalForRequest = config.timeoutIntervalForRequest
+            URLSession.shared.configuration.timeoutIntervalForResource = config.timeoutIntervalForResource
+            
             Task { @MainActor in
-                self.modelInfo = "Preparing to download \(self.modelConfiguration.name)..."
+                self.modelInfo = "Preparing to load \(self.modelConfiguration.name)..."
             }
 
-            let modelContainer = try await LLMModelFactory.shared.loadContainer(configuration: model) {
-                progress in
-                Task { @MainActor in
-                    self.modelInfo =
-                        "Downloading \(self.modelConfiguration.name): \(Int(progress.fractionCompleted * 100))%"
-                    self.progress = progress.fractionCompleted
+            // Always try to load from local cache first if model was previously installed
+            // or offline mode is forced
+            let forceOffline = ModelPreferences.shared.forceOfflineMode
+            let wasInstalled = UserDefaults.standard.bool(forKey: "model_installed_\(model.id)")
+            
+            if wasInstalled || forceOffline {
+                do {
+                    Task { @MainActor in
+                        self.modelInfo = "Loading local model \(self.modelConfiguration.name)..."
+                    }
+                    
+                    let modelContainer = try await LLMModelFactory.shared.loadContainer(
+                        configuration: model
+                    )
+                    
+                    modelInfo = "Loaded \(self.modelConfiguration.id).  Weights: \(MLX.GPU.activeMemory / 1024 / 1024)M"
+                    loadState = .loaded(modelContainer)
+                    return modelContainer
+                } catch {
+                    // If local load fails and we're in force offline mode, throw error
+                    if forceOffline {
+                        Task { @MainActor in
+                            self.modelInfo = "Local model not available and offline mode is enabled."
+                        }
+                        throw LLMEvaluatorError.modelNotDownloaded(modelName)
+                    }
+                    
+                    // Otherwise we'll fall through to the download path
+                    Task { @MainActor in
+                        self.modelInfo = "Local model not available. Attempting download..."
+                    }
                 }
             }
+            
+            // Try to load model with potential download
+            let modelContainer: ModelContainer
+            do {
+                modelContainer = try await LLMModelFactory.shared.loadContainer(configuration: model) { progress in
+                    Task { @MainActor in
+                        self.modelInfo =
+                            "Downloading \(self.modelConfiguration.name): \(Int(progress.fractionCompleted * 100))%"
+                        self.progress = progress.fractionCompleted
+                    }
+                }
+                
+                // Mark model as installed for future reference
+                UserDefaults.standard.set(true, forKey: "model_installed_\(model.id)")
+            } catch {
+                // If download fails but we already have it installed, try one more time with local-only
+                if UserDefaults.standard.bool(forKey: "model_installed_\(model.id)") {
+                    Task { @MainActor in
+                        self.modelInfo = "Download failed. Trying to use locally cached model..."
+                    }
+                    
+                    // Try to load from local cache with no download attempt
+                    modelContainer = try await LLMModelFactory.shared.loadContainer(
+                        configuration: model
+                    )
+                } else {
+                    // No previously successful installation and current download failed
+                    throw error
+                }
+            }
+            
             modelInfo =
                 "Loaded \(self.modelConfiguration.id).  Weights: \(MLX.GPU.activeMemory / 1024 / 1024)M"
             loadState = .loaded(modelContainer)
@@ -162,8 +253,31 @@ class LLMEvaluator {
             }
             stat = " Tokens/second: \(String(format: "%.3f", result.tokensPerSecond))"
 
+        } catch let error as URLError {
+            // Handle URL-specific errors with more helpful offline-first messages
+            let errorMessage: String
+            switch error.code {
+            case .timedOut:
+                errorMessage = "Connection timed out. Since models are designed to work offline, try restarting the app to use the local copy."
+            case .notConnectedToInternet:
+                errorMessage = "Not connected to the internet. If this model was previously downloaded, try restarting the app to use the local copy."
+            case .networkConnectionLost:
+                errorMessage = "Network connection was lost. If this model was previously downloaded, restart the app to force using local copy."
+            case .cannotFindHost, .cannotConnectToHost:
+                errorMessage = "Cannot connect to server. If this model was previously downloaded, restart the app to force using local copy."
+            default:
+                errorMessage = "Network error: \(error.localizedDescription). If this model was previously downloaded, restart the app to use local copy."
+            }
+            output = errorMessage
         } catch {
-            output = "Failed: \(error)"
+            // Check if it's a model loading error
+            if error.localizedDescription.contains("file doesn't exist") || 
+               error.localizedDescription.contains("no such file") {
+                output = "Model not found locally. Please download the model first with an internet connection."
+            } else {
+                // General error handling for non-URL errors
+                output = "Failed: \(error)"
+            }
         }
 
         running = false
@@ -247,8 +361,35 @@ class LLMEvaluator {
                     
                     continuation.finish()
                     
+                } catch let error as URLError {
+                    // Handle URL-specific errors with more helpful offline-first messages
+                    let errorMessage: String
+                    switch error.code {
+                    case .timedOut:
+                        errorMessage = "Connection timed out. Since models are designed to work offline, try restarting the app to use the local copy."
+                    case .notConnectedToInternet:
+                        errorMessage = "Not connected to the internet. If this model was previously downloaded, try restarting the app to use the local copy."
+                    case .networkConnectionLost:
+                        errorMessage = "Network connection was lost. If this model was previously downloaded, restart the app to force using local copy."
+                    case .cannotFindHost, .cannotConnectToHost:
+                        errorMessage = "Cannot connect to server. If this model was previously downloaded, restart the app to force using local copy."
+                    default:
+                        errorMessage = "Network error: \(error.localizedDescription). If this model was previously downloaded, restart the app to use local copy."
+                    }
+                    continuation.finish(throwing: NSError(domain: "NetworkError", 
+                                                        code: error.code.rawValue, 
+                                                        userInfo: [NSLocalizedDescriptionKey: errorMessage]))
                 } catch {
-                    continuation.finish(throwing: error)
+                    // Check if it's a model loading error
+                    if error.localizedDescription.contains("file doesn't exist") || 
+                       error.localizedDescription.contains("no such file") {
+                        let errorMessage = "Model not found locally. Please download the model first with an internet connection."
+                        continuation.finish(throwing: NSError(domain: "ModelError", 
+                                                            code: 404, 
+                                                            userInfo: [NSLocalizedDescriptionKey: errorMessage]))
+                    } else {
+                        continuation.finish(throwing: error)
+                    }
                 }
                 
                 running = false
